@@ -1,0 +1,60 @@
+buildscript {
+    ext.kotlin_version = '2.1.10'
+    ext.ausweisapp_version = '2.3.0'
+    ext.sdkwrapper_version = "$ausweisapp_version"
+
+    repositories {
+        google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.8.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jmailen.gradle:kotlinter-gradle:5.0.1"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.8.6"
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.52.0'
+    }
+}
+
+plugins {
+    id("org.sonarqube") version "5.0.0.4638"
+    id("java")
+    id("org.jetbrains.kotlinx.kover") version "0.9.1"
+}
+
+def isNonStable = { String version ->
+  def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+  def regex = /^[0-9,.v-]+(-r)?$/
+  return !stableKeyword && !(version ==~ regex)
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "$project.rootDir/ausweisapp" }
+    }
+    apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+    tasks.named("dependencyUpdates").configure {
+      checkForGradleUpdate = false
+      rejectVersionIf {
+        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+      }
+    }
+}
+
+task tarball(type: Tar) {
+    into ('/') {
+        from rootDir
+        include '**'
+        exclude ('dist', '**/build/**', '.reviewboardrc', '.gradle', '.idea', '**/*.aar')
+     }
+
+    archiveFileName = "SDKWrapper-Android-Sources.tgz"
+    destinationDirectory = file('build/tar')
+    compression = Compression.GZIP
+}

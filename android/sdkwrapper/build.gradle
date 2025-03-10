@@ -1,0 +1,193 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+apply plugin: "org.jmailen.kotlinter"
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: 'org.jetbrains.kotlinx.kover'
+
+android {
+    compileSdk 35
+    buildToolsVersion = "35.0.1"
+    namespace "com.governikus.ausweisapp.sdkwrapper"
+
+    defaultConfig {
+        minSdkVersion 28
+        targetSdkVersion 35
+        base {
+            archivesName = "sdkwrapper"
+        }
+
+        consumerProguardFiles 'consumer-rules.pro'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        testOptions.unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+        allWarningsAsErrors = true
+        freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn", "-Xstring-concat=inline"] // Used for UnitTests, can be removed with kotlin 1.7.0
+    }
+
+    lint {
+        checkDependencies false
+        warningsAsErrors = true
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "${archivesBaseName}-${variant.name}-${sdkwrapper_version}.aar"
+        }
+    }
+
+    publishing {
+        singleVariant("release")
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.sources", "src/main"
+        property "sonar.tests", "src/test"
+    }
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    archiveClassifier = "sources"
+    archiveVersion = sdkwrapper_version
+}
+
+afterEvaluate {
+    if (System.getenv("GPG_ID")) {
+        signing {
+            setProperty("signing.gnupg.keyName", System.getenv("GPG_ID")[-8..-1])
+            setProperty("signing.gnupg.passphrase", System.getenv("GPG_PSW"))
+            useGpgCmd()
+            sign publishing.publications
+        }
+    }
+    publishing {
+        repositories {
+            maven {
+                name = 'NexusSnapshot'
+                credentials {
+                    username System.getenv("NEXUS_USERNAME")
+                    password System.getenv("NEXUS_PSW")
+                }
+                url = "https://repo.govkg.de/repository/ausweisapp-snapshots"
+            }
+            maven {
+                name = 'NexusRelease'
+                credentials {
+                    username System.getenv("NEXUS_USERNAME")
+                    password System.getenv("NEXUS_PSW")
+                }
+                url = "https://repo.govkg.de/repository/ausweisapp-releases"
+            }
+            maven {
+                name = 'Central'
+                credentials {
+                    username System.getenv("CENTRAL_USERNAME")
+                    password System.getenv("CENTRAL_PSW")
+                }
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+            }
+        }
+        publications.all {
+            publication -> pom {
+                name = 'AusweisApp2 SDK Wrapper'
+                description = 'Convenient authentication SDK'
+                url = 'https://www.governikus.de'
+                licenses {
+                    license {
+                        name = 'EUPL-v1.2'
+                        url = 'https://eupl.eu/1.2/en/'
+                    }
+                }
+                developers {
+                    developer {
+                        email = 'support@ausweisapp.de'
+                        organization = 'Governikus'
+                        organizationUrl = 'https://www.governikus.de/'
+                        timezone = 'Europe/Berlin'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/Governikus/AusweisApp2Wrapper-Android'
+                }
+            }
+        }
+        publications {
+            snapshot(MavenPublication) {
+                from components.release
+
+                groupId = 'com.governikus.ausweisapp'
+                artifactId = 'sdkwrapper'
+                version = "${sdkwrapper_version}-SNAPSHOT"
+
+                artifact(sourceJar)
+            }
+            release(MavenPublication) {
+                from components.release
+
+                groupId = 'com.governikus.ausweisapp'
+                artifactId = 'sdkwrapper'
+                version = sdkwrapper_version
+
+                artifact(sourceJar)
+            }
+        }
+    }
+}
+
+def useLocal = file("${rootDir}/ausweisapp/ausweisapp.aar").exists();
+
+dependencies {
+    if (useLocal) {
+        implementation project(':ausweisapp')
+        println "⚠   ⚠   ⚠   ⚠   WARNING  ⚠   ⚠   ⚠   ⚠\n" +
+        "   Using local SDK might be outdated  \n" +
+        "⚠  Delete local SDK in lib folder to ⚠\n" +
+        "   use latest version!                \n" +
+        "⚠   ⚠   ⚠   ⚠   WARNING  ⚠   ⚠   ⚠   ⚠"
+    }
+    else {
+        implementation "com.governikus:ausweisapp:$ausweisapp_version"
+    }
+
+    implementation 'com.google.code.gson:gson:2.12.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1'
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1'
+
+}
