@@ -123,7 +123,7 @@ pipeline {
 			steps {
 				dir('ios') {
 					script {
-						PROJECT_VERSION = sh(
+						def PROJECT_VERSION = sh(
 							script: 'hg log --template "{latesttag}" --rev .',
 							returnStdout: true
 						)
@@ -173,7 +173,7 @@ pipeline {
 
 						def artifactPrefix = "SDKWrapper-${params.REVIEWBOARD_REVIEW_BRANCH}"
 						sh 'cd AusweisApp2SDKWrapper; mkdir -p build/dist'
-						sh "cd AusweisApp2SDKWrapper/build/spm; cmake -E tar cvfJ ../dist/${artifactPrefix}.xcframework.tar.xz AusweisApp2SDKWrapper.xcframework Package.swift Sources"
+						sh "cd AusweisApp2SDKWrapper/build/spm; cmake -E tar cvfJ ../dist/${artifactPrefix}-iOS.tar.xz AusweisApp2SDKWrapper.xcframework Package.swift Sources"
 						sh "cd AusweisApp2SDKWrapper/build; cmake -E tar cvfJ dist/${artifactPrefix}-iphoneos.framework.dSYM.tar.xz AusweisApp2SDKWrapper-iphoneos.xcarchive/dSYMs/AusweisApp2SDKWrapper.framework.dSYM"
 						sh "cd AusweisApp2SDKWrapper/build; cmake -E tar cvfJ dist/${artifactPrefix}-iphonesimulator-arm64.framework.dSYM.tar.xz AusweisApp2SDKWrapper-iphonesimulator-arm64.xcarchive/dSYMs/AusweisApp2SDKWrapper.framework.dSYM"
 						sh "cd AusweisApp2SDKWrapper/build; cmake -E tar cvfJ dist/${artifactPrefix}-iphonesimulator-x86_64.framework.dSYM.tar.xz AusweisApp2SDKWrapper-iphonesimulator-x86_64.xcarchive/dSYMs/AusweisApp2SDKWrapper.framework.dSYM"
@@ -185,7 +185,7 @@ pipeline {
 			steps {
 				dir('ios/AusweisApp2SDKWrapper/build/dist') {
 					archiveArtifacts artifacts: 'SDKWrapper-iOS-Sources.tar.xz'
-					archiveArtifacts artifacts: 'SDKWrapper-*.xcframework.tar.xz'
+					archiveArtifacts artifacts: 'SDKWrapper-*-iOS.tar.xz'
 					archiveArtifacts artifacts: 'SDKWrapper-*-iphoneos.framework.dSYM.tar.xz'
 					archiveArtifacts artifacts: 'SDKWrapper-*-iphonesimulator-arm64.framework.dSYM.tar.xz'
 					archiveArtifacts artifacts: 'SDKWrapper-*-iphonesimulator-x86_64.framework.dSYM.tar.xz'

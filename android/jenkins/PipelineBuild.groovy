@@ -100,7 +100,7 @@ pipeline {
 			steps {
 				dir('android') {
 					script {
-						PROJECT_VERSION = sh(
+						def PROJECT_VERSION = sh(
 							script: 'hg log --template "{latesttag}" --rev .',
 							returnStdout: true
 						)
@@ -115,6 +115,8 @@ pipeline {
 				dir('android') {
 					sh './gradlew assemble'
 					sh "./gradlew -Dmaven.repo.local=${WORKSPACE}/android/dist publishReleasePublicationToMavenLocal"
+					sh "rm ${WORKSPACE}/android/dist/com/governikus/ausweisapp/sdkwrapper/maven-metadata-local.xml"
+					sh "cd ${WORKSPACE}/android/dist; cmake -E tar cvfJ SDKWrapper-${REVIEWBOARD_REVIEW_BRANCH}-Android.tar.xz com"
 				}
 			}
 		}
@@ -159,7 +161,7 @@ pipeline {
 					archiveArtifacts artifacts: 'tester/build/outputs/apk/release/sdkwrapper-tester-release-*.apk'
 					archiveArtifacts artifacts: 'sdkwrapper/build/outputs/aar/sdkwrapper-debug-*.aar'
 					archiveArtifacts artifacts: 'sdkwrapper/build/outputs/aar/sdkwrapper-release-*.aar'
-					archiveArtifacts artifacts: 'dist/**/*', excludes: '**/*.xml'
+					archiveArtifacts artifacts: 'dist/**/SDKWrapper-*-Android.tar.xz'
 					archiveArtifacts artifacts: 'build/tar/SDKWrapper-Android-Sources.tgz'
 				}
 			}

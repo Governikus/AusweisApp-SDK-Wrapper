@@ -1,10 +1,18 @@
 Changelog
 =========
 
+Version 2.3.2
+^^^^^^^^^^^^^
+
+**Release date:** 26. June 2025
+
+- Update AusweisApp SDK to version 2.3.2.
+
+
 Version 2.3.0
 ^^^^^^^^^^^^^
 
-**Release date:** 10. März 2025
+**Release date:** 10. March 2025
 
 - Update AusweisApp SDK to version 2.3.0.
 - Remove support for iOS 14 and 15.
@@ -13,7 +21,7 @@ Version 2.3.0
 Version 2.2.2
 ^^^^^^^^^^^^^
 
-**Release date:** 23. Oktober 2024
+**Release date:** 23. October 2024
 
 - Update AusweisApp SDK to version 2.2.2.
 - Add Android ABIs armeabi-v7a and x86_64 in addition to arm64-v8a.

@@ -20,8 +20,8 @@ if(branches.isEmpty())
 
 
 
-job("SDKWrapper_Android_Review_Trigger") {
-	label('Trigger')
+job("SDKWrapper_Android_Review") {
+	label('Common')
 	logRotator {
 		daysToKeep(3)
 		numToKeep(50)
@@ -74,7 +74,7 @@ job("SDKWrapper_Android_Review_Trigger") {
 
 branches.each { branch ->
 	job("SDKWrapper_Android_Daily_${branch}") {
-		label('Trigger')
+		label('Common')
 		logRotator {
 			daysToKeep(7)
 			numToKeep(10)
@@ -111,7 +111,7 @@ branches.each { branch ->
 				allowEmpty(false)
 				pattern('**/*')
 			}
-			mailer('', true, true)
+			mailer('${DEFAULT_EMAIL_RECIPIENTS}', true, false)
 		}
 		triggers {
 			cron('0 6 * * *')
@@ -120,7 +120,7 @@ branches.each { branch ->
 }
 
 job("SDKWrapper_Android_Release") {
-	label('Trigger')
+	label('Common')
 	parameters {
 		stringParam( 'changeset', '', 'Build given changeset (tag) as release' )
 		choiceParam( 'sdkSource', ['maven', 'Release_Android_AAR'], 'Source of the AAR.')

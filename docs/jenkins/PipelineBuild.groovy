@@ -65,14 +65,14 @@ pipeline {
 		stage('Package') {
 			steps {
 				dir('docs') {
-					sh 'cd _build/; mv html SDKWrapper-Docs; cmake -E tar cvfJ SDKWrapper-Docs.tar.xz SDKWrapper-Docs'
+					sh 'cd _build/; mv html SDKWrapper-Docs; cmake -E tar cvfJ SDKWrapper-${REVIEWBOARD_REVIEW_BRANCH}-Docs.tar.xz SDKWrapper-Docs'
 				}
 			}
 		}
 		stage('Archive') {
 			steps {
 				archiveArtifacts 'SDKWrapper-Docs-Sources.tar.xz'
-				archiveArtifacts 'docs/_build/SDKWrapper-Docs.tar.xz'
+				archiveArtifacts 'docs/_build/SDKWrapper-*-Docs.tar.xz'
 			}
 		}
 	}
