@@ -7,7 +7,7 @@ import shlex
 
 # -- General configuration ------------------------------------------------
 
-AA2_SDKWRAPPER_VERSION = '2.3.2'
+AA2_SDKWRAPPER_VERSION = '2.4.0'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.3'

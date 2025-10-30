@@ -8,91 +8,82 @@ internal interface Command {
     val cmd: String
 }
 
-internal class Accept : Command {
-    override val cmd = "ACCEPT"
-}
+internal class Accept(
+    override val cmd: String = "ACCEPT",
+) : Command
 
-internal class Cancel : Command {
-    override val cmd = "CANCEL"
-}
+internal class Cancel(
+    override val cmd: String = "CANCEL",
+) : Command
 
-internal class ContinueWorkflow : Command {
-    override val cmd = "CONTINUE"
-}
+internal class ContinueWorkflow(
+    override val cmd: String = "CONTINUE",
+) : Command
 
-internal class GetCertificate : Command {
-    override val cmd = "GET_CERTIFICATE"
-}
+internal class GetCertificate(
+    override val cmd: String = "GET_CERTIFICATE",
+) : Command
 
 internal class RunAuth(
     val tcTokenURL: String,
     val developerMode: Boolean,
     val status: Boolean,
-) : Command {
-    override val cmd = "RUN_AUTH"
-}
+    override val cmd: String = "RUN_AUTH",
+) : Command
 
 internal class RunChangePin(
     val status: Boolean,
-) : Command {
-    override val cmd = "RUN_CHANGE_PIN"
-}
+    override val cmd: String = "RUN_CHANGE_PIN",
+) : Command
 
-internal class GetAccessRights : Command {
-    override val cmd = "GET_ACCESS_RIGHTS"
-}
+internal class GetAccessRights(
+    override val cmd: String = "GET_ACCESS_RIGHTS",
+) : Command
 
 internal class SetAccessRights(
     val chat: List<String>,
-) : Command {
-    override val cmd = "SET_ACCESS_RIGHTS"
-}
+    override val cmd: String = "SET_ACCESS_RIGHTS",
+) : Command
 
 internal class SetCan(
     val value: String?,
-) : Command {
-    override val cmd = "SET_CAN"
-}
+    override val cmd: String = "SET_CAN",
+) : Command
 
 internal class SetCard(
     val name: String,
     val simulator: Simulator?,
-) : Command {
-    override val cmd = "SET_CARD"
-}
+    override val cmd: String = "SET_CARD",
+) : Command
 
 internal class SetPin(
     val value: String?,
-) : Command {
-    override val cmd = "SET_PIN"
-}
+    override val cmd: String = "SET_PIN",
+) : Command
 
 internal class SetNewPin(
     val value: String?,
-) : Command {
-    override val cmd = "SET_NEW_PIN"
-}
+    override val cmd: String = "SET_NEW_PIN",
+) : Command
 
 internal class SetPuk(
     val value: String?,
-) : Command {
-    override val cmd = "SET_PUK"
-}
+    override val cmd: String = "SET_PUK",
+) : Command
 
-internal class GetStatus : Command {
-    override val cmd = "GET_STATUS"
-}
+internal class GetStatus(
+    override val cmd: String = "GET_STATUS",
+) : Command
 
-internal class GetInfo : Command {
-    override val cmd = "GET_INFO"
-}
+internal class GetInfo(
+    override val cmd: String = "GET_INFO",
+) : Command
 
 internal class GetReader(
     val name: String,
-) : Command {
-    override val cmd = "GET_READER"
-}
+    override val cmd: String = "GET_READER",
+) : Command
 
-internal class GetReaderList : Command {
-    override val cmd = "GET_READER_LIST"
-}
+internal class GetReaderList(
+    override val cmd: String = "GET_READER_LIST",
+) : Command

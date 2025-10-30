@@ -7,17 +7,18 @@ package com.governikus.ausweisapp.sdkwrapper.card.core
 import android.content.Context
 import android.net.Uri
 import android.nfc.Tag
-import com.google.gson.Gson
 import com.governikus.ausweisapp.sdkwrapper.SDKWrapper
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Accept
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Command
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Message
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.RunAuth
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.SetPin
-import kotlinx.coroutines.DelicateCoroutinesApi
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -42,8 +43,7 @@ class WorkflowControllerTest {
     private var workflowController: WorkflowController? = null
     private var connection: MockSdkConnection? = null
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+    private val mainThreadSurrogate = StandardTestDispatcher()
 
     @Before
     fun setUp() {
@@ -55,7 +55,6 @@ class WorkflowControllerTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-        mainThreadSurrogate.close()
         workflowController = null
         connection = null
     }
@@ -77,6 +76,8 @@ class WorkflowControllerTest {
                     )
 
                     workflowController.start(RuntimeEnvironment.getApplication())
+
+                    advanceUntilIdle()
                 }
             assert(completed)
 
@@ -102,6 +103,8 @@ class WorkflowControllerTest {
                     )
 
                     workflowController.startAuthentication(Uri.parse("https://test.test"))
+
+                    advanceUntilIdle()
                 }
             assert(completed)
         }
@@ -137,6 +140,8 @@ class WorkflowControllerTest {
 
                     workflowController.start(RuntimeEnvironment.getApplication())
                     workflowController.startAuthentication(testUrl)
+
+                    advanceUntilIdle()
                 }
 
             assert(completed)
@@ -289,6 +294,8 @@ class WorkflowControllerTest {
 
                     workflowController.start(RuntimeEnvironment.getApplication())
                     workflowController.startAuthentication(tcTokenUrl)
+
+                    advanceUntilIdle()
                 }
 
             assert(completed)
@@ -297,6 +304,7 @@ class WorkflowControllerTest {
 
 internal class MockSdkConnection : WorkflowController.SdkConnection {
     private var onMessageReceived: ((message: Message) -> Unit)? = null
+    private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
     var onCommandSend: ((command: Command) -> Unit)? = null
 
@@ -321,7 +329,10 @@ internal class MockSdkConnection : WorkflowController.SdkConnection {
 
     override fun updateNfcTag(tag: Tag): Boolean = false
 
-    override fun <T : Command> send(command: T): Boolean {
+    override fun <T : Command> send(
+        command: T,
+        clazz: Class<T>,
+    ): Boolean {
         SDKWrapper.launch {
             onCommandSend?.invoke(command)
         }
@@ -330,8 +341,9 @@ internal class MockSdkConnection : WorkflowController.SdkConnection {
 
     fun receive(messageJson: String) {
         SDKWrapper.launch {
-            val message = Gson().fromJson(messageJson, Message::class.java)
-            onMessageReceived?.invoke(message)
+            moshi.adapter(Message::class.java).fromJson(messageJson)?.let {
+                onMessageReceived?.invoke(it)
+            }
         }
     }
 }

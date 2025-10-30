@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 2.4.0
+^^^^^^^^^^^^^
+
+**Release date:** 30. October 2025
+
+- Update AusweisApp SDK to version 2.4.0.
+
+
 Version 2.3.2
 ^^^^^^^^^^^^^
 

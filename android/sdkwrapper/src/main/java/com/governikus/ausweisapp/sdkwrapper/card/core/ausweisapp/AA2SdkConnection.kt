@@ -12,13 +12,13 @@ import android.nfc.Tag
 import android.os.IBinder
 import android.os.RemoteException
 import android.util.Log
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
 import com.governikus.ausweisapp.sdkwrapper.card.core.WorkflowController
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Command
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Message
 import com.governikus.ausweisapp2.IAusweisApp2Sdk
 import com.governikus.ausweisapp2.IAusweisApp2SdkCallback
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 internal class AA2SdkConnection : WorkflowController.SdkConnection {
     private var context: Context? = null
@@ -26,7 +26,7 @@ internal class AA2SdkConnection : WorkflowController.SdkConnection {
     private var sdk: IAusweisApp2Sdk? = null
     private var sdkSessionId: String? = null
 
-    private val gson = Gson()
+    private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
     override val isConnected: Boolean
         get() = sdk != null
@@ -45,7 +45,6 @@ internal class AA2SdkConnection : WorkflowController.SdkConnection {
             object : IAusweisApp2SdkCallback.Stub() {
                 override fun sessionIdGenerated(
                     sessionId: String,
-                    isSecureSessionId: Boolean,
                 ) {
                     this@AA2SdkConnection.sdkSessionId = sessionId
                 }
@@ -53,12 +52,11 @@ internal class AA2SdkConnection : WorkflowController.SdkConnection {
                 override fun receive(messageJson: String) {
                     Log.d(TAG, "Received message: $messageJson")
 
-                    try {
-                        val message = gson.fromJson(messageJson, Message::class.java)
-                        onMessageReceived?.invoke(message)
-                    } catch (e: JsonSyntaxException) {
-                        Log.e(TAG, "Could not parse json message", e)
+                    moshi.adapter(Message::class.java).fromJson(messageJson)?.let {
+                        onMessageReceived?.invoke(it)
+                        return
                     }
+                    Log.e(TAG, "Could not parse json message")
                 }
 
                 override fun sdkDisconnected() {
@@ -107,12 +105,15 @@ internal class AA2SdkConnection : WorkflowController.SdkConnection {
         sdkSessionId = null
     }
 
-    override fun <T : Command> send(command: T): Boolean {
+    override fun <T : Command> send(
+        command: T,
+        clazz: Class<T>,
+    ): Boolean {
         val sdk = sdk ?: return false
         val sessionId = sdkSessionId ?: return false
 
         return try {
-            val messageJson = gson.toJson(command)
+            val messageJson = moshi.adapter(clazz).toJson(command)
             sdk.send(sessionId, messageJson)
         } catch (e: RemoteException) {
             Log.d(TAG, "Could not send command", e)

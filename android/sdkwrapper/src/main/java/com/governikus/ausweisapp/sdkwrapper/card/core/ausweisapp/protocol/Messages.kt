@@ -4,7 +4,7 @@
 
 package com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
 
 internal object Messages {
     const val MSG_ACCESS_RIGHTS = "ACCESS_RIGHTS"
@@ -49,7 +49,7 @@ internal data class Message(
     val transactionInfo: String?,
     val url: String?,
     val validity: Validity?,
-    @SerializedName("VersionInfo")
+    @Json(name = "VersionInfo")
     val versionInfo: VersionInfo?,
     val workflow: String?,
 )
@@ -105,18 +105,18 @@ internal data class Result(
 )
 
 internal data class VersionInfo(
-    @SerializedName("Name")
+    @Json(name = "Name")
     val name: String,
-    @SerializedName("Implementation-Title")
+    @Json(name = "Implementation-Title")
     val implementationTitle: String,
-    @SerializedName("Implementation-Vendor")
+    @Json(name = "Implementation-Vendor")
     val implementationVendor: String,
-    @SerializedName("Implementation-Version")
+    @Json(name = "Implementation-Version")
     val implementationVersion: String,
-    @SerializedName("Specification-Title")
+    @Json(name = "Specification-Title")
     val specificationTitle: String,
-    @SerializedName("Specification-Vendor")
+    @Json(name = "Specification-Vendor")
     val specificationVendor: String,
-    @SerializedName("Specification-Version")
+    @Json(name = "Specification-Version")
     val specificationVersion: String,
 )

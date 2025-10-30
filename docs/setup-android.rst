@@ -22,26 +22,7 @@ repository of Android. To use it, make the following adjustments to your Gradle 
 
   .. code-block:: groovy
 
-    implementation 'com.governikus.ausweisapp:sdkwrapper:2.3.2'
-
-App Bundle
-----------
-
-The AusweisApp SDK Wrapper uses native libraries which need to be extracted when used in an App Bundle,
-otherwise the SDK will not work correctly.
-
-Add the following statement to your app's build.gradle file:
-
-.. code-block:: groovy
-
-    android {
-        packagingOptions {
-            jniLibs {
-                useLegacyPackaging = true
-            }
-        }
-    }
-
+    implementation 'com.governikus.ausweisapp:sdkwrapper:2.4.0'
 
 Initialization of the Android Application
 -----------------------------------------

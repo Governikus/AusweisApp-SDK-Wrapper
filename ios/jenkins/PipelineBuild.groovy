@@ -113,7 +113,7 @@ pipeline {
 					script {
 						def cacheDir = 'test'
 						sh "rm -rf ${cacheDir}; rm -rf AusweisApp2SDKWrapper/build/${cacheDir}"
-						sh "cd AusweisApp2SDKWrapper; xcodebuild test -scheme SDKWrapperTests -destination \"platform=iOS Simulator,name=iPhone 16\" -derivedDataPath build/${cacheDir} -clonedSourcePackagesDirPath ../${cacheDir} -resultBundlePath testOutput"
+						sh "cd AusweisApp2SDKWrapper; xcodebuild test -scheme SDKWrapperTests -destination \"platform=iOS Simulator,name=iPhone 17\" -derivedDataPath build/${cacheDir} -clonedSourcePackagesDirPath ../${cacheDir} -resultBundlePath testOutput"
 					}
 				}
 			}
@@ -142,7 +142,7 @@ pipeline {
 						sh "rm -rf ${sourceFolderName}"
 						sh "mkdir ${sourceFolderName}"
 
-						sh "rsync -av --exclude='build' --exclude='xcshareddata' --exclude='.swiftpm' ./AusweisApp2SDKWrapper ${sourceFolderName}"
+						sh "rsync -av --exclude='build' --exclude='xcshareddata' --exclude='.swiftpm' --exclude='testOutput*' ./AusweisApp2SDKWrapper ${sourceFolderName}"
 						sh "rsync -av --exclude='ExportOptions.plist' --exclude='*_private.*' ./jenkins ${sourceFolderName}"
 						sh "cp sonar-project.properties ${sourceFolderName}"
 
@@ -168,12 +168,13 @@ pipeline {
 
 						sh 'cd AusweisApp2SDKWrapper; xcodebuild -create-xcframework -framework build/AusweisApp2SDKWrapper-iphoneos.xcarchive/Products/Library/Frameworks/AusweisApp2SDKWrapper.framework -framework build/AusweisApp2SDKWrapper-iphonesimulator.xcarchive/Products/Library/Frameworks/AusweisApp2SDKWrapper.framework -output build/spm/AusweisApp2SDKWrapper.xcframework'
 
+						sh 'cd AusweisApp2SDKWrapper; cp ../../LICENSE.officially.txt build/spm/LICENSE.txt'
 						sh 'cd AusweisApp2SDKWrapper; cp -r Sources/ build/spm'
 						sh 'cd AusweisApp2SDKWrapper; cp -r packaging/ build/spm'
 
 						def artifactPrefix = "SDKWrapper-${params.REVIEWBOARD_REVIEW_BRANCH}"
 						sh 'cd AusweisApp2SDKWrapper; mkdir -p build/dist'
-						sh "cd AusweisApp2SDKWrapper/build/spm; cmake -E tar cvfJ ../dist/${artifactPrefix}-iOS.tar.xz AusweisApp2SDKWrapper.xcframework Package.swift Sources"
+						sh "cd AusweisApp2SDKWrapper/build/spm; cmake -E tar cvfJ ../dist/${artifactPrefix}-iOS.tar.xz LICENSE.txt AusweisApp2SDKWrapper.xcframework Package.swift Sources"
 						sh "cd AusweisApp2SDKWrapper/build; cmake -E tar cvfJ dist/${artifactPrefix}-iphoneos.framework.dSYM.tar.xz AusweisApp2SDKWrapper-iphoneos.xcarchive/dSYMs/AusweisApp2SDKWrapper.framework.dSYM"
 						sh "cd AusweisApp2SDKWrapper/build; cmake -E tar cvfJ dist/${artifactPrefix}-iphonesimulator-arm64.framework.dSYM.tar.xz AusweisApp2SDKWrapper-iphonesimulator-arm64.xcarchive/dSYMs/AusweisApp2SDKWrapper.framework.dSYM"
 						sh "cd AusweisApp2SDKWrapper/build; cmake -E tar cvfJ dist/${artifactPrefix}-iphonesimulator-x86_64.framework.dSYM.tar.xz AusweisApp2SDKWrapper-iphonesimulator-x86_64.xcarchive/dSYMs/AusweisApp2SDKWrapper.framework.dSYM"

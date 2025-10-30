@@ -82,7 +82,10 @@ class WorkflowController internal constructor(
 
         fun updateNfcTag(tag: Tag): Boolean
 
-        fun <T : Command> send(command: T): Boolean
+        fun <T : Command> send(
+            command: T,
+            clazz: Class<T>,
+        ): Boolean
     }
 
     private val workflowCallbacks = ArrayList<WorkflowCallbacks>()
@@ -461,7 +464,7 @@ class WorkflowController internal constructor(
     private inline fun <reified T : Command> send(command: T) =
         SDKWrapper.launch(ioDispatcher) {
             if (isStarted) {
-                sdkConnection.send(command)
+                sdkConnection.send(command, T::class.java)
             } else {
                 callback { onWrapperError(WrapperError("WorkflowController::send: isStarted", "Not started")) }
             }

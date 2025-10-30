@@ -115,8 +115,10 @@ pipeline {
 				dir('android') {
 					sh './gradlew assemble'
 					sh "./gradlew -Dmaven.repo.local=${WORKSPACE}/android/dist publishReleasePublicationToMavenLocal"
+					sh "./gradlew -Dmaven.repo.local=${WORKSPACE}/android/dist generateChecksums"
 					sh "rm ${WORKSPACE}/android/dist/com/governikus/ausweisapp/sdkwrapper/maven-metadata-local.xml"
-					sh "cd ${WORKSPACE}/android/dist; cmake -E tar cvfJ SDKWrapper-${REVIEWBOARD_REVIEW_BRANCH}-Android.tar.xz com"
+					sh "cd ${WORKSPACE}/android/dist; cmake -E tar cf sdkwrapper-${REVIEWBOARD_REVIEW_BRANCH}.zip --format=zip com"
+					sh "cd ${WORKSPACE}/android/dist; cmake -E tar cvfJ SDKWrapper-${REVIEWBOARD_REVIEW_BRANCH}-Android.tar.xz sdkwrapper-${REVIEWBOARD_REVIEW_BRANCH}.zip"
 				}
 			}
 		}
@@ -143,7 +145,7 @@ pipeline {
 			}
 			steps {
 				dir('android') {
-					sh './gradlew publishReleasePublicationToCentralRepository'
+					sh "./gradlew mavenUpload -Pfilename=${WORKSPACE}/android/dist/sdkwrapper-${REVIEWBOARD_REVIEW_BRANCH}.zip"
 				}
 			}
 		}

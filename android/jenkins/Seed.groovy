@@ -1,7 +1,7 @@
 println 'Try to slurp branches from repository'
 
 def branches = []
-def api = new URL("${MERCURIAL_REPOSITORY_URL}/json-branches/")
+def api = new URI("${MERCURIAL_REPOSITORY_URL}/json-branches/").toURL()
 def content = new groovy.json.JsonSlurper().parse(api.newReader())
 content.each
 {
