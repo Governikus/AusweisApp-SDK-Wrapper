@@ -1,7 +1,7 @@
 buildscript {
-    ext.kotlin_version = '2.1.21'
-    ext.ausweisapp_version = '2.4.0'
-    ext.sdkwrapper_version = "$ausweisapp_version"
+    ext.kotlin_version = '2.3.0'
+    ext.ausweisapp_version = '2.4.1'
+    ext.sdkwrapper_version = '2.4.1'
 
     repositories {
         google()
@@ -12,12 +12,12 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.10.0'
+        classpath 'com.android.tools.build:gradle:8.13.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jmailen.gradle:kotlinter-gradle:5.0.2"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.9.0"
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.52.0'
-        classpath 'com.squareup.okhttp3:okhttp:5.2.1'
+        classpath 'com.squareup.okhttp3:okhttp:5.3.2'
     }
 }
 
@@ -36,7 +36,7 @@ def isNonStable = { String version ->
 sonarqube {
     properties {
         property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/kover/report.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", project.layout.buildDirectory.file("reports/kover/report.xml").get().asFile
     }
 }
 
@@ -61,11 +61,11 @@ allprojects {
     }
 }
 
-task tarball(type: Tar) {
+tasks.register("tarball", Tar) {
     into ('/') {
         from rootDir
         include '**'
-        exclude ('dist', '**/build/**', '.reviewboardrc', '.gradle', '.idea', '**/*.aar')
+        exclude ('dist', '**/build/**', '.reviewboardrc', '.gradle', '.idea', '**/*.aar', '**/*.apk')
      }
 
     archiveFileName = "SDKWrapper-Android-Sources.tgz"

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_card_workflow"
+    app:startDestination="@id/startup_fragment">
+
+    <fragment
+        android:id="@+id/startup_fragment"
+        android:name="com.governikus.ausweisapp.tester.wrapper.card.ui.StartupFragment">
+        <action
+            android:id="@+id/action_start_authentication"
+            app:destination="@id/navigation_authentication_workflow"
+            app:popUpTo="@id/navigation_card_workflow"/>
+        <action
+            android:id="@+id/action_start_pin_change"
+            app:destination="@id/navigation_pin_change_workflow"
+            app:popUpTo="@id/navigation_card_workflow"/>
+    </fragment>
+
+    <include app:graph="@navigation/navigation_authentication_workflow"/>
+    <include app:graph="@navigation/navigation_pin_change_workflow"/>
+
+</navigation>

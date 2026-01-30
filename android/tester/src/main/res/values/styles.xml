@@ -1,0 +1,35 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+    </style>
+    <style name="SDKWrapperTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        <item name="checkboxStyle">@style/Widget.MaterialComponents.CompoundButton.CheckBox</item>
+
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+
+        <item name="idl_textAppearanceTitle">?attr/textAppearanceHeadline6</item>
+        <item name="idl_textAppearanceBody">?attr/textAppearanceSubtitle1</item>
+        <item name="idl_textAppearanceListTitle">?attr/textAppearanceHeadline6</item>
+        <item name="idl_textAppearanceListItem">?attr/textAppearanceBody1</item>
+        <item name="idl_textAppearanceListItemCaption">?attr/textAppearanceSubtitle2</item>
+        <item name="idl_textAppearanceCameraHint">?attr/textAppearanceBody1</item>
+
+        <item name="idl_authenticationAbortedIcon">@drawable/ic_cancel_128dp</item>
+        <item name="idl_enterNewPinIcon">@drawable/ic_lock_open_128dp</item>
+        <item name="idl_enterPasswordIcon">@drawable/ic_lock_128dp</item>
+        <item name="idl_errorIcon">@drawable/ic_error_128dp</item>
+        <item name="idl_loadCertificateIcon">@drawable/ic_certificate_128dp</item>
+        <item name="idl_positionCardIcon">@drawable/ic_phone_nfc_128dp</item>
+        <item name="idl_readingProgressIcon">@drawable/ic_id_card_128dp</item>
+    </style>
+    <style name="SDKTheme" parent="SDKWrapperTheme"/>
+
+</resources>

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2025 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core
@@ -234,7 +234,7 @@ class WorkflowController internal constructor(
      *
      * List of possible access rights are listed in [AccessRight]
      *
-     * This command is allowed only if the SDK asked for a pin via [WorkflowCallbacks.onAccessRights].
+     * This command is allowed only if the SDK asked for specific access rights via [WorkflowCallbacks.onAccessRights].
      * Otherwise you will get a callback to [WorkflowCallbacks.onBadState].
      *
      * @param accessRights List of enabled optional access rights. If the list is empty all optional access rights are disabled.

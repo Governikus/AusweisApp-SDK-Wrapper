@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="password_input_width">200dp</dimen>
+
+    <dimen name="margin_default">24dp</dimen>
+    <dimen name="margin_large">48dp</dimen>
+</resources>

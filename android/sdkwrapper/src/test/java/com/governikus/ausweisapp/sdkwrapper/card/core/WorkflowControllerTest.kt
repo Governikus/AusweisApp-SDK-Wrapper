@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-2025 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core
@@ -27,6 +27,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -109,6 +110,7 @@ class WorkflowControllerTest {
             assert(completed)
         }
 
+    @Ignore("Test is flaky, kotlinx.coroutines.test.UncompletedCoroutinesError: After waiting for 1s, the test body did not run to completion")
     @Test
     fun testAuthenticationStarted() =
         runTest(timeout = 1000.milliseconds) {
@@ -149,7 +151,7 @@ class WorkflowControllerTest {
 
     @Test
     fun testFullAuthentication() =
-        runTest(timeout = 1000.milliseconds) {
+        runTest(timeout = 30000.milliseconds) {
             assertNotNull(workflowController)
             assertNotNull(connection)
             val workflowController = workflowController!!

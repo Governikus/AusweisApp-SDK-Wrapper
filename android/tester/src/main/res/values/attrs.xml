@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="idl_textAppearanceTitle" format="reference"/>
+    <attr name="idl_textAppearanceBody" format="reference"/>
+    <attr name="idl_textAppearanceListTitle" format="reference"/>
+    <attr name="idl_textAppearanceListItemCaption" format="reference"/>
+    <attr name="idl_textAppearanceListItem" format="reference"/>
+    <attr name="idl_textAppearanceCameraHint" format="reference"/>
+
+    <attr name="idl_authenticationAbortedIcon" format="reference"/>
+    <attr name="idl_enterNewPinIcon" format="reference"/>
+    <attr name="idl_enterPasswordIcon" format="reference"/>
+    <attr name="idl_errorIcon" format="reference"/>
+    <attr name="idl_loadCertificateIcon" format="reference"/>
+    <attr name="idl_positionCardIcon" format="reference"/>
+    <attr name="idl_readingProgressIcon" format="reference"/>
+
+</resources>

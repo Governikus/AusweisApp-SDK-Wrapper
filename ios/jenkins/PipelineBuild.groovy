@@ -1,9 +1,6 @@
 pipeline {
 	agent {
-		node {
-			label 'iOS'
-			customWorkspace params.WORKSPACE ?: env.WORKSPACE
-		}
+		label 'iOS'
 	}
 	parameters {
 		string( name: 'REVIEWBOARD_REVIEW_ID', defaultValue: '', description: 'ID of the Review' )
@@ -11,9 +8,8 @@ pipeline {
 		string( name: 'REVIEWBOARD_SERVER', defaultValue: '', description: 'Server' )
 		string( name: 'REVIEWBOARD_STATUS_UPDATE_ID', defaultValue: '', description: '' )
 		string( name: 'REVIEWBOARD_DIFF_REVISION', defaultValue: '', description: '' )
-		string( name: 'sdkSource', defaultValue: 'github', description: 'Source of the AA2 Swift Package.\nExamples: github, local repositories' )
+		string( name: 'sdkSource', defaultValue: 'github', description: 'Source of the AA2 Swift Package.\nExamples: github, Release_iOS_SwiftPackage, default_Review_iOS_SwiftPackage, default_iOS_SwiftPackage' )
 		booleanParam( name: 'performSonarScan', defaultValue: false, description: 'Perform a sonar scan')
-		booleanParam( name: 'runReviewBoardUpdate', defaultValue: true, description: 'Update the corresponding ReviewBoard review.')
 	}
 	options {
 		skipStagesAfterUnstable()
@@ -142,8 +138,10 @@ pipeline {
 						sh "rm -rf ${sourceFolderName}"
 						sh "mkdir ${sourceFolderName}"
 
-						sh "rsync -av --exclude='build' --exclude='xcshareddata' --exclude='.swiftpm' --exclude='testOutput*' ./AusweisApp2SDKWrapper ${sourceFolderName}"
-						sh "rsync -av --exclude='ExportOptions.plist' --exclude='*_private.*' ./jenkins ${sourceFolderName}"
+						sh "rsync -av --exclude='build' --exclude='xcshareddata' --exclude='xcuserdata' --exclude='.swiftpm' --exclude='testOutput*' ./AusweisApp2SDKWrapper ${sourceFolderName}"
+						sh "rsync -av --exclude='build' --exclude='xcshareddata' --exclude='xcuserdata' --exclude='.swiftpm' --exclude='testOutput*' ./SDKWrapperTester ${sourceFolderName}"
+						sh "rsync -av --exclude='build' --exclude='xcshareddata' --exclude='xcuserdata' --exclude='.swiftpm' --exclude='testOutput*' ./SDKWrapperAndTester.xcworkspace ${sourceFolderName}"
+						sh "rsync -av ./jenkins ${sourceFolderName}"
 						sh "cp sonar-project.properties ${sourceFolderName}"
 
 						sh 'mkdir -p AusweisApp2SDKWrapper/build/dist'
@@ -182,6 +180,17 @@ pipeline {
 				}
 			}
 		}
+		stage('Package SDKWrapperTester') {
+			steps {
+				dir('ios') {
+					script {
+						sh 'xcodebuild archive -workspace SDKWrapperAndTester.xcworkspace -scheme SDKWrapperTester -sdk iphoneos ARCHS="arm64" -archivePath build/SDKWrapperTester.xcarchive'
+						sh 'xcodebuild -archivePath build/SDKWrapperTester.xcarchive -exportArchive -exportOptionsPlist jenkins/ExportOptions.plist -exportPath build/dist/ -target ipa'
+						sh "mv build/dist/SDKWrapperTester.ipa build/dist/SDKWrapperTester-${params.REVIEWBOARD_REVIEW_BRANCH}.ipa"
+					}
+				}
+			}
+		}
 		stage('Archive') {
 			steps {
 				dir('ios/AusweisApp2SDKWrapper/build/dist') {
@@ -190,7 +199,10 @@ pipeline {
 					archiveArtifacts artifacts: 'SDKWrapper-*-iphoneos.framework.dSYM.tar.xz'
 					archiveArtifacts artifacts: 'SDKWrapper-*-iphonesimulator-arm64.framework.dSYM.tar.xz'
 					archiveArtifacts artifacts: 'SDKWrapper-*-iphonesimulator-x86_64.framework.dSYM.tar.xz'
-				 }
+				}
+				dir('ios/build/dist') {
+					archiveArtifacts artifacts: '*.ipa'
+				}
 			}
 		}
 		stage('Verify formatting') {
@@ -217,7 +229,7 @@ pipeline {
 	post {
 		always {
 			script {
-				if (params.runReviewBoardUpdate && params.REVIEWBOARD_REVIEW_ID != '') {
+				if (params.REVIEWBOARD_REVIEW_ID != '') {
 					def rb_result = "error"
 					def rb_desc = "build failed."
 					if (currentBuild.result == 'SUCCESS') {

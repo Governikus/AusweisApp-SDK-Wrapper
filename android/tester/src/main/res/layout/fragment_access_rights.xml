@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/scroll_view_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/access_rights_provider_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:text="@string/access_rights_provider_title"
+            android:textAppearance="?attr/idl_textAppearanceListTitle"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/access_rights_provider_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:text="@string/access_rights_provider_name_label"
+            android:textAppearance="?attr/idl_textAppearanceListItemCaption"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/access_rights_provider_title"/>
+
+        <TextView
+            android:id="@+id/access_rights_provider_purpose_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:text="@string/access_rights_provider_purpose_label"
+            android:textAppearance="?attr/idl_textAppearanceListItemCaption"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/access_rights_provider_name_label"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_provider"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:barrierDirection="right"
+            app:constraint_referenced_ids="access_rights_provider_name_label, access_rights_provider_purpose_label"/>
+
+        <TextView
+            android:id="@+id/access_rights_provider_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:textAppearance="?attr/idl_textAppearanceListItem"
+            app:layout_constraintLeft_toRightOf="@id/barrier_provider"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/access_rights_provider_name_label"
+            app:layout_constraintBottom_toBottomOf="@id/access_rights_provider_name_label"
+            tools:text="Example Provider"/>
+
+        <TextView
+            android:id="@+id/access_rights_provider_purpose"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:textAppearance="?attr/idl_textAppearanceListItem"
+            app:layout_constraintLeft_toRightOf="@id/barrier_provider"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/access_rights_provider_purpose_label"
+            app:layout_constraintBottom_toBottomOf="@id/access_rights_provider_purpose_label"
+            tools:text="Example Purpose"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_show_certificate"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin_default"
+            android:insetTop="@dimen/margin_default"
+            android:insetBottom="@dimen/margin_default"
+            android:padding="0dp"
+            android:text="@string/access_rights_show_certificate"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/access_rights_provider_purpose_label"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_certificate_description"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:constraint_referenced_ids="access_rights_provider_name_label,access_rights_provider_purpose_label,access_rights_provider_name,access_rights_provider_purpose,btn_show_certificate"/>
+
+        <TextView
+            android:id="@+id/access_rights_missing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:text="@string/access_rights_certificate_missing"
+            android:textAppearance="?attr/idl_textAppearanceListItem"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/access_rights_provider_title"/>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_certificate"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="btn_show_certificate,access_rights_missing"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_accept_access_rights"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            android:text="@string/accept_access_rights"
+            app:icon="@drawable/ic_check_24dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/barrier_certificate"/>
+
+        <TextView
+            android:id="@+id/required_access_rights_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginHorizontal="@dimen/margin_default"
+            android:text="@string/access_rights_required_title"
+            android:textAppearance="?attr/idl_textAppearanceListTitle"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_accept_access_rights"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/required_access_rights_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/required_access_rights_title"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_required_access_rights"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:constraint_referenced_ids="required_access_rights_title, required_access_rights_container"/>
+
+        <TextView
+            android:id="@+id/optional_access_rights_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginHorizontal="@dimen/margin_default"
+            android:text="@string/access_rights_optional_title"
+            android:textAppearance="?attr/idl_textAppearanceListTitle"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/required_access_rights_container"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/optional_access_rights_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_default"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/optional_access_rights_title"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_optional_access_rights"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:constraint_referenced_ids="optional_access_rights_title, optional_access_rights_container"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

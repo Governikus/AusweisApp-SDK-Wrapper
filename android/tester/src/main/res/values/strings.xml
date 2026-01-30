@@ -1,0 +1,170 @@
+<resources>
+    <string name="app_name">SDK Wrapper Tester App</string>
+
+    <string name="workflow_selection_title">Tester App - Start</string>
+    <string name="workflow_selection_start_authentication">Online Authentication</string>
+    <string name="workflow_selection_start_change_pin">Change PIN</string>
+    <string name="workflow_selection_subtitle_sdk_wrapper">SDK Wrapper</string>
+    <string name="workflow_selection_subtitle_sdk">SDK</string>
+    <string name="workflow_selection_text_testerMode">Im Tester Modus kann mithilfe eines Buttons eine
+        Authentisierung getestet werden
+    </string>
+    <string name="workflow_selection_text_websocketMode">Im Websocket Modus wird eine Websocket geöffnet,
+        der alle Anfragen an das SDK Weiterleitet.\n Die IP des Websockets wird in das
+        Logfenster geschrieben.
+    </string>
+    <string name="workflow_selection_websocketMode">WebsocketMode</string>
+    <string name="workflow_selection_testerMode">TesterMode</string>
+
+    <string name="authentication_title">Tester App - Online Auth</string>
+    <string name="authentication_start">Start Authentication</string>
+    <string name="authentication_start_required_rights">Start Authentication\n(All access rights required)</string>
+    <string name="authentication_start_can_allowed">Start CAN-allowed Authentication</string>
+    <string name="authentication_start_developer_mode">Start Authentication with developerMode</string>
+    <string name="authentication_start_with_card_simulator">Start Authentication with Card-Simulator</string>
+    <string name="authentication_start_with_card_simulator_default_data">Default Simulator data</string>
+    <string name="authentication_start_with_card_simulator_different_name">Different name: "ERIK"</string>
+    <string name="authentication_start_with_card_simulator_different_pseudonym">Different Pseudonym/RestrictedId</string>
+
+    <string name="auth_result_error_message_title">Error message:\n%1s\n\nOpen result URL</string>
+    <string name="auth_result_success_message_title">Open result URL</string>
+
+    <string name="change_pin_title">Tester App - Change PIN</string>
+    <string name="change_pin_start">Change PIN</string>
+    <string name="change_transport_pin_start">Change Transport PIN</string>
+    <string name="change_pin_result">Change PIN result: %1$b (Reason: %2$s)</string>
+
+    <string name="start_workflow_info">Clicking any of the buttons will start the SDK Wrapper</string>
+
+    <string name="workflow_aborted">Workflow aborted</string>
+
+    <string name="content_description_lock">Lock</string>
+    <string name="content_description_position_card">Smartphone with NFC</string>
+    <string name="content_description_error">Error</string>
+    <string name="content_description_card">ID Card</string>
+    <string name="content_description_certificate">Certificate</string>
+    <string name="content_description_abort">Abort</string>
+
+    <string name="loading_certificate_title">Loading certificate…</string>
+    <string name="loading_certificate">Loading service provider certificate…</string>
+    <string name="loading_certificate_please_wait">Please wait until the service provider certificate has been loaded.</string>
+
+    <string name="authentication_aborted_title">Authentication aborted</string>
+    <string name="authentication_aborted_info_header">Aborting authentication…</string>
+    <string name="authentication_aborted_info_text">The authentication was aborted, waiting for response from service provider.</string>
+
+    <string name="reading_progress_title">Card access</string>
+    <string name="reading_progress_dont_move">The ID card is being accessed, please don\'t move the card.</string>
+    <string name="reading_progress_wait_until_done">Please wait until the card access is completed.</string>
+
+    <string name="card_workflow_unknown_card">Received unknown card (without eID function)</string>
+    <string name="card_workflow_card_deactivated">Received an ID card with disabled eID function.</string>
+    <string name="card_workflow_card_inoperative">Received an ID card where the PUK can no longer be used to unblock the PIN.</string>
+    <string name="card_workflow_authentication_finished_remove_card_message">Authentication finished, you may now remove the ID card.</string>
+    <string name="card_workflow_pin_finished_remove_card_message">PIN change finished, you may now remove the ID card.</string>
+
+    <string name="access_rights_title">Requested Data</string>
+    <string name="access_rights_required_title">Required Data</string>
+    <string name="access_rights_optional_title">Optional Data</string>
+    <string name="accept_access_rights">Accept</string>
+    <string name="access_rights_provider_title">Certificate</string>
+    <string name="access_rights_provider_name_label">Provider</string>
+    <string name="access_rights_provider_purpose_label">Purpose</string>
+    <string name="access_rights_show_certificate">Certificate details</string>
+    <string name="access_rights_certificate_missing">Certificate description can\'t be displayed</string>
+
+    <string name="certificate_description_title">Service provider details</string>
+    <string name="certificate_issuer_information">Issuer information</string>
+    <string name="certificate_issuer_name">Issuer name</string>
+    <string name="certificate_issuer_url">Issuer URL</string>
+    <string name="certificate_subject_information">Subject information</string>
+    <string name="certificate_purpose">Purpose</string>
+    <string name="certificate_subject_name">Subject name</string>
+    <string name="certificate_subject_url">Subject URL</string>
+    <string name="certificate_tou">Terms of Usage</string>
+    <string name="certificate_validity">Validity</string>
+    <string name="certificate_issue_date">Issue date</string>
+    <string name="certificate_expiration_date">Expiration date</string>
+
+    <string name="enter_password_pin_title">PIN required</string>
+    <string name="enter_password_pin_info_header">Please enter the PIN</string>
+    <string name="enter_password_pin_field_hint">6-digit PIN</string>
+    <plurals name="enter_password_pin_retry_counter_message">
+        <item quantity="one">%d PIN attempt left.</item>
+        <item quantity="other">%d PIN attempts left.</item>
+    </plurals>
+    <string name="enter_password_can_title">CAN required</string>
+    <string name="enter_password_can_info_header">Please enter the CAN</string>
+    <string name="enter_password_can_info_text">The CAN is needed to continue with the workflow. The 6-digit CAN is printed on the front of the ID card.</string>
+    <string name="enter_password_can_field_hint">6-digit CAN</string>
+    <string name="enter_password_puk_title">PUK required</string>
+    <string name="enter_password_puk_info_header">Please enter the PUK</string>
+    <string name="enter_password_puk_info_text">The ID card is blocked! Please enter the PUK to unlock it.</string>
+    <string name="enter_password_puk_field_hint">10-digit PUK</string>
+    <string name="enter_password_wrong_try">The last input was incorrect!</string>
+    <string name="enter_password_accept">Continue</string>
+
+    <string name="enter_new_pin_title">Change PIN</string>
+    <string name="enter_new_pin_info_header">Change the PIN</string>
+    <string name="enter_new_pin_info_text">Please enter a new PIN and confirm it.</string>
+    <string name="enter_new_pin_field">New PIN</string>
+    <string name="enter_new_pin_confirmation_field">Confirm PIN</string>
+    <string name="enter_new_pin_confirmation_error">Confirmation PIN does not match PIN</string>
+    <string name="enter_new_pin_accept">Continue</string>
+
+    <string name="position_card_title">Card access required</string>
+    <string name="position_card_info_header">Communication with the ID card required, please place the device on the ID card.</string>
+
+    <string name="pause_title">Workflow Interrupted</string>
+    <string name="pause_info">The workflow was interrupted for the following reason:</string>
+    <string name="pause_continue">Continue Workflow</string>
+
+    <string name="error_title">Error</string>
+    <string name="error_info">An error occurred, the authentication was aborted!</string>
+    <string name="error_accept">OK</string>
+    <string name="error_message_unknown_error">An unknown error occurred during authentication. Please inform the software manufacturer about the problem.</string>
+
+    <string name="back_press_info">Tap back button again in order to abort the workflow</string>
+    <string name="enter_password_transport_pin_info_header">Please enter the Transport PIN</string>
+    <string name="enter_password_transport_pin_field_hint">5-digit PIN</string>
+
+    <string name="access_right_address">Address</string>
+    <string name="access_right_birth_name">Birth name</string>
+    <string name="access_right_family_name">Family Name</string>
+    <string name="access_right_given_name">Given Name(s)</string>
+    <string name="access_right_place_of_birth">Place of birth</string>
+    <string name="access_right_date_of_birth">Date of birth</string>
+    <string name="access_right_artistic_name">Religious / artistic name</string>
+    <string name="access_right_doctoral_degree">Doctoral degree</string>
+    <string name="access_right_nationality">Nationality</string>
+    <string name="access_right_issuing_country">Issuing country</string>
+    <string name="access_right_document_type">Document type</string>
+    <string name="access_right_residence_permit_1">Residence permit I</string>
+    <string name="access_right_pseudonym">Pseudonym</string>
+    <string name="access_right_age_verification">Age verification</string>
+    <string name="access_right_address_verification">Address verification</string>
+    <string name="access_right_residence_permit_2">Residence permit II</string>
+    <string name="access_right_community_id">Community-ID</string>
+    <string name="access_right_write_community_id">Write community-ID</string>
+    <string name="access_right_valid_until">Valid until</string>
+    <string name="access_right_write_residence_permit_2">Write residence permit II</string>
+    <string name="access_right_write_residence_permit_1">Write residence permit I</string>
+    <string name="access_right_write_address">Write address</string>
+    <string name="access_right_can_allowed">CAN-allowed</string>
+    <string name="access_right_pin_management">PIN Management</string>
+
+    <string name="test_eid_tc_token_url" translatable="false">https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&amp;redirect=true</string>
+    <string name="test_eid_developerMode_tc_token_url" translatable="false">http://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&amp;redirect=true</string>
+    <string name="test_eid_cardSimulator_tc_token_url" translatable="false">https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&amp;redirect=true</string>
+    <string name="test_eid_can_tc_token_url" translatable="false">https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_can&amp;redirect=true</string>
+    <string name="test_eid_tc_token_url_required_rights" translatable="false">https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json</string>
+
+    <string name="testerMode_authentication">SDK \n Authentisierung</string>
+    <string name="testerMode_back">Zurück</string>
+    <string name="testerMode_default_pin">123456</string>
+    <string name="testerMode_password">Password</string>
+    <string name="testerMode_insertCard">Insert card</string>
+    <string name="testerMode_open_result">Open Result</string>
+
+    <string name="websocketMode_start">Start Websocket</string>
+</resources>

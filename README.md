@@ -24,4 +24,4 @@ Just open the AusweisApp2SDKWrapper/Package.swift in Xcode.
 
 ## License
 
-Copyright (c) 2025 Governikus GmbH & Co. KG, Germany
+Copyright (c) 2026 Governikus GmbH & Co. KG, Germany

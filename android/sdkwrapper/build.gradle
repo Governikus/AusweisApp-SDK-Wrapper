@@ -37,7 +37,7 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
         allWarningsAsErrors = true
-        freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn", "-Xstring-concat=inline"] // Used for UnitTests, can be removed with kotlin 1.7.0
+        freeCompilerArgs = ["-Xstring-concat=inline", "-Xannotation-default-target=param-property"]
     }
 
     lint {
@@ -63,6 +63,18 @@ android {
 
     publishing {
         singleVariant("release")
+    }
+
+    testOptions {
+        unitTests.all {
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                showExceptions true
+                exceptionFormat "full"
+                showCauses true
+                showStackTraces true
+            }
+        }
     }
 }
 

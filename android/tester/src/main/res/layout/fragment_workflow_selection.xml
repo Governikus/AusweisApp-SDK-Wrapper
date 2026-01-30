@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/scroll_view_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_margin="@dimen/margin_default"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textHeadingMenuWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_subtitle_sdk_wrapper"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_start_authentication_workflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_start_authentication"
+            android:textAllCaps="false" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_start_change_pin_workflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_start_change_pin"
+            android:textAllCaps="false" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textHeadingMenuSDK"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_subtitle_sdk"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewTester"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_text_testerMode"
+            android:textAlignment="center" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_tester_integrated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_testerMode"
+            android:textAllCaps="false" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/textViewWebsocket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_text_websocketMode"
+            android:textAlignment="center" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_websocket_integrated_"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_selection_websocketMode"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

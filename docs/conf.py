@@ -7,7 +7,7 @@ import shlex
 
 # -- General configuration ------------------------------------------------
 
-AA2_SDKWRAPPER_VERSION = '2.4.0'
+AA2_SDKWRAPPER_VERSION = '2.4.1'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.3'
@@ -38,7 +38,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'AusweisApp SDK Wrapper'
-copyright = '2023-2025, Governikus GmbH & Co. KG'
+copyright = '2023-2026, Governikus GmbH & Co. KG'
 author = 'Governikus GmbH & Co. KG'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -162,8 +162,6 @@ latex_show_urls = 'footnote'
 # If false, no module index is generated.
 #latex_domain_indices = True
 
-AA2_SDK_INV_URL = 'https://ausweisapp-ci.govkg.de/job/Release_Docs/lastSuccessfulBuild/artifact/build/docs/sdk/html/en/objects.inv'
-
 intersphinx_mapping = {
-    "sphinx": ("https://www.ausweisapp.bund.de/sdk/", ("objects.inv", AA2_SDK_INV_URL))
+    "sphinx": ("https://www.ausweisapp.bund.de/sdk/", "objects.inv")
 }
