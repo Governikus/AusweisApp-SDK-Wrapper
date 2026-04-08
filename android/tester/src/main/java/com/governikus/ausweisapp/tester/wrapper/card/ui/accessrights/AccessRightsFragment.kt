@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -7,7 +7,6 @@ package com.governikus.ausweisapp.tester.wrapper.card.ui.accessrights
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -88,10 +87,5 @@ internal class AccessRightsFragment : BaseFragment<FragmentAccessRightsBinding>(
         viewBinding.optionalAccessRightsContainer.setHasFixedSize(false)
         viewBinding.optionalAccessRightsContainer.isNestedScrollingEnabled = false
         viewBinding.optionalAccessRightsContainer.adapter = viewModel.optionalRightsAdapter
-    }
-
-    override fun onApplyInsets(insets: WindowInsetsCompat) {
-        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        viewBinding?.scrollViewContent?.setPadding(0, 0, 0, systemBarInsets.bottom)
     }
 }

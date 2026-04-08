@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 import os
 import shlex
+import sys
 
 # -- General configuration ------------------------------------------------
 
-AA2_SDKWRAPPER_VERSION = '2.4.1'
+AA2_SDKWRAPPER_VERSION = '2.5.0'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.3'
@@ -20,7 +20,11 @@ numfig = True
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx_tabs.tabs', 'sphinx.ext.intersphinx', 'sphinx_copybutton']
+extensions = [
+    'sphinx_tabs.tabs',
+    'sphinx.ext.intersphinx',
+    'sphinx_copybutton',
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = []
@@ -31,14 +35,14 @@ templates_path = []
 source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+# source_encoding = 'utf-8-sig'
 
 # The master toctree document.
 master_doc = 'index'
 
 # General information about the project.
 project = 'AusweisApp SDK Wrapper'
-copyright = '2023-2026, Governikus GmbH & Co. KG'
+copyright = '2023-2026, Governikus GmbH & Co. KG'  # noqa: A001
 author = 'Governikus GmbH & Co. KG'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -62,7 +66,6 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = []
-
 
 
 # The name of the Pygments (syntax highlighting) style to use.
@@ -105,14 +108,12 @@ html_permalinks = True
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-# The paper size ('letterpaper' or 'a4paper').
-'papersize': 'a4paper',
-
-# The font size ('10pt', '11pt' or '12pt').
-'pointsize': '11pt',
-
-# Additional stuff for the LaTeX preamble.
-'preamble': r'''
+    # The paper size ('letterpaper' or 'a4paper').
+    'papersize': 'a4paper',
+    # The font size ('10pt', '11pt' or '12pt').
+    'pointsize': '11pt',
+    # Additional stuff for the LaTeX preamble.
+    'preamble': r"""
 \hypersetup{pdfauthor={Governikus GmbH \& Co. KG},
             pdftitle={AusweisApp SDK Wrapper},
             pdfsubject={Handbuch},
@@ -120,26 +121,29 @@ latex_elements = {
             pdfproducer={LaTeX},
             pdfcreator={Sphinx}
 }
-''',
-
-# Override tableofcontents
-'tableofcontents': '''
+""",
+    # Override tableofcontents
+    'tableofcontents': """
 \\tableofcontents
 \\newpage
 \\pagestyle{plain}
 \\pagenumbering{arabic}
-''',
-
-# Latex figure (float) alignment
-'figure_align': 'H',
+""",
+    # Latex figure (float) alignment
+    'figure_align': 'H',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'AusweisApp-SDKWrapper-{}-Manual.tex'.format(AA2_SDKWRAPPER_VERSION), 'AusweisApp SDK Wrapper Manual',
-   r'Governikus GmbH & Co. KG', 'howto'),
+    (
+        master_doc,
+        f'AusweisApp-SDKWrapper-{AA2_SDKWRAPPER_VERSION}-Manual.tex',
+        'AusweisApp SDK Wrapper Manual',
+        r'Governikus GmbH & Co. KG',
+        'howto',
+    ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -148,7 +152,7 @@ latex_logo = '_img/npa.png'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-#latex_use_parts = False
+# latex_use_parts = False
 
 # If true, show page references after internal links.
 latex_show_pagerefs = True
@@ -157,11 +161,11 @@ latex_show_pagerefs = True
 latex_show_urls = 'footnote'
 
 # Documents to append as an appendix to all manuals.
-#latex_appendices = []
+# latex_appendices = []
 
 # If false, no module index is generated.
-#latex_domain_indices = True
+# latex_domain_indices = True
 
 intersphinx_mapping = {
-    "sphinx": ("https://www.ausweisapp.bund.de/sdk/", "objects.inv")
+    'sphinx': ('https://www.ausweisapp.bund.de/sdk/', 'objects.inv')
 }

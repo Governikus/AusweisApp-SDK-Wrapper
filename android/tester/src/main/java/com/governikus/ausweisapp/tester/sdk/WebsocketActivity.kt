@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -12,6 +12,8 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.governikus.ausweisapp.tester.wrapper.databinding.ActivityWebsocketBinding
 import java.io.IOException
 import java.util.Locale
@@ -60,6 +62,11 @@ class WebsocketActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
         dispatcher = ForegroundDispatcher(this) { nfcIntent -> sdkConnection?.send(nfcIntent) }
         viewBinding.websocketLogView.movementMethod = ScrollingMovementMethod()
+        ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { v, insets ->
+            val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBarInsets.left, systemBarInsets.top, systemBarInsets.right, systemBarInsets.bottom)
+            insets
+        }
     }
 
     override fun onDestroy() {
@@ -152,6 +159,7 @@ class WebsocketActivity : AppCompatActivity() {
                     webSocketServer.send("Connect to SDK..")
                     startAA2SDK()
                 }
+
                 "close" -> {
                     if (sdkConnection == null) {
                         webSocketServer.send("Not connected yet")
@@ -161,12 +169,14 @@ class WebsocketActivity : AppCompatActivity() {
                     unbindService(sdkConnection)
                     this@WebsocketActivity.sdkConnection = null
                 }
+
                 "help" -> {
                     webSocketServer.send("---------Help---------")
                     webSocketServer.send(":open - Open connection to SDK (optional: com.governikus.ausweisapp2.dev as parameter)")
                     webSocketServer.send(":close - Close connection to SDK")
                     webSocketServer.send(":help - This help")
                 }
+
                 else -> {
                     addLineOfText("Unknown command")
                     webSocketServer.send("Unknown command")

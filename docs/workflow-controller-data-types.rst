@@ -701,6 +701,46 @@ Provides information about the underlying AusweisApp
       [...]
     }
 
+.. _wc-connectioninfo:
+
+ConnectionInfo
+--------------
+
+Provides information about the LocalIfd connection to an
+installed AusweisApp (Android only)
+
+- **Connected**:
+  The connection is establised.
+
+- **Disconnected**
+  No connection is present.
+
+- **InvalidCertificate**
+  The connection failed because the certificate mismatches.
+
+- **IncompatibleVersion**
+  The version of the installed AusweisApp is incompatible.
+
+- **NotInstalled**
+  No installed AusweisApp was found.
+
+- **Unknown**
+  The information could not be retrieved.
+
+.. tabs::
+
+  .. code-tab:: kotlin
+
+    enum class ConnectionInfo(val rawName: String) {
+        Connected("CONNECTED"),
+        Disconnected("DISCONNECTED"),
+        InvalidCertificate("INVALID_CERTIFICATE"),
+        IncompatibleVersion("INCOMPATIBLE_VERSION"),
+        NotInstalled("NOT_INSTALLED"),
+        Unknown("UNKNOWN")
+        ;
+    }
+
 .. _wc-access-right:
 
 AccessRight

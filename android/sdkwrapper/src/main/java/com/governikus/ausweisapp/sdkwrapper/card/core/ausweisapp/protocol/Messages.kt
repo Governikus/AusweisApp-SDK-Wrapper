@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -52,6 +52,8 @@ internal data class Message(
     @Json(name = "VersionInfo")
     val versionInfo: VersionInfo?,
     val workflow: String?,
+    @Json(name = "AusweisApp")
+    val connectionInfo: String?,
 )
 
 internal data class Description(

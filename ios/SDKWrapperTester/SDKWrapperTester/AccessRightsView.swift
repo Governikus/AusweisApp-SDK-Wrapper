@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -61,8 +61,8 @@ struct AccessRightsView: View {
 		Form {
 			Section(header:
 				Text("Certificate")
-					.textAppearance(theme.textAppearanceListTitle)
-			) {
+					.textAppearance(theme.textAppearanceListTitle))
+			{ // swiftlint:disable:this opening_brace
 				if certificateDescription != nil {
 					HStack {
 						Text("Provider")
@@ -91,8 +91,8 @@ struct AccessRightsView: View {
 			if !self.accessRights.requiredRights.isEmpty {
 				Section(header:
 					Text("Required Data")
-						.textAppearance(theme.textAppearanceListTitle)
-				) {
+						.textAppearance(theme.textAppearanceListTitle))
+				{ // swiftlint:disable:this opening_brace
 					ForEach(accessRights.requiredRights, id: \.self) { right in
 						Text(AccessRightNames.pretty[right] ?? right.rawValue)
 							.textAppearance(self.theme.textAppearanceListItemCaption)
@@ -103,8 +103,8 @@ struct AccessRightsView: View {
 			if !self.optionalRights.isEmpty {
 				Section(header:
 					Text("Optional Data")
-						.textAppearance(theme.textAppearanceListTitle)
-				) {
+						.textAppearance(theme.textAppearanceListTitle))
+				{ // swiftlint:disable:this opening_brace
 					ForEach(self.optionalRights, id: \.self.display) { right in
 						OptionalRightToggle(optionalRight: right)
 					}

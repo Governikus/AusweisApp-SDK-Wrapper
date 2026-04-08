@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding.toolbar.let { toolbar ->
             ViewCompat.setOnApplyWindowInsetsListener(toolbar) { v, insets ->
                 val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.setPadding(0, systemBarInsets.top, 0, 0)
+                v.setPadding(systemBarInsets.left, systemBarInsets.top, systemBarInsets.right, systemBarInsets.bottom)
                 insets
             }
         }

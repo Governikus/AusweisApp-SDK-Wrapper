@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -11,13 +11,33 @@ open class SDKWrapperTesterTheme: ObservableObject {
 	var iconSizeSmall: CGFloat = 20
 	var iconSizeLarge: CGFloat = 96
 
-	open var textAppearanceButton: TextAppearance { TextAppearance(font: .body, color: .accentColor) }
-	open var textAppearanceTitle: TextAppearance { TextAppearance(font: .headline, color: .primary) }
-	open var textAppearanceBody: TextAppearance { TextAppearance(font: .body, color: .primary) }
-	open var textAppearanceListTitle: TextAppearance { TextAppearance(font: .footnote, color: .secondary) }
-	open var textAppearanceListItem: TextAppearance { TextAppearance(font: .body, color: .secondary) }
-	open var textAppearanceListItemCaption: TextAppearance { TextAppearance(font: .body, color: .primary) }
-	open var textAppearanceWarning: TextAppearance { TextAppearance(font: .body, color: .red) }
+	open var textAppearanceButton: TextAppearance {
+		TextAppearance(font: .body, color: .accentColor)
+	}
+
+	open var textAppearanceTitle: TextAppearance {
+		TextAppearance(font: .headline, color: .primary)
+	}
+
+	open var textAppearanceBody: TextAppearance {
+		TextAppearance(font: .body, color: .primary)
+	}
+
+	open var textAppearanceListTitle: TextAppearance {
+		TextAppearance(font: .footnote, color: .secondary)
+	}
+
+	open var textAppearanceListItem: TextAppearance {
+		TextAppearance(font: .body, color: .secondary)
+	}
+
+	open var textAppearanceListItemCaption: TextAppearance {
+		TextAppearance(font: .body, color: .primary)
+	}
+
+	open var textAppearanceWarning: TextAppearance {
+		TextAppearance(font: .body, color: .red)
+	}
 
 	open var errorIcon: AnyView {
 		Image(systemName: "exclamationmark.circle")

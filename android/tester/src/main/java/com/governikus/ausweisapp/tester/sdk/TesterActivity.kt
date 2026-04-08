@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -15,13 +15,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
-import androidx.core.view.isVisible
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.Accept
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.Continue
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.Message
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.Reader
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.RunAuth
-import com.governikus.ausweisapp.tester.sdk.jsonobjects.SetCard
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.SetPin
 import com.governikus.ausweisapp.tester.wrapper.R
 import com.governikus.ausweisapp.tester.wrapper.databinding.ActivityTesterBinding
@@ -46,7 +44,6 @@ class TesterActivity : AppCompatActivity() {
     private var sdkConnection: SdkConnection? = null
     private var currentState = State.UNDEFINED
     private lateinit var viewBinding: ActivityTesterBinding
-    private var smartReaderName: String? = null
     private var resultUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,17 +118,19 @@ class TesterActivity : AppCompatActivity() {
      * @throws RemoteException
      */
     fun sendSetPin() {
-        sdkConnection?.send(SetPin(viewBinding.pin.text.toString()), SetPin::class.java)
+        val length = viewBinding.pin.text.length
+        if (length == 0) {
+            sdkConnection?.send(SetPin(null), SetPin::class.java)
+        } else {
+            val pin = CharArray(length)
+            viewBinding.pin.text.getChars(0, length, pin, 0)
+            sdkConnection?.send(SetPin(pin), SetPin::class.java)
+            pin.fill('\u0000')
+        }
     }
 
     fun sendContinue() {
         sdkConnection?.send(Continue(), Continue::class.java)
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    fun sendSetSmartCard(view: View) {
-        val smartReaderName = smartReaderName ?: return
-        sdkConnection?.send(SetCard(smartReaderName), SetCard::class.java)
     }
 
     private fun parseAndShow(
@@ -176,13 +175,10 @@ class TesterActivity : AppCompatActivity() {
                 if (message.msg == "ACCESS_RIGHTS") {
                     sendAccept()
                 } else if (message.msg == "ENTER_PIN") {
-                    currentState = State.PIN
+                    sendSetPin()
                 }
             }
-            if (currentState == State.PIN) {
-                currentState = State.HAS_SENT
-                sendSetPin()
-            }
+
             if (message.msg == "READER") {
                 handleReaderMessage(json)
             }
@@ -215,22 +211,6 @@ class TesterActivity : AppCompatActivity() {
             } else {
                 addLineOfText("eID card detected")
             }
-        }
-
-        if (!reader.name.startsWith("Smart")) {
-            return
-        }
-
-        val readerName =
-            if (reader.attached && reader.insertable) {
-                reader.name
-            } else {
-                null
-            }
-
-        runOnUiThread {
-            smartReaderName = readerName
-            viewBinding.fabInsertCard.isVisible = smartReaderName != null
         }
     }
 

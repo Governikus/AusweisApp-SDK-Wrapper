@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -9,7 +9,6 @@ import android.text.InputFilter.LengthFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import com.governikus.ausweisapp.tester.wrapper.card.ui.util.WorkflowFragmentViewModelFactory
@@ -36,7 +35,14 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
 
         viewBinding.etNewPin.setFilters(arrayOf(LengthFilter(viewModel.newPinInputLength)))
         viewBinding.etNewPin.doOnTextChanged { s, _, _, _ ->
-            viewModel.newPin.postValue(s.toString())
+            val newPin =
+                if (s != null) {
+                    CharArray(s.length) { index -> s[index] }
+                } else {
+                    CharArray(0)
+                }
+            viewModel.newPin.postValue(newPin)
+            newPin.fill('\u0000')
         }
 
         viewModel.pinErrorMessage.observe(viewLifecycleOwner) { viewBinding.tilConfirmNewPin.setError(it) }
@@ -44,7 +50,14 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
         viewBinding.etConfirmNewPin.setFilters(arrayOf(LengthFilter(viewModel.newPinInputLength)))
         viewBinding.etConfirmNewPin.setOnClickListener { viewModel.onAccept() }
         viewBinding.etConfirmNewPin.doOnTextChanged { s, _, _, _ ->
-            viewModel.confirmationPin.postValue(s.toString())
+            val confirmationPin =
+                if (s != null) {
+                    CharArray(s.length) { index -> s[index] }
+                } else {
+                    CharArray(0)
+                }
+            viewModel.confirmationPin.postValue(confirmationPin)
+            confirmationPin.fill('\u0000')
         }
         viewBinding.etConfirmNewPin.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
@@ -52,17 +65,18 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
                     viewModel.onAccept()
                     true
                 }
-                else -> false
+
+                else -> {
+                    false
+                }
             }
         }
 
+        viewBinding.btnStartPinChangePinpad.setEnabled(viewModel.workflowViewModel.hasPinPadReader.value ?: false)
         viewModel.isNewPinValid.observe(viewLifecycleOwner) { viewBinding.btnStartPinChange.setEnabled(it) }
+        viewModel.workflowViewModel.hasPinPadReader.observe(viewLifecycleOwner) { viewBinding.btnStartPinChangePinpad.setEnabled(it) }
 
         viewBinding.btnStartPinChange.setOnClickListener { viewModel.onAccept() }
-    }
-
-    override fun onApplyInsets(insets: WindowInsetsCompat) {
-        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        viewBinding?.root?.setPadding(0, 0, 0, systemBarInsets.bottom)
+        viewBinding.btnStartPinChangePinpad.setOnClickListener { viewModel.onAcceptEmptyPassword() }
     }
 }

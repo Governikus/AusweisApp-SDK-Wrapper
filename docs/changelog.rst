@@ -1,12 +1,27 @@
 Changelog
 =========
 
+Version 2.5.0
+^^^^^^^^^^^^^
+
+**Release date:** 8. April 2026
+
+- Update AusweisApp SDK to version 2.5.0.
+- Remove support for iOS 16.
+- Update Android NDK to r29 (29.0.14206865).
+- Update Android SDK Platform to Android 16 (API-Level 36).
+- Added parameter ``connectionInfo`` to :ref:`wc-on-info` (Android only).
+- Add new methods for sending sensitive data via CharArray instead of String
+  (Android only). The old methods have been deprecated.
+
+
 Version 2.4.1
 ^^^^^^^^^^^^^
 
 **Release date:** 29. January 2026
 
 - Update AusweisApp SDK to version 2.4.1.
+
 
 Version 2.4.0
 ^^^^^^^^^^^^^

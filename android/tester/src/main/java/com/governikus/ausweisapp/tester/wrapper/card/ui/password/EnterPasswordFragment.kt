@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -9,7 +9,6 @@ import android.text.InputFilter.LengthFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import com.governikus.ausweisapp.tester.wrapper.card.ui.util.WorkflowFragmentViewModelFactory
@@ -67,7 +66,14 @@ internal class EnterPasswordFragment : BaseFragment<FragmentEnterPasswordBinding
         viewModel.passwordInputLength.observe(viewLifecycleOwner) { viewBinding.etPassword.setFilters(arrayOf(LengthFilter(it))) }
         viewBinding.etPassword.setOnClickListener { viewModel.onAccept() }
         viewBinding.etPassword.doOnTextChanged { s, _, _, _ ->
-            viewModel.password.postValue(s.toString())
+            val password =
+                if (s != null) {
+                    CharArray(s.length) { index -> s[index] }
+                } else {
+                    CharArray(0)
+                }
+            viewModel.password.postValue(password)
+            password.fill('\u0000')
         }
         viewBinding.etPassword.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {
@@ -75,7 +81,10 @@ internal class EnterPasswordFragment : BaseFragment<FragmentEnterPasswordBinding
                     viewModel.onAccept()
                     true
                 }
-                else -> false
+
+                else -> {
+                    false
+                }
             }
         }
 
@@ -86,10 +95,9 @@ internal class EnterPasswordFragment : BaseFragment<FragmentEnterPasswordBinding
 
         viewModel.isPasswordValid.observe(viewLifecycleOwner) { viewBinding.btnAccept.setEnabled(it) }
         viewBinding.btnAccept.setOnClickListener { viewModel.onAccept() }
-    }
+        viewBinding.btnAcceptPinpad.setEnabled(viewModel.workflowViewModel.hasPinPadReader.value ?: false)
 
-    override fun onApplyInsets(insets: WindowInsetsCompat) {
-        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        viewBinding?.scrollViewContent?.setPadding(0, 0, 0, systemBarInsets.bottom)
+        viewModel.workflowViewModel.hasPinPadReader.observe(viewLifecycleOwner) { viewBinding.btnAcceptPinpad.setEnabled(it) }
+        viewBinding.btnAcceptPinpad.setOnClickListener { viewModel.onAcceptEmptyPassword() }
     }
 }

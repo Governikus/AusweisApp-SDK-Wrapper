@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2023-2026 Governikus GmbH & Co. KG, Germany
  */
 

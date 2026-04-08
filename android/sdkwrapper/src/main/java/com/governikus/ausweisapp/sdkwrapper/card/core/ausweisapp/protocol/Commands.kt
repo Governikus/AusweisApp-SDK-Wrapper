@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -6,6 +6,33 @@ package com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol
 
 internal interface Command {
     val cmd: String
+}
+
+internal interface SensitiveCommand : Command {
+    val value: CharArray?
+
+    fun toJsonCharArray(): CharArray {
+        val prefixStr = "{\"cmd\":\"$cmd\",\"value\":"
+        val currentValue = value
+
+        if (currentValue == null) {
+            return "$prefixStr null}".toCharArray()
+        }
+
+        val prefix = "$prefixStr\"".toCharArray()
+        val suffix = "\"}".toCharArray()
+
+        val result = CharArray(prefix.size + currentValue.size + suffix.size)
+        prefix.copyInto(result, destinationOffset = 0)
+        currentValue.copyInto(result, destinationOffset = prefix.size)
+        suffix.copyInto(result, destinationOffset = prefix.size + currentValue.size)
+
+        return result
+    }
+
+    fun clear() {
+        value?.fill('\u0000')
+    }
 }
 
 internal class Accept(
@@ -46,9 +73,9 @@ internal class SetAccessRights(
 ) : Command
 
 internal class SetCan(
-    val value: String?,
+    override val value: CharArray?,
     override val cmd: String = "SET_CAN",
-) : Command
+) : SensitiveCommand
 
 internal class SetCard(
     val name: String,
@@ -57,19 +84,19 @@ internal class SetCard(
 ) : Command
 
 internal class SetPin(
-    val value: String?,
+    override val value: CharArray?,
     override val cmd: String = "SET_PIN",
-) : Command
+) : SensitiveCommand
 
 internal class SetNewPin(
-    val value: String?,
+    override val value: CharArray?,
     override val cmd: String = "SET_NEW_PIN",
-) : Command
+) : SensitiveCommand
 
 internal class SetPuk(
-    val value: String?,
+    override val value: CharArray?,
     override val cmd: String = "SET_PUK",
-) : Command
+) : SensitiveCommand
 
 internal class GetStatus(
     override val cmd: String = "GET_STATUS",

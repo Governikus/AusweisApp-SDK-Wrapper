@@ -22,7 +22,7 @@ repository of Android. To use it, make the following adjustments to your Gradle 
 
   .. code-block:: groovy
 
-    implementation 'com.governikus.ausweisapp:sdkwrapper:2.4.1'
+    implementation 'com.governikus.ausweisapp:sdkwrapper:2.5.0'
 
 Initialization of the Android Application
 -----------------------------------------

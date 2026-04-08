@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -42,7 +42,7 @@ class TestModeModel: ObservableObject {
 		let deactivated: Bool?
 		let retryCounter: Int?
 
-		public func isEmpty() -> Bool {
+		func isEmpty() -> Bool {
 			return inoperative == nil && deactivated == nil && retryCounter == nil
 		}
 	}
@@ -70,7 +70,7 @@ class TestModeModel: ObservableObject {
 	private var apiLevel: Int?
 
 	// swiftlint: disable function_parameter_count
-	public func authenticate(
+	func authenticate(
 		to tcTokenUrl: String,
 		withPin pin: String,
 		useCustomMessages: Bool,
@@ -96,7 +96,7 @@ class TestModeModel: ObservableObject {
 
 	// swiftlint: enable function_parameter_count
 
-	public func stop() {
+	func stop() {
 		if !isStarted {
 			return
 		}
@@ -109,7 +109,7 @@ class TestModeModel: ObservableObject {
 		apiLevel = nil
 	}
 
-	public func setPin() {
+	func setPin() {
 		send(Command(cmd: "SET_PIN", value: pin))
 	}
 
@@ -181,7 +181,7 @@ class TestModeModel: ObservableObject {
 		case "ACCESS_RIGHTS":
 			send(Command(cmd: "ACCEPT"))
 		case "ENTER_PIN":
-			if !handleInterrupt && interruptScan {
+			if !handleInterrupt, interruptScan {
 				send(Command(cmd: "INTERRUPT"))
 			} else {
 				send(Command(cmd: "SET_PIN", value: pin))

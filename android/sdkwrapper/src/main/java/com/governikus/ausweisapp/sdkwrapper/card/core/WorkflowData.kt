@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -142,7 +142,16 @@ data class SimulatorFile(
     val fileId: String,
     val shortFileId: String,
     val content: String,
-) : Parcelable
+) : Parcelable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SimulatorFile) return false
+
+        return fileId == other.fileId && shortFileId == other.shortFileId
+    }
+
+    override fun hashCode() = 31 * fileId.hashCode() + shortFileId.hashCode()
+}
 
 /**
  * Keys for Simulator reader
@@ -240,6 +249,25 @@ data class VersionInfo(
     val specificationVendor: String,
     val specificationVersion: String,
 ) : Parcelable
+
+/**
+ * List of possible connection information in [WorkflowCallbacks.onInfo]
+ */
+enum class ConnectionInfo(
+    val rawName: String,
+) {
+    Connected("CONNECTED"),
+    Disconnected("DISCONNECTED"),
+    InvalidCertificate("INVALID_CERTIFICATE"),
+    IncompatibleVersion("INCOMPATIBLE_VERSION"),
+    NotInstalled("NOT_INSTALLED"),
+    Unknown("UNKNOWN"),
+    ;
+
+    companion object {
+        fun fromRawName(name: String?): ConnectionInfo? = values().firstOrNull { it.rawName == name }
+    }
+}
 
 /**
  * Provides information about an error.

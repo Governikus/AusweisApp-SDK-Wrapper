@@ -1,11 +1,13 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
 import Foundation
 
 extension AA2Message {
-	var aa2DateFormat: String { "yyyy-MM-dd" }
+	var aa2DateFormat: String {
+		"yyyy-MM-dd"
+	}
 
 	func getCertificateDescription() -> CertificateDescription? {
 		guard
@@ -32,9 +34,8 @@ extension AA2Message {
 	func getReaders() -> [Reader]? {
 		guard let readers = readers else { return nil }
 
-		let readerList = readers.compactMap { reader -> Reader? in Reader(reader: reader)
+		return readers.compactMap { reader -> Reader? in Reader(reader: reader)
 		}
-		return readerList
 	}
 
 	func getReader() -> Reader? {

@@ -1,1 +1,32 @@
+pluginManagement {
+    repositories {
+        if (System.getenv("MIRROR_GOOGLE_MAVEN")) {
+            maven { url = System.getenv("MIRROR_GOOGLE_MAVEN") }
+        } else {
+            google()
+        }
+        if (System.getenv("MIRROR_MAVEN")) {
+            maven { url = System.getenv("MIRROR_MAVEN") }
+        } else {
+            mavenCentral()
+        }
+        if (System.getenv("MIRROR_GRADLE")) {
+            maven { url = System.getenv("MIRROR_GRADLE") }
+        } else {
+            gradlePluginPortal()
+        }
+    }
+    plugins {
+        id("androidx.navigation.safeargs.kotlin") version "2.9.7"
+        id("com.android.application") version "8.13.2"
+        id("com.android.library") version "8.13.2"
+        id("com.github.ben-manes.versions") version "0.53.0"
+        id("org.jetbrains.kotlin.android") version "2.3.20"
+        id("org.jetbrains.kotlin.plugin.parcelize") version "2.3.20"
+        id("org.jetbrains.kotlinx.kover") version "0.9.7"
+        id("org.jmailen.kotlinter") version "5.4.2"
+        id("org.sonarqube") version "7.2.3.7755"
+    }
+}
+
 include ':tester', ':sdkwrapper', ':ausweisapp'

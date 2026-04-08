@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -25,7 +25,7 @@ class WorkflowControllerTests: XCTestCase {
 		testCallbacks = nil
 	}
 
-	func testOnStarted() throws {
+	func testOnStarted() {
 		let onStartedExpectation = expectation(description: "onStarted called")
 
 		testCallbacks.doOnStarted = {
@@ -38,7 +38,7 @@ class WorkflowControllerTests: XCTestCase {
 		XCTAssertTrue(workflowController.isStarted)
 	}
 
-	func testErrorNotStarted() throws {
+	func testErrorNotStarted() {
 		let onErrorExpectation = expectation(description: "onWrapperError called")
 
 		testCallbacks.doOnError = {
@@ -51,7 +51,7 @@ class WorkflowControllerTests: XCTestCase {
 		waitForExpectations(timeout: 1, handler: nil)
 	}
 
-	func testAuthenticationStarted() throws {
+	func testAuthenticationStarted() {
 		let onAuthenticationStartedExpectation = expectation(description: "onAuthenticationStarted called")
 		let authCommandReceivedExpectation = expectation(description: "authCommandReceived")
 
@@ -76,7 +76,7 @@ class WorkflowControllerTests: XCTestCase {
 	}
 
 	// swiftlint:disable function_body_length
-	func testFullAuthentication() throws {
+	func testFullAuthentication() {
 		let pin = "123456"
 
 		let exampleDateString = "1999-07-20"
@@ -122,8 +122,7 @@ class WorkflowControllerTests: XCTestCase {
 						"            \"major\": \"http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok\"" +
 						"           }," +
 						"  \"url\": \"https://test.governikus-eid.de/gov_autent/async?refID=_123456789\"" +
-						"}"
-				)
+						"}")
 			}
 		}
 
@@ -157,8 +156,7 @@ class WorkflowControllerTests: XCTestCase {
 					"  \"msg\": \"ENTER_PIN\"," +
 					"  \"reader\":" +
 					readerMessage +
-					"}"
-			)
+					"}")
 		}
 
 		let onInsertCardExpectation = expectation(description: "onInsertCard called")
@@ -208,8 +206,7 @@ class WorkflowControllerTests: XCTestCase {
 					"         \"required\": [\"Address\", \"FamilyName\"]" +
 					"        }," +
 					"  \"transactionInfo\": \"this is an example\"" +
-					"}"
-			)
+					"}")
 		}
 
 		workflowController.start()
@@ -239,7 +236,7 @@ class MockSdkConnection: SdkConnection {
 		isStarted = false
 	}
 
-	func send<T>(command: T) where T: Command {
+	func send<T: Command>(command: T) {
 		if let onCommandSend = onCommandSend {
 			DispatchQueue.global().async {
 				onCommandSend(command)

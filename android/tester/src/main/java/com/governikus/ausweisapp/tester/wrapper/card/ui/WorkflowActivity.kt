@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -13,7 +13,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.core.content.IntentCompat.getSerializableExtra
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -56,7 +55,7 @@ internal class WorkflowActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(viewBinding.toolbar) { v, insets ->
             val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, systemBarInsets.top, 0, 0)
+            v.setPadding(systemBarInsets.left, systemBarInsets.top, systemBarInsets.right, systemBarInsets.bottom)
             insets
         }
 
@@ -140,7 +139,12 @@ internal class WorkflowActivity : AppCompatActivity() {
             Workflow.CHANGE_TRANSPORT_PIN -> {
                 navController.navigate(
                     R.id.action_start_pin_change,
-                    bundleOf("passwordType" to EnterPasswordFragment.PasswordType.TRANSPORT_PIN.type),
+                    Bundle().apply {
+                        putString(
+                            "passwordType",
+                            EnterPasswordFragment.PasswordType.TRANSPORT_PIN.type,
+                        )
+                    },
                 )
             }
         }
@@ -158,11 +162,22 @@ internal class WorkflowActivity : AppCompatActivity() {
 
     private fun backPressed() {
         when {
-            navHostFragment.childFragmentManager.backStackEntryCount > 0 -> navHostFragment.navController.popBackStack()
-            viewModel.workflowStatus == WorkflowViewModel.WorkflowStatus.COMPLETED -> viewModel.acceptError()
-            viewModel.workflowStatus == WorkflowViewModel.WorkflowStatus.CANCELLED -> { /* Do nothing waiting for completion */ }
+            navHostFragment.childFragmentManager.backStackEntryCount > 0 -> {
+                navHostFragment.navController.popBackStack()
+            }
 
-            lastBackPress + CLOSE_TIME_DELAY > System.currentTimeMillis() -> viewModel.cancelWorkflow()
+            viewModel.workflowStatus == WorkflowViewModel.WorkflowStatus.COMPLETED -> {
+                viewModel.acceptError()
+            }
+
+            viewModel.workflowStatus == WorkflowViewModel.WorkflowStatus.CANCELLED -> {
+                // Do nothing waiting for completion
+            }
+
+            lastBackPress + CLOSE_TIME_DELAY > System.currentTimeMillis() -> {
+                viewModel.cancelWorkflow()
+            }
+
             else -> {
                 lastBackPress = System.currentTimeMillis()
                 Toast.makeText(this, R.string.back_press_info, Toast.LENGTH_SHORT).show()

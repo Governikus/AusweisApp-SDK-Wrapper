@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -148,7 +148,7 @@ public struct AuthResult {
 
 /// Final result of a PIN change.
 public struct ChangePinResult {
-	// False if an error occured or the PIN change was aborted.
+	/// False if an error occured or the PIN change was aborted.
 	public let success: Bool
 
 	/// Unique error code if the PIN change failed.
@@ -333,6 +333,12 @@ public struct SimulatorFile: Encodable {
 		fileId = withFileId
 		shortFileId = withShortFileId
 		content = withContent
+	}
+}
+
+extension SimulatorFile: Equatable {
+	public static func == (lhs: SimulatorFile, rhs: SimulatorFile) -> Bool {
+		lhs.fileId == rhs.fileId && lhs.shortFileId == rhs.shortFileId
 	}
 }
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -14,8 +14,8 @@ struct CertificateInformationView: View {
 		Form {
 			Section(header:
 				Text("Issuer information")
-					.textAppearance(theme.textAppearanceListTitle)
-			) {
+					.textAppearance(theme.textAppearanceListTitle))
+			{ // swiftlint:disable:this opening_brace
 				HStack {
 					Text("Issuer name")
 						.textAppearance(theme.textAppearanceListItemCaption)
@@ -34,8 +34,8 @@ struct CertificateInformationView: View {
 
 			Section(header:
 				Text("Subject information")
-					.textAppearance(theme.textAppearanceListTitle)
-			) {
+					.textAppearance(theme.textAppearanceListTitle))
+			{ // swiftlint:disable:this opening_brace
 				HStack {
 					Text("Purpose")
 						.textAppearance(theme.textAppearanceListItemCaption)
@@ -61,16 +61,16 @@ struct CertificateInformationView: View {
 
 			Section(header:
 				Text("Terms of Usage")
-					.textAppearance(theme.textAppearanceListTitle)
-			) {
+					.textAppearance(theme.textAppearanceListTitle))
+			{ // swiftlint:disable:this opening_brace
 				Text(description.termsOfUsage)
 					.textAppearance(theme.textAppearanceListItemCaption)
 			}
 
 			Section(header:
 				Text("Validity")
-					.textAppearance(theme.textAppearanceListTitle)
-			) {
+					.textAppearance(theme.textAppearanceListTitle))
+			{ // swiftlint:disable:this opening_brace
 				HStack {
 					Text("Issue date")
 						.textAppearance(theme.textAppearanceListItemCaption)

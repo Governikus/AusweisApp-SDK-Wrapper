@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -86,6 +86,57 @@ class WorkflowControllerTest {
         }
 
     @Test
+    fun testOnInfo() =
+        runTest(timeout = 1000.milliseconds) {
+            assertNotNull(workflowController)
+            assertNotNull(connection)
+            val workflowController = workflowController!!
+            val connection = connection!!
+
+            connection.onCommandSend = {
+                val infoString = """
+                {
+                   "AusweisApp": "CONNECTED",
+                    "VersionInfo": {
+                        "Implementation-Title": "AusweisApp2",
+                        "Implementation-Vendor": "Governikus GmbH & Co. KG",
+                        "Implementation-Version": "2.4.104+61-default-6bb35d835157+-draft",
+                        "Name": "AusweisApp2",
+                        "Specification-Title": "TR-03124-1",
+                        "Specification-Vendor": "Federal Office for Information Security",
+                        "Specification-Version": "1.4"
+                      },
+                    "msg": "INFO"
+                }
+                """
+                connection.receive(infoString)
+            }
+
+            val completed =
+                suspendCoroutine<Boolean> {
+                    workflowController.registerCallbacks(
+                        object : TestWorkflowCallbacks() {
+                            override fun onInfo(
+                                versionInfo: VersionInfo,
+                                connectionInfo: ConnectionInfo,
+                            ) {
+                                assertEquals(ConnectionInfo.Connected, connectionInfo)
+                                it.resume(true)
+                            }
+                        },
+                    )
+
+                    workflowController.start(RuntimeEnvironment.getApplication())
+                    assertEquals(true, workflowController.isStarted)
+                    workflowController.getInfo()
+
+                    advanceUntilIdle()
+                }
+
+            assert(completed)
+        }
+
+    @Test
     fun testErrorNotStarted() =
         runTest(timeout = 1000.milliseconds) {
             assertNotNull(workflowController)
@@ -158,7 +209,7 @@ class WorkflowControllerTest {
             val connection = connection!!
 
             val tcTokenUrl = Uri.parse("https://test.test")
-            val testPin = "123456"
+            val testPin = "123456".toCharArray()
 
             connection.onCommandSend = { command ->
                 when (command) {
@@ -168,9 +219,11 @@ class WorkflowControllerTest {
 
                         connection.receive("{\"msg\":\"AUTH\"}")
                     }
+
                     is Accept -> {
                         connection.receive("{\"msg\":\"INSERT_CARD\"}")
                     }
+
                     is SetPin -> {
                         assertEquals(testPin, command.value)
 
@@ -185,6 +238,7 @@ class WorkflowControllerTest {
                                 "}",
                         )
                     }
+
                     else -> {
                     }
                 }
@@ -400,7 +454,10 @@ internal open class TestWorkflowCallbacks : WorkflowCallbacks {
 
     override fun onStatus(workflowProgress: WorkflowProgress) {}
 
-    override fun onInfo(versionInfo: VersionInfo) {}
+    override fun onInfo(
+        versionInfo: VersionInfo,
+        connectionInfo: ConnectionInfo,
+    ) {}
 
     override fun onBadState(error: String) {}
 

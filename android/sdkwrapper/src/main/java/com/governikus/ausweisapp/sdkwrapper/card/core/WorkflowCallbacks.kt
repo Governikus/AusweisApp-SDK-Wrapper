@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -193,8 +193,12 @@ interface WorkflowCallbacks {
      * Response to a call to [WorkflowController.getInfo].
      *
      * @param versionInfo Holds information about the currently utilized AusweisApp2.
+     * @param connectionInfo Holds information about the LocalIfd connection to the installed AusweisApp2.
      */
-    fun onInfo(versionInfo: VersionInfo)
+    fun onInfo(
+        versionInfo: VersionInfo,
+        connectionInfo: ConnectionInfo,
+    )
 
     /**
      * Called if an error within the AusweisApp2 SDK occurred. Please report this as it indicates a bug.

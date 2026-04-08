@@ -18,6 +18,7 @@
 -keep class com.governikus.ausweisapp.sdkwrapper.card.core.AuthResult { *; }
 -keep class com.governikus.ausweisapp.sdkwrapper.card.core.AuthResultData { *; }
 -keep class com.governikus.ausweisapp.sdkwrapper.card.core.VersionInfo { *; }
+-keep class com.governikus.ausweisapp.sdkwrapper.card.core.ConnectionInfo { *; }
 -keep class com.governikus.ausweisapp.sdkwrapper.card.core.WorkflowProgress { *; }
 -keep class com.governikus.ausweisapp.sdkwrapper.card.core.WrapperError { *; }
 -keep class com.governikus.ausweisapp.sdkwrapper.card.core.ChangePinResult { *; }

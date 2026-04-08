@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -7,7 +7,6 @@ package com.governikus.ausweisapp.tester.wrapper.card.ui.error
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
 import com.governikus.ausweisapp.tester.wrapper.card.ui.util.WorkflowFragmentViewModelFactory
 import com.governikus.ausweisapp.tester.wrapper.common.BaseFragment
@@ -35,10 +34,5 @@ internal class ErrorFragment : BaseFragment<FragmentErrorBinding>() {
         viewModel.workflowViewModel.errorMessage.observe(viewLifecycleOwner) { viewBinding.tvErrorMessage.setText(it) }
 
         viewBinding.btnAcceptError.setOnClickListener { viewModel.onAccept() }
-    }
-
-    override fun onApplyInsets(insets: WindowInsetsCompat) {
-        val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        viewBinding?.root?.setPadding(0, 0, 0, systemBarInsets.bottom)
     }
 }

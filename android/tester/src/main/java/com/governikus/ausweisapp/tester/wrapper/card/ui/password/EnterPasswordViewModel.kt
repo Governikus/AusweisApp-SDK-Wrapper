@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -38,7 +38,7 @@ internal class EnterPasswordViewModel(
             }
         }
 
-    val password = MutableLiveData<String>()
+    val password = MutableLiveData<CharArray>()
 
     val passwordInputLength =
         passwordType.map { passwordType ->
@@ -63,7 +63,7 @@ internal class EnterPasswordViewModel(
     val isPasswordValid =
         passwordInputLength.switchMap { passwordInputLength ->
             password.map { password ->
-                !password.isNullOrBlank() && password.length == passwordInputLength
+                password != null && password.size == passwordInputLength
             }
         }
 
@@ -97,16 +97,20 @@ internal class EnterPasswordViewModel(
                 workflowViewModel.currentCard.map { currentCard ->
                     when {
                         // Initial password request, show no error
-                        currentCard == null -> null
+                        currentCard == null -> {
+                            null
+                        }
+
                         // When we have a last card and have to ask for the PIN again or we have to ask for the PUK/CAN after while the retryCounter did not change, the last input was wrong
                         lastCard != null -> {
                             val retryCounterEqual = (lastCard.pinRetryCounter == currentCard.pinRetryCounter)
                             if (
                                 (
-                                    passwordType == EnterPasswordFragment.PasswordType.PIN ||
-                                        passwordType == EnterPasswordFragment.PasswordType.TRANSPORT_PIN
-                                ) &&
-                                lastCard.pinRetryCounter!! > 0 ||
+                                    (
+                                        passwordType == EnterPasswordFragment.PasswordType.PIN ||
+                                            passwordType == EnterPasswordFragment.PasswordType.TRANSPORT_PIN
+                                    ) && lastCard.pinRetryCounter!! > 0
+                                ) ||
                                 (passwordType == EnterPasswordFragment.PasswordType.PUK && retryCounterEqual) ||
                                 (passwordType == EnterPasswordFragment.PasswordType.CAN && retryCounterEqual)
                             ) {
@@ -115,10 +119,12 @@ internal class EnterPasswordViewModel(
                                 null
                             }
                         }
+
                         // If we have no last card and don't have our initial pin/can it means the user gave a wrong input
                         !workflowViewModel.hasStoredPin && !workflowViewModel.hasStoredCan -> {
                             application.getString(R.string.enter_password_wrong_try)
                         }
+
                         // If we still have our initial pin/can and no last card, it means the AA2 SDK did not ask for it, so we are in a different state than expected.
                         else -> {
                             null
@@ -132,6 +138,17 @@ internal class EnterPasswordViewModel(
             passwordErrorMessage != null
         }
 
+    fun setPassword(
+        passwordType: EnterPasswordFragment.PasswordType,
+        value: CharArray?,
+    ) {
+        when (passwordType) {
+            EnterPasswordFragment.PasswordType.CAN -> workflowViewModel.setCan(value)
+            EnterPasswordFragment.PasswordType.PUK -> workflowViewModel.setPuk(value)
+            EnterPasswordFragment.PasswordType.PIN, EnterPasswordFragment.PasswordType.TRANSPORT_PIN -> workflowViewModel.setPin(value)
+        }
+    }
+
     fun onAccept() {
         val password = password.value ?: return
         val passwordType = passwordType.value ?: return
@@ -141,10 +158,12 @@ internal class EnterPasswordViewModel(
             return
         }
 
-        when (passwordType) {
-            EnterPasswordFragment.PasswordType.CAN -> workflowViewModel.setCan(password)
-            EnterPasswordFragment.PasswordType.PUK -> workflowViewModel.setPuk(password)
-            EnterPasswordFragment.PasswordType.PIN, EnterPasswordFragment.PasswordType.TRANSPORT_PIN -> workflowViewModel.setPin(password)
-        }
+        setPassword(passwordType, password)
+    }
+
+    fun onAcceptEmptyPassword() {
+        val passwordType = passwordType.value ?: return
+
+        setPassword(passwordType, null)
     }
 }

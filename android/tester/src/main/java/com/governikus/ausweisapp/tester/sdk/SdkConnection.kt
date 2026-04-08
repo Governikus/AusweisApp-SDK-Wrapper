@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -14,6 +14,7 @@ import android.os.RemoteException
 import android.util.Log
 import androidx.core.content.IntentCompat.getParcelableExtra
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.Command
+import com.governikus.ausweisapp.tester.sdk.jsonobjects.SensitiveCommand
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.SetApiLevel
 import com.governikus.ausweisapp2.IAusweisApp2Sdk
 import com.squareup.moshi.Moshi
@@ -48,17 +49,41 @@ class SdkConnection internal constructor(
     }
 
     fun <T : Command> send(
-        message: T,
+        command: T,
         clazz: Class<T>,
-    ) {
-        send(moshi.adapter(clazz).toJson(message))
+    ): Boolean {
+        val sdk = aa2SDKCallback ?: return false
+        val sessionId = callback.sessionID ?: return false
+
+        var messagePayload: CharArray? = null
+
+        return try {
+            messagePayload =
+                if (command is SensitiveCommand) {
+                    command.toJsonCharArray()
+                } else {
+                    moshi.adapter(clazz).toJson(command).toCharArray()
+                }
+
+            sdk.transmit(sessionId, messagePayload)
+        } catch (e: Exception) {
+            Log.d(tag, "Could not send command", e)
+            false
+        } finally {
+            messagePayload?.fill('\u0000')
+            if (command is SensitiveCommand) {
+                command.clear()
+            }
+        }
     }
 
-    fun send(message: String) {
+    fun send(
+        message: String,
+    ) {
         val sdk = aa2SDKCallback ?: return
+        val sessionId = callback.sessionID ?: return
 
-        Log.d("send()", message)
-        sdk.send(callback.sessionID, message)
+        sdk.transmit(sessionId, message.toCharArray())
     }
 
     fun send(intent: Intent) {

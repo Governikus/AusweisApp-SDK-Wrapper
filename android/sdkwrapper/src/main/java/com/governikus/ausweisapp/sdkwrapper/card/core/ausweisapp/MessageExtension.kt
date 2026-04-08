@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -59,9 +59,9 @@ internal fun Message.getCard(): Card? {
 
 internal fun Message.getReaderFromRoot(): Reader? {
     val name = name ?: return null
-    val insertable = insertable ?: return null
-    val attached = attached ?: return null
-    val keypad = keypad ?: return null
+    val insertable = insertable ?: false
+    val attached = attached ?: false
+    val keypad = keypad ?: false
 
     return Reader(
         name,

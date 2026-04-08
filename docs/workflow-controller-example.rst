@@ -56,7 +56,7 @@ Empty callback declarations are left out to increase readability.
 
         import AusweisApp2SDKWrapper
 
-        @available(iOS 16, *)
+        @available(iOS 17, *)
         class WorkflowViewModel: ObservableObject {
             private let workflowController = AA2SDKWrapper.workflowController
 
@@ -73,7 +73,7 @@ Empty callback declarations are left out to increase readability.
             }
         }
 
-        @available(iOS 16, *)
+        @available(iOS 17, *)
         extension WorkflowViewModel: WorkflowCallbacks {
             func onAccessRights(error: String?, accessRights: AusweisApp2SDKWrapper.AccessRights?) {
                 workflowController.accept()
@@ -92,11 +92,6 @@ Empty callback declarations are left out to increase readability.
             func onStarted() {
                 let tcTokenUrl = URL(string: "[...]")
                 workflowController.startAuthentication(withTcTokenUrl: tcTokenUrl)
-            }
-
-            func start() {
-                workflowController.registerCallbacks(self)
-                workflowController.start()
             }
         }
 

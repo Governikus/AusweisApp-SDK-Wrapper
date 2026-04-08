@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -24,8 +24,9 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         viewBinding = onCreateViewBinding(inflater)
 
         viewBinding?.root?.let { root ->
-            ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
-                onApplyInsets(insets)
+            ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
+                val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBarInsets.left, systemBarInsets.top, systemBarInsets.right, systemBarInsets.bottom)
                 insets
             }
         }
@@ -40,6 +41,4 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
         viewBinding = null
     }
-
-    abstract fun onApplyInsets(insets: WindowInsetsCompat)
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -15,6 +15,7 @@ import android.util.Log
 import com.governikus.ausweisapp.sdkwrapper.card.core.WorkflowController
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Command
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Message
+import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.SensitiveCommand
 import com.governikus.ausweisapp2.IAusweisApp2Sdk
 import com.governikus.ausweisapp2.IAusweisApp2SdkCallback
 import com.squareup.moshi.Moshi
@@ -23,8 +24,8 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 internal class AA2SdkConnection : WorkflowController.SdkConnection {
     private var context: Context? = null
     private var sdkConnection: ServiceConnection? = null
-    private var sdk: IAusweisApp2Sdk? = null
-    private var sdkSessionId: String? = null
+    internal var sdk: IAusweisApp2Sdk? = null
+    internal var sdkSessionId: String? = null
 
     private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
@@ -112,12 +113,25 @@ internal class AA2SdkConnection : WorkflowController.SdkConnection {
         val sdk = sdk ?: return false
         val sessionId = sdkSessionId ?: return false
 
+        var messagePayload: CharArray? = null
+
         return try {
-            val messageJson = moshi.adapter(clazz).toJson(command)
-            sdk.send(sessionId, messageJson)
-        } catch (e: RemoteException) {
+            messagePayload =
+                if (command is SensitiveCommand) {
+                    command.toJsonCharArray()
+                } else {
+                    moshi.adapter(clazz).toJson(command).toCharArray()
+                }
+
+            sdk.transmit(sessionId, messagePayload)
+        } catch (e: Exception) {
             Log.d(TAG, "Could not send command", e)
             false
+        } finally {
+            messagePayload?.fill('\u0000')
+            if (command is SensitiveCommand) {
+                command.clear()
+            }
         }
     }
 

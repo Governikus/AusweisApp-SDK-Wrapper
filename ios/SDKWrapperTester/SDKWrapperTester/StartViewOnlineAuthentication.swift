@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -11,7 +11,7 @@ import SwiftUI
 struct StartViewOnlineAuthentication: View {
 	weak var viewController: UIViewController?
 	@State private var tcTokenUrl
-		= URL(string: "https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&redirect=true")!
+		= URL(string: "https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json")!
 	@State private var tcTokenUrlAllRightsRequired
 		= URL(string: "https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json")!
 	@State private var tcTokenUrlCanAllowed

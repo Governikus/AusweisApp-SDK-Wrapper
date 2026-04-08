@@ -436,12 +436,16 @@ Response to a call to :ref:`wc-get-info`.
 - **versionInfo**:
   Holds information about the currently utilized AusweisApp.
   See :ref:`wc-versioninfo`.
+- **connectionInfo**:
+  Holds information about the LocalIfd connection to an installed
+  AusweisApp (Android only).
+  See :ref:`wc-connectioninfo`.
 
 .. tabs::
 
   .. code-tab:: kotlin
 
-    fun onInfo(versionInfo: VersionInfo)
+    fun onInfo(versionInfo: VersionInfo, connectionInfo: ConnectionInfo)
 
   .. code-tab:: swift
 

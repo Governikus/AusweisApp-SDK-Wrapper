@@ -1,30 +1,52 @@
-buildscript {
-    ext.kotlin_version = '2.3.0'
-    ext.ausweisapp_version = '2.4.1'
-    ext.sdkwrapper_version = '2.4.1'
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
-    repositories {
-        google()
-        maven {
-            url = "https://plugins.gradle.org/m2/"
+plugins {
+    id("com.github.ben-manes.versions")
+    id("org.jetbrains.kotlinx.kover")
+    id("org.sonarqube")
+
+    id("com.android.application") apply false
+    id("org.jetbrains.kotlin.android") apply false
+}
+
+ext {
+    ausweisapp_version = '2.5.0'
+    sdkwrapper_version = '2.5.0'
+    java_version = 21
+
+    configureRename = { Project module, String suffix ->
+
+        module.tasks.register("renameOutput") {
+            dependsOn("assemble")
+
+            doLast {
+                def outputDir = module.layout.buildDirectory.dir("outputs/${suffix}").get()
+                module.fileTree(outputDir).matching {
+                    include("**/*-*.${suffix}")
+                    exclude("**/*-*-*.${suffix}")
+                }.each { file ->
+                    def versionedName = file.name.replace(".${suffix}", "-${sdkwrapper_version}.${suffix}")
+                    file.renameTo(new File(file.parent, versionedName))
+                }
+            }
         }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jmailen.gradle:kotlinter-gradle:5.0.2"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.9.0"
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.52.0'
-        classpath 'com.squareup.okhttp3:okhttp:5.3.2'
+
+        module.tasks.named("assemble") {
+            finalizedBy("renameOutput")
+        }
     }
 }
 
-plugins {
-    id("org.sonarqube") version "6.0.1.5171"
-    id("java")
-    id("org.jetbrains.kotlinx.kover") version "0.9.1"
+subprojects { subproject ->
+    subproject.afterEvaluate {
+        tasks.withType(KotlinJvmCompile).configureEach {
+            compilerOptions {
+                allWarningsAsErrors.set(true)
+                freeCompilerArgs.add("-Xstring-concat=inline")
+                freeCompilerArgs.add("-Xannotation-default-target=param-property")
+            }
+        }
+    }
 }
 
 def isNonStable = { String version ->
@@ -46,18 +68,26 @@ dependencies {
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
+        if (System.getenv("MIRROR_GOOGLE_MAVEN")) {
+            maven { url = System.getenv("MIRROR_GOOGLE_MAVEN") }
+        } else {
+            google()
+        }
+        if (System.getenv("MIRROR_MAVEN")) {
+           maven { url = System.getenv("MIRROR_MAVEN") }
+        } else {
+            mavenCentral()
+        }
         maven {
             url = "$project.rootDir/ausweisapp"
         }
     }
-    apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
-    tasks.named("dependencyUpdates").configure {
-      checkForGradleUpdate = false
-      rejectVersionIf {
+}
+
+tasks.named("dependencyUpdates").configure {
+    checkForGradleUpdate = false
+    rejectVersionIf {
         isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
-      }
     }
 }
 

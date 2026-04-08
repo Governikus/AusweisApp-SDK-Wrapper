@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -17,22 +17,22 @@ internal class EnterNewPinViewModel(
     workflowViewModel: WorkflowViewModel,
     application: Application,
 ) : WorkflowFragmentViewModel(workflowViewModel, application) {
-    val newPin = MutableLiveData<String>()
-    val confirmationPin = MutableLiveData<String>()
+    val newPin = MutableLiveData<CharArray>()
+    val confirmationPin = MutableLiveData<CharArray>()
 
     val newPinInputLength = WorkflowController.PIN_LENGTH
 
     val isNewPinValid =
         newPin.switchMap { newPin ->
             confirmationPin.map { confirmationPin ->
-                newPin?.length == newPinInputLength && newPin == confirmationPin
+                newPin?.size == newPinInputLength && newPin.contentEquals(confirmationPin)
             }
         }
 
     val pinErrorMessage =
         newPin.switchMap { newPin ->
             confirmationPin.map { confirmationPin ->
-                if (confirmationPin?.length == newPinInputLength && newPin != confirmationPin) {
+                if (confirmationPin?.size == newPinInputLength && !newPin.contentEquals(confirmationPin)) {
                     application.getString(R.string.enter_new_pin_confirmation_error)
                 } else {
                     null
@@ -49,5 +49,9 @@ internal class EnterNewPinViewModel(
         }
 
         workflowViewModel.setNewPin(newPin)
+    }
+
+    fun onAcceptEmptyPassword() {
+        workflowViewModel.setNewPin(null)
     }
 }

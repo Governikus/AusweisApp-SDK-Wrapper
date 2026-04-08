@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -7,7 +7,7 @@ package com.governikus.ausweisapp.tester.wrapper.card.ui
 import android.app.Activity
 import android.app.Application
 import android.net.Uri
-import androidx.core.os.bundleOf
+import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.governikus.ausweisapp.sdkwrapper.SDKWrapper.workflowController
@@ -18,6 +18,7 @@ import com.governikus.ausweisapp.sdkwrapper.card.core.Card
 import com.governikus.ausweisapp.sdkwrapper.card.core.Cause
 import com.governikus.ausweisapp.sdkwrapper.card.core.CertificateDescription
 import com.governikus.ausweisapp.sdkwrapper.card.core.ChangePinResult
+import com.governikus.ausweisapp.sdkwrapper.card.core.ConnectionInfo
 import com.governikus.ausweisapp.sdkwrapper.card.core.Reader
 import com.governikus.ausweisapp.sdkwrapper.card.core.Simulator
 import com.governikus.ausweisapp.sdkwrapper.card.core.SimulatorFile
@@ -56,10 +57,10 @@ internal class WorkflowViewModel(
     var developerMode: Boolean = false
     var cardSimulatorMode: SimulatorMode = SimulatorMode.DISABLED
 
-    private var pin: String? = null
-    private var can: String? = null
-    private var puk: String? = null
-    private var newPin: String? = null
+    private var pin: CharArray? = null
+    private var can: CharArray? = null
+    private var puk: CharArray? = null
+    private var newPin: CharArray? = null
 
     val hasStoredPin: Boolean
         get() = pin != null
@@ -74,6 +75,10 @@ internal class WorkflowViewModel(
 
     val currentCard = MutableLiveData<Card>()
     val lastCard = MutableLiveData<Card>()
+    var connectedReaders = mutableMapOf<String, Reader>()
+    val hasPinPadReader: MutableLiveData<Boolean> by lazy {
+        MutableLiveData(false)
+    }
 
     val workflowProgress = MutableLiveData<WorkflowProgress>()
 
@@ -84,6 +89,48 @@ internal class WorkflowViewModel(
 
     private var authResult: AuthResult? = null
     private var changePinResult: ChangePinResult? = null
+
+    private fun initSimulatorFiles() =
+        listOf(
+            SimulatorFile("0101", "01", "610413024944"),
+            SimulatorFile("0102", "02", "6203130144"),
+            SimulatorFile("0103", "03", "630a12083230323931303331"),
+            SimulatorFile("0104", "04", "64070c054552494b41"),
+            SimulatorFile("0105", "05", "650c0c0a4d55535445524d414e4e"),
+            SimulatorFile("0106", "06", "66020c00"),
+            SimulatorFile("0107", "07", "67020c00"),
+            SimulatorFile("0108", "08", "680a12083139363430383132"),
+            SimulatorFile("0109", "09", "690aa1080c064245524c494e"),
+            SimulatorFile("010a", "0a", "6a03130144"),
+            SimulatorFile("010b", "0b", "6b03130146"),
+            SimulatorFile(
+                "010c",
+                "0c",
+                "6c30312e302c06072a8648ce3d0101022100a9fb57dba1eea9bc3e660a909d838d726e3bf623d52620282013481d1f6e5377",
+            ),
+            SimulatorFile("010d", "0d", "6d080c064741424c4552"),
+            SimulatorFile("010f", "0f", "6f0a12083230313931313031"),
+            SimulatorFile(
+                "0111",
+                "11",
+                "712d302baa120c10484549444553545241e1ba9e45203137ab070c054bc3964c4ead03130144ae0713053531313437",
+            ),
+            SimulatorFile("0112", "12", "7209040702760503150000"),
+            SimulatorFile("0113", "13", "7316a1140c125245534944454e4345205045524d49542031"),
+            SimulatorFile("0114", "14", "7416a1140c125245534944454e4345205045524d49542032"),
+            SimulatorFile("0115", "15", "7515131374656c3a2b34392d3033302d31323334353637"),
+            SimulatorFile("0116", "16", "761516136572696b61406d75737465726d616e6e2e6465"),
+        )
+
+    private fun replaceSimulatorFile(
+        files: MutableList<SimulatorFile>,
+        updated: SimulatorFile,
+    ) {
+        val index = files.indexOf(updated)
+        if (index != -1) {
+            files[index] = updated
+        }
+    }
 
     private val workflowCallback =
         object : WorkflowCallbacks {
@@ -145,7 +192,17 @@ internal class WorkflowViewModel(
                         "The current keypad stater is: ${reader?.keypad}\n" +
                         "The current insertable state is: ${reader?.insertable}\n",
                 )
-                val card: Card = reader?.card ?: return
+
+                val attached: Boolean = reader?.attached ?: return
+                if (attached) {
+                    connectedReaders[reader.name] = reader
+                } else {
+                    connectedReaders.remove(reader.name)
+                }
+
+                hasPinPadReader.value = connectedReaders.values.any { it.keypad && it.name != "Simulator" }
+
+                val card: Card = reader.card ?: return
 
                 if (card.isUnknown()) {
                     toast.show(application.getString(R.string.card_workflow_unknown_card))
@@ -187,23 +244,20 @@ internal class WorkflowViewModel(
                 if (showErrorMessageIfError(error)) return
 
                 when (cardSimulatorMode) {
-                    SimulatorMode.DEFAULT_DATA -> workflowController.setCard("Simulator", null)
+                    SimulatorMode.DEFAULT_DATA -> {
+                        workflowController.setCard("Simulator", null)
+                    }
+
                     SimulatorMode.DIFFERENT_FIRST_NAME -> {
-                        val simulatorFiles =
-                            listOf(
-                                SimulatorFile("0103", "03", "630a12083230323931303331"),
-                                // ERIK
-                                SimulatorFile("0104", "04", "64060c044552494b"),
-                            )
+                        val simulatorFiles = initSimulatorFiles()
+                        replaceSimulatorFile(simulatorFiles as MutableList<SimulatorFile>, SimulatorFile("0104", "04", "64060c044552494b")) // ERIK
                         workflowController.setCard("Simulator", Simulator(simulatorFiles, null))
                     }
+
                     SimulatorMode.DIFFERENT_PSEUDONYM -> {
                         val simulator =
                             Simulator(
-                                listOf(
-                                    SimulatorFile("0103", "03", "630a12083230323931303331"),
-                                    SimulatorFile("0104", "04", "64070c054552494b41"),
-                                ),
+                                initSimulatorFiles(),
                                 listOf(
                                     SimulatorKey(
                                         2,
@@ -213,7 +267,10 @@ internal class WorkflowViewModel(
                             )
                         workflowController.setCard("Simulator", simulator)
                     }
-                    else -> navigation.navigate(R.id.action_card_requested)
+
+                    else -> {
+                        navigation.navigate(R.id.action_card_requested)
+                    }
                 }
             }
 
@@ -233,12 +290,17 @@ internal class WorkflowViewModel(
 
                 val currentPin = pin
                 pin = null
-                if (currentPin.isNullOrBlank()) {
+                if (currentPin == null || currentPin.size == 0) {
                     didRequestPassword = true
                     if (workflow == WorkflowActivity.Workflow.CHANGE_TRANSPORT_PIN) {
                         navigation.navigate(
                             R.id.action_request_pin,
-                            bundleOf("passwordType" to EnterPasswordFragment.PasswordType.TRANSPORT_PIN.type),
+                            Bundle().apply {
+                                putString(
+                                    "passwordType",
+                                    EnterPasswordFragment.PasswordType.TRANSPORT_PIN.type,
+                                )
+                            },
                         )
                     } else {
                         navigation.navigate(R.id.action_request_pin)
@@ -264,7 +326,7 @@ internal class WorkflowViewModel(
 
                 val currentNewPin = newPin
                 newPin = null
-                if (currentNewPin.isNullOrBlank()) {
+                if (currentNewPin == null || currentNewPin.size == 0) {
                     didRequestPassword = true
                     navigation.navigate(R.id.action_request_new_pin)
                 } else {
@@ -288,7 +350,7 @@ internal class WorkflowViewModel(
 
                 val currentPuk = puk
                 puk = null
-                if (currentPuk.isNullOrBlank()) {
+                if (currentPuk == null || currentPuk.size == 0) {
                     didRequestPassword = true
                     navigation.navigate(R.id.action_request_puk)
                 } else {
@@ -312,7 +374,7 @@ internal class WorkflowViewModel(
 
                 val currentCan = can
                 can = null
-                if (currentCan.isNullOrBlank()) {
+                if (currentCan == null || currentCan.size == 0) {
                     didRequestPassword = true
                     navigation.navigate(R.id.action_request_can)
                 } else {
@@ -328,11 +390,15 @@ internal class WorkflowViewModel(
                 val isCancellationByUser = authResult.result?.minor?.endsWith("cancellationByUser") == true
 
                 when {
-                    isCancellationByUser -> finishWithResult()
+                    isCancellationByUser -> {
+                        finishWithResult()
+                    }
+
                     !isError -> {
                         toast.show(application.getString(R.string.card_workflow_authentication_finished_remove_card_message))
                         finishWithResult()
                     }
+
                     else -> {
                         val authErrorMessage = authResult.result?.message
                         errorMessage.value =
@@ -367,14 +433,18 @@ internal class WorkflowViewModel(
                 this@WorkflowViewModel.workflowProgress.value = workflowProgress
             }
 
-            override fun onInfo(versionInfo: VersionInfo) {
+            override fun onInfo(
+                versionInfo: VersionInfo,
+                connectionInfo: ConnectionInfo,
+            ) {
                 println(
                     "Received INFO from GET_INFO\n" +
                         "The current name is: ${versionInfo.name}\n" +
                         "The current implementationTittle is: ${versionInfo.implementationTitle}\n" +
                         "The current implementationVendor is: ${versionInfo.implementationVendor}\n" +
                         "The current specificationVendor is: ${versionInfo.specificationVendor}\n" +
-                        "The current specificationVersion is: ${versionInfo.specificationVersion}\n",
+                        "The current specificationVersion is: ${versionInfo.specificationVersion}\n" +
+                        "The current state of LocalIfd is: ${connectionInfo}\n",
                 )
             }
 
@@ -408,7 +478,7 @@ internal class WorkflowViewModel(
         workflowController.startChangePin()
     }
 
-    fun setPin(pin: String) {
+    fun setPin(pin: CharArray?) {
         lastCard.value = currentCard.value
 
         navigation.navigate(R.id.password_entered)
@@ -422,7 +492,7 @@ internal class WorkflowViewModel(
         }
     }
 
-    fun setCan(can: String) {
+    fun setCan(can: CharArray?) {
         lastCard.value = currentCard.value
 
         navigation.navigate(R.id.password_entered)
@@ -434,14 +504,14 @@ internal class WorkflowViewModel(
         }
     }
 
-    fun setPuk(puk: String) {
+    fun setPuk(puk: CharArray?) {
         lastCard.value = currentCard.value
 
         navigation.navigate(R.id.password_entered)
         workflowController.setPuk(puk)
     }
 
-    fun setNewPin(newPin: String) {
+    fun setNewPin(newPin: CharArray?) {
         lastCard.value = currentCard.value
 
         navigation.navigate(R.id.password_entered)
@@ -495,11 +565,24 @@ internal class WorkflowViewModel(
     private fun finishWithResult() {
         when (workflow) {
             WorkflowActivity.Workflow.AUTHENTICATE -> {
-                val result = bundleOf(RESULT_AUTH to authResult)
+                val result =
+                    Bundle().apply {
+                        putParcelable(
+                            RESULT_AUTH,
+                            authResult,
+                        )
+                    }
                 workflowEvent.finished(Activity.RESULT_OK, result)
             }
+
             WorkflowActivity.Workflow.CHANGE_PIN, WorkflowActivity.Workflow.CHANGE_TRANSPORT_PIN -> {
-                val result = bundleOf(RESULT_CHANGE_PIN to changePinResult)
+                val result =
+                    Bundle().apply {
+                        putParcelable(
+                            RESULT_CHANGE_PIN,
+                            changePinResult,
+                        )
+                    }
                 workflowEvent.finished(Activity.RESULT_OK, result)
             }
         }
@@ -527,11 +610,11 @@ internal class WorkflowViewModel(
         }
     }
 
-    fun presetPin(pin: String?) {
+    fun presetPin(pin: CharArray?) {
         this.pin = pin
     }
 
-    fun presetCan(can: String?) {
+    fun presetCan(can: CharArray?) {
         this.can = can
     }
 

@@ -1,11 +1,17 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'androidx.navigation.safeargs.kotlin'
-apply plugin: "org.jmailen.kotlinter"
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("androidx.navigation.safeargs.kotlin")
+    id("org.jmailen.kotlinter")
+}
+
+kotlin {
+    jvmToolchain(java_version)
+}
 
 android {
     //noinspection GradleDependency
-    compileSdk = 35
+    compileSdk = 36
     buildToolsVersion = "36.1.0"
     namespace = "com.governikus.ausweisapp.tester.wrapper"
 
@@ -13,7 +19,7 @@ android {
         applicationId "com.governikus.ausweisapp.tester.wrapper"
         minSdkVersion 28
         //noinspection OldTargetApi
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode 1
         versionName sdkwrapper_version
 
@@ -21,14 +27,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-        allWarningsAsErrors = true
-        freeCompilerArgs = ["-Xannotation-default-target=param-property"]
+        sourceCompatibility = JavaVersion.toVersion(java_version)
+        targetCompatibility = JavaVersion.toVersion(java_version)
     }
 
     lint {
@@ -70,12 +70,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-    applicationVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "sdkwrapper-tester-${variant.name}-${defaultConfig.versionName}.apk"
-        }
-    }
 }
 
 sonarqube {
@@ -85,13 +79,14 @@ sonarqube {
     }
 }
 
+configureRename(project, 'apk')
+
 def useLocal = file("${rootDir}/ausweisapp/ausweisapp.aar").exists();
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.7.1'
-    //noinspection GradleDependency
-    implementation 'androidx.core:core-ktx:1.16.0'
+    implementation 'androidx.core:core-ktx:1.18.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.9.7'
     implementation 'androidx.navigation:navigation-ui-ktx:2.9.7'
@@ -117,9 +112,9 @@ dependencies {
     implementation 'com.squareup.moshi:moshi:1.15.2'
     implementation 'com.squareup.moshi:moshi-kotlin:1.15.2'
 
-    implementation 'io.ktor:ktor-server-core:3.4.0'
-    implementation 'io.ktor:ktor-server-netty:3.4.0'
-    implementation 'io.ktor:ktor-server-websockets:3.4.0'
+    implementation 'io.ktor:ktor-server-core:3.4.2'
+    implementation 'io.ktor:ktor-server-netty:3.4.2'
+    implementation 'io.ktor:ktor-server-websockets:3.4.2'
 
     testImplementation 'junit:junit:4.13.2'
 

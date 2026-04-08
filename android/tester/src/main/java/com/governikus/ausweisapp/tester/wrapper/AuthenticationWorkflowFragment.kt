@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -74,7 +74,7 @@ class AuthenticationWorkflowFragment : Fragment(R.layout.fragment_authentication
                 viewBinding?.root?.let { root ->
                     ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
                         val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                        viewBinding?.scrollViewContent?.setPadding(0, 0, 0, systemBarInsets.bottom)
+                        viewBinding?.scrollViewContent?.setPadding(systemBarInsets.left, systemBarInsets.top, systemBarInsets.right, systemBarInsets.bottom)
                         insets
                     }
                 }

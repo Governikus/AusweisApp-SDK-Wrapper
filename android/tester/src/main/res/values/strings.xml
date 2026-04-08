@@ -103,6 +103,7 @@
     <string name="enter_password_puk_field_hint">10-digit PUK</string>
     <string name="enter_password_wrong_try">The last input was incorrect!</string>
     <string name="enter_password_accept">Continue</string>
+    <string name="enter_password_accept_pinpad">Continue with Pinpad Reader</string>
 
     <string name="enter_new_pin_title">Change PIN</string>
     <string name="enter_new_pin_info_header">Change the PIN</string>
@@ -111,6 +112,7 @@
     <string name="enter_new_pin_confirmation_field">Confirm PIN</string>
     <string name="enter_new_pin_confirmation_error">Confirmation PIN does not match PIN</string>
     <string name="enter_new_pin_accept">Continue</string>
+    <string name="enter_new_pin_accept_pinpad">Continue with Pinpad Reader</string>
 
     <string name="position_card_title">Card access required</string>
     <string name="position_card_info_header">Communication with the ID card required, please place the device on the ID card.</string>
@@ -153,9 +155,9 @@
     <string name="access_right_can_allowed">CAN-allowed</string>
     <string name="access_right_pin_management">PIN Management</string>
 
-    <string name="test_eid_tc_token_url" translatable="false">https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&amp;redirect=true</string>
+    <string name="test_eid_tc_token_url" translatable="false">https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json</string>
     <string name="test_eid_developerMode_tc_token_url" translatable="false">http://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&amp;redirect=true</string>
-    <string name="test_eid_cardSimulator_tc_token_url" translatable="false">https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&amp;redirect=true</string>
+    <string name="test_eid_cardSimulator_tc_token_url" translatable="false">https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json</string>
     <string name="test_eid_can_tc_token_url" translatable="false">https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_can&amp;redirect=true</string>
     <string name="test_eid_tc_token_url_required_rights" translatable="false">https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json</string>
 
@@ -163,7 +165,6 @@
     <string name="testerMode_back">Zurück</string>
     <string name="testerMode_default_pin">123456</string>
     <string name="testerMode_password">Password</string>
-    <string name="testerMode_insertCard">Insert card</string>
     <string name="testerMode_open_result">Open Result</string>
 
     <string name="websocketMode_start">Start Websocket</string>

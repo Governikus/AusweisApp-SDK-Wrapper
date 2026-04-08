@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
  */
 
@@ -287,8 +287,21 @@ class WorkflowController internal constructor(
      *
      * @param pin The personal identification number (PIN) of the card. Must contain 5 (Transport PIN) or 6 digits.
      */
-    fun setPin(pin: String?) {
+    fun setPin(pin: CharArray?) {
         send(SetPin(pin))
+    }
+
+    @Suppress("kotlin:S1133")
+    @Deprecated(
+        message = "Use the CharArray version instead.",
+        replaceWith = ReplaceWith("setPin(pin?.toCharArray())"),
+    )
+    fun setPin(pin: String?) {
+        setPin(pin?.toCharArray())
+    }
+
+    fun setPin(pin: Nothing?) {
+        setPin(pin as CharArray?)
     }
 
     /**
@@ -302,8 +315,21 @@ class WorkflowController internal constructor(
      * @param newPin The new personal identification number (PIN) of the card. Must only contain 6 digits.
      * Must be null if the current reader has a keypad. See [Reader].
      */
-    fun setNewPin(newPin: String?) {
+    fun setNewPin(newPin: CharArray?) {
         send(SetNewPin(newPin))
+    }
+
+    @Suppress("kotlin:S1133")
+    @Deprecated(
+        message = "Use the CharArray version instead.",
+        replaceWith = ReplaceWith("setNewPin(newPin?.toCharArray())"),
+    )
+    fun setNewPin(newPin: String?) {
+        setNewPin(newPin?.toCharArray())
+    }
+
+    fun setNewPin(newPin: Nothing?) {
+        setNewPin(newPin as CharArray?)
     }
 
     /**
@@ -326,8 +352,21 @@ class WorkflowController internal constructor(
      * @param puk The personal unblocking key (PUK) of the card. Must only contain 10 digits.
      * Must be null if the current reader has a keypad. See [Reader].
      */
-    fun setPuk(puk: String?) {
+    fun setPuk(puk: CharArray?) {
         send(SetPuk(puk))
+    }
+
+    @Suppress("kotlin:S1133")
+    @Deprecated(
+        message = "Use the CharArray version instead.",
+        replaceWith = ReplaceWith("setPuk(puk?.toCharArray())"),
+    )
+    fun setPuk(puk: String?) {
+        setPuk(puk?.toCharArray())
+    }
+
+    fun setPuk(puk: Nothing?) {
+        setPuk(puk as CharArray?)
     }
 
     /**
@@ -349,8 +388,21 @@ class WorkflowController internal constructor(
      * @param can The card access number (CAN) of the card. Must only contain 6 digits.
      * Must be null if the current reader has a keypad. See [Reader].
      */
-    fun setCan(can: String?) {
+    fun setCan(can: CharArray?) {
         send(SetCan(can))
+    }
+
+    @Suppress("kotlin:S1133")
+    @Deprecated(
+        message = "Use the CharArray version instead.",
+        replaceWith = ReplaceWith("setCan(can?.toCharArray())"),
+    )
+    fun setCan(can: String?) {
+        setCan(can?.toCharArray())
+    }
+
+    fun setCan(can: Nothing?) {
+        setCan(can as CharArray?)
     }
 
     /**
@@ -488,15 +540,19 @@ class WorkflowController internal constructor(
             MSG_ENTER_PIN -> {
                 callback { onEnterPin(message.error, reader) }
             }
+
             MSG_ENTER_NEW_PIN -> {
                 callback { onEnterNewPin(message.error, reader) }
             }
+
             MSG_ENTER_PUK -> {
                 callback { onEnterPuk(message.error, reader) }
             }
+
             MSG_ENTER_CAN -> {
                 callback { onEnterCan(message.error, reader) }
             }
+
             else -> {
                 Log.d(TAG, "Received unknown enter password message ${message.msg}")
             }
@@ -506,15 +562,15 @@ class WorkflowController internal constructor(
     private fun handleMessage(message: Message) {
         when (message.msg) {
             MSG_INFO -> {
-                when (val info = message.getVersionInfo()) {
-                    null -> {
-                        callback { onWrapperError(WrapperError(message.msg, "Parsing error")) }
-                    }
-                    else -> {
-                        callback { onInfo(info) }
-                    }
+                val info = message.getVersionInfo()
+                val connection = ConnectionInfo.fromRawName(message.connectionInfo)
+                if (info == null || connection == null) {
+                    callback { onWrapperError(WrapperError(message.msg, "Parsing error")) }
+                } else {
+                    callback { onInfo(info, connection) }
                 }
             }
+
             MSG_AUTH -> {
                 if (message.error != null) {
                     callback { onAuthenticationStartFailed(message.error) }
@@ -525,77 +581,95 @@ class WorkflowController internal constructor(
                         // Everything is fine, the SDK started the authentication workflow and sent an empty AUTH message.
                         callback { onAuthenticationStarted() }
                     }
+
                     else -> {
                         callback { onAuthenticationCompleted(authResult) }
                     }
                 }
             }
+
             MSG_ACCESS_RIGHTS -> {
                 when (val accessRights = message.getAccessRights()) {
                     null -> {
                         callback { onWrapperError(WrapperError(message.msg, "Missing access rights")) }
                     }
+
                     else -> {
                         callback { onAccessRights(message.error, accessRights) }
                     }
                 }
             }
+
             MSG_BAD_STATE -> {
                 callback { onWrapperError(WrapperError(message.msg, message.error ?: "Unknown bad state")) }
             }
+
             MSG_CHANGE_PIN -> {
                 when (message.success) {
                     null -> {
                         callback { onChangePinStarted() }
                     }
+
                     else -> {
                         callback { onChangePinCompleted(ChangePinResult(message.success, message.reason)) }
                     }
                 }
             }
+
             MSG_ENTER_PIN, MSG_ENTER_CAN, MSG_ENTER_PUK, MSG_ENTER_NEW_PIN -> {
                 handleEnterPassword(message)
             }
+
             MSG_INSERT_CARD -> {
                 callback { onInsertCard(null) }
             }
+
             MSG_CERTIFICATE -> {
                 when (val certificateDescription = message.getCertificateDescription()) {
                     null -> {
                         callback { onWrapperError(WrapperError(message.msg, "Missing certificateDescription")) }
                     }
+
                     else -> {
                         callback { onCertificate(certificateDescription) }
                     }
                 }
             }
+
             MSG_PAUSE -> {
                 when (val cause = Cause.fromRawName(message.cause)) {
                     null -> {
                         callback { onWrapperError(WrapperError(message.msg, "Failed to map cause \"${message.cause}\" to PauseReason")) }
                     }
+
                     else -> {
                         callback { onPause(cause) }
                     }
                 }
             }
+
             MSG_READER -> {
                 callback { onReader(message.getReaderFromRoot()) }
             }
+
             MSG_READER_LIST -> {
                 callback { onReaderList(message.getReaderList()) }
             }
+
             MSG_INVALID, MSG_UNKNOWN_COMMAND -> {
                 val error = message.error ?: "Unknown SDK Wrapper error"
                 callback { onWrapperError(WrapperError(message.msg, error)) }
             }
+
             MSG_INTERNAL_ERROR -> {
                 val errorMessage = message.error ?: "Unknown internal error"
                 callback { onInternalError(errorMessage) }
             }
+
             MSG_STATUS -> {
                 callback { onStatus(message.getWorkflowProgress()) }
             }
+
             else -> {
                 Log.d(TAG, "Received unknown message ${message.msg}")
             }

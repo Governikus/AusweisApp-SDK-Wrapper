@@ -6,22 +6,28 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-parcelize'
-apply plugin: "org.jmailen.kotlinter"
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-apply plugin: 'org.jetbrains.kotlinx.kover'
+plugins {
+    id("com.android.library")
+    id("maven-publish")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.parcelize")
+    id("org.jmailen.kotlinter")
+    id("org.jetbrains.kotlinx.kover")
+    id("signing")
+}
+
+kotlin {
+    jvmToolchain(java_version)
+}
 
 android {
-    compileSdk = 35
+    compileSdk = 36
     buildToolsVersion = "36.1.0"
     namespace = "com.governikus.ausweisapp.sdkwrapper"
 
     defaultConfig {
         minSdkVersion 28
-        targetSdkVersion 35
+        targetSdkVersion 36
 
         consumerProguardFiles 'consumer-rules.pro'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -30,14 +36,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-        allWarningsAsErrors = true
-        freeCompilerArgs = ["-Xstring-concat=inline", "-Xannotation-default-target=param-property"]
+        sourceCompatibility = JavaVersion.toVersion(java_version)
+        targetCompatibility = JavaVersion.toVersion(java_version)
     }
 
     lint {
@@ -55,12 +55,6 @@ android {
         }
     }
 
-    libraryVariants.all { variant ->
-        variant.outputs.all {
-            outputFileName = "sdkwrapper-${variant.name}-${sdkwrapper_version}.aar"
-        }
-    }
-
     publishing {
         singleVariant("release")
     }
@@ -69,10 +63,10 @@ android {
         unitTests.all {
             testLogging {
                 events "passed", "skipped", "failed", "standardOut", "standardError"
-                showExceptions true
-                exceptionFormat "full"
-                showCauses true
-                showStackTraces true
+                showExceptions = true
+                exceptionFormat = "full"
+                showCauses = true
+                showStackTraces = true
             }
         }
     }
@@ -84,6 +78,8 @@ sonarqube {
         property "sonar.tests", "src/test"
     }
 }
+
+configureRename(project, 'aar')
 
 tasks.register("sourceJar", Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -117,14 +113,6 @@ afterEvaluate {
                     password = System.getenv("NEXUS_PSW")
                 }
                 url = "https://repo.govkg.de/repository/ausweisapp-releases"
-            }
-            maven {
-                name = 'Central'
-                credentials {
-                    username = System.getenv("CENTRAL_USERNAME")
-                    password = System.getenv("CENTRAL_PSW")
-                }
-                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
             }
         }
         publications.all {
@@ -195,12 +183,21 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'androidx.test:core:1.7.0'
-    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
 
     androidTestImplementation 'androidx.test.ext:junit:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
+}
+
+tasks.withType(Test).configureEach {
+    def mirrorMaven = System.getenv("MIRROR_MAVEN")
+
+    if (mirrorMaven != null) {
+        systemProperty "robolectric.dependency.repo.url", mirrorMaven
+        systemProperty "robolectric.dependency.repo.id", "ci-mirror"
+    }
 }
 
 tasks.register("generateChecksums") {
