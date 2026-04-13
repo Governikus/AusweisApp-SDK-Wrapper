@@ -527,7 +527,7 @@
 				CODE_SIGN_ENTITLEMENTS = SDKWrapperTester/SDKWrapperTester.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2.5.0;
+				CURRENT_PROJECT_VERSION = 2.5.1;
 				DEVELOPMENT_ASSET_PATHS = "\"SDKWrapperTester/Preview Content\"";
 				DEVELOPMENT_TEAM = G7EQCJU4BR;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = G7EQCJU4BR;
@@ -538,7 +538,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.governikus.sdkwrappertester;
 				PRODUCT_NAME = SDKWrapperTester;
 				PROVISIONING_PROFILE_SPECIFIER = "SDK Wrapper Tester";
@@ -555,7 +555,7 @@
 				CODE_SIGN_ENTITLEMENTS = SDKWrapperTester/SDKWrapperTester.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2.5.0;
+				CURRENT_PROJECT_VERSION = 2.5.1;
 				DEVELOPMENT_ASSET_PATHS = "\"SDKWrapperTester/Preview Content\"";
 				DEVELOPMENT_TEAM = G7EQCJU4BR;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = G7EQCJU4BR;
@@ -566,7 +566,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.0;
+				MARKETING_VERSION = 2.5.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.governikus.sdkwrappertester;
 				PRODUCT_NAME = SDKWrapperTester;
 				PROVISIONING_PROFILE_SPECIFIER = "SDK Wrapper Tester";
@@ -613,7 +613,7 @@
 			repositoryURL = "https://github.com/Governikus/AusweisApp2-SDK-iOS";
 			requirement = {
 				kind = exactVersion;
-				version = 2.5.0;
+				version = 2.5.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

@@ -295,7 +295,10 @@ tasks.register("mavenUpload") {
             }
         }
 
-        if (json.deploymentState == "FAILED") {
+        boolean deleteAfterDeploy = providers.gradleProperty("deleteAfterDeploy")
+            .map { it.toBoolean() }
+            .getOrElse(false)
+        if (json.deploymentState == "FAILED" || deleteAfterDeploy) {
             Request delete = new Request.Builder()
                 .url("https://central.sonatype.com/api/v1/publisher/deployment/${deploymentId}")
                 .header("Authorization", "Bearer ${bearerToken}")
