@@ -44,7 +44,6 @@
 		D308B2F02CBE641B00A650F0 /* WebsocketModeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D308B2EC2CBE641B00A650F0 /* WebsocketModeModel.swift */; };
 		D308B2F42CBE65C600A650F0 /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D308B2F22CBE65C600A650F0 /* LogView.swift */; };
 		D308B2F52CBE65C600A650F0 /* LogMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D308B2F32CBE65C600A650F0 /* LogMessageView.swift */; };
-		D308B3002CBE68FC00A650F0 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = D308B2FF2CBE68FC00A650F0 /* Swifter */; };
 		D308B3082CBE6D4700A650F0 /* AusweisApp2SDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = D308B3072CBE6D4700A650F0 /* AusweisApp2SDK.swift */; };
 		D308B30B2CBE7BED00A650F0 /* AusweisApp2 in Frameworks */ = {isa = PBXBuildFile; productRef = D308B30A2CBE7BED00A650F0 /* AusweisApp2 */; };
 /* End PBXBuildFile section */
@@ -109,7 +108,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				B067583229A5057B0091AB02 /* AusweisApp2SDKWrapper in Frameworks */,
-				D308B3002CBE68FC00A650F0 /* Swifter in Frameworks */,
 				D308B30B2CBE7BED00A650F0 /* AusweisApp2 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -254,7 +252,6 @@
 			name = SDKWrapperTester;
 			packageProductDependencies = (
 				B067583129A5057B0091AB02 /* AusweisApp2SDKWrapper */,
-				D308B2FF2CBE68FC00A650F0 /* Swifter */,
 				D308B30A2CBE7BED00A650F0 /* AusweisApp2 */,
 			);
 			productName = SDKWrapperTester;
@@ -286,7 +283,6 @@
 			);
 			mainGroup = 8B0FB1202458184200AE1EBF;
 			packageReferences = (
-				D308B2FE2CBE68FC00A650F0 /* XCRemoteSwiftPackageReference "swifter" */,
 				D308B3092CBE7BED00A650F0 /* XCRemoteSwiftPackageReference "AusweisApp2-SDK-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -527,7 +523,7 @@
 				CODE_SIGN_ENTITLEMENTS = SDKWrapperTester/SDKWrapperTester.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2.5.1;
+				CURRENT_PROJECT_VERSION = 2.5.3;
 				DEVELOPMENT_ASSET_PATHS = "\"SDKWrapperTester/Preview Content\"";
 				DEVELOPMENT_TEAM = G7EQCJU4BR;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = G7EQCJU4BR;
@@ -538,7 +534,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
+				MARKETING_VERSION = 2.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.governikus.sdkwrappertester;
 				PRODUCT_NAME = SDKWrapperTester;
 				PROVISIONING_PROFILE_SPECIFIER = "SDK Wrapper Tester";
@@ -555,7 +551,7 @@
 				CODE_SIGN_ENTITLEMENTS = SDKWrapperTester/SDKWrapperTester.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2.5.1;
+				CURRENT_PROJECT_VERSION = 2.5.3;
 				DEVELOPMENT_ASSET_PATHS = "\"SDKWrapperTester/Preview Content\"";
 				DEVELOPMENT_TEAM = G7EQCJU4BR;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = G7EQCJU4BR;
@@ -566,7 +562,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
+				MARKETING_VERSION = 2.5.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.governikus.sdkwrappertester;
 				PRODUCT_NAME = SDKWrapperTester;
 				PROVISIONING_PROFILE_SPECIFIER = "SDK Wrapper Tester";
@@ -600,20 +596,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		D308B2FE2CBE68FC00A650F0 /* XCRemoteSwiftPackageReference "swifter" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/httpswift/swifter.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.5.0;
-			};
-		};
 		D308B3092CBE7BED00A650F0 /* XCRemoteSwiftPackageReference "AusweisApp2-SDK-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Governikus/AusweisApp2-SDK-iOS";
 			requirement = {
 				kind = exactVersion;
-				version = 2.5.1;
+				version = 2.5.3;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -622,11 +610,6 @@
 		B067583129A5057B0091AB02 /* AusweisApp2SDKWrapper */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AusweisApp2SDKWrapper;
-		};
-		D308B2FF2CBE68FC00A650F0 /* Swifter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D308B2FE2CBE68FC00A650F0 /* XCRemoteSwiftPackageReference "swifter" */;
-			productName = Swifter;
 		};
 		D308B30A2CBE7BED00A650F0 /* AusweisApp2 */ = {
 			isa = XCSwiftPackageProductDependency;

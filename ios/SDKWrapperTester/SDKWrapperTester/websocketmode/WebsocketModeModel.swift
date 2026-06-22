@@ -4,27 +4,14 @@
 
 import Foundation
 import Network
-import Swifter
 
 class WebsocketModeModel: ObservableObject {
 	@Published var isStarted: Bool = false
 	@Published var logMessages: [LogMessage] = []
 
 	private let serverPort: UInt16 = 8080
-
-	private var websocketSession: WebSocketSession?
-	private lazy var server: HttpServer = {
-		let server = HttpServer()
-		server["/"] = websocket(text: { [weak self] _, text in
-			self?.websocketDispatch(message: text)
-		}, connected: { [weak self] session in
-			self?.log("Client connected")
-			self?.websocketSession = session
-		}, disconnected: { [weak self] _ in
-			self?.log("Client disconnected")
-		})
-		return server
-	}()
+	private var listener: NWListener?
+	private var connection: NWConnection?
 
 	private lazy var wifiPathMonitor: NWPathMonitor = {
 		let pathMon = NWPathMonitor(requiredInterfaceType: .wifi)
@@ -37,27 +24,38 @@ class WebsocketModeModel: ObservableObject {
 		return pathMon
 	}()
 
+	private func log(_ message: String) {
+		DispatchQueue.main.async {
+			self.logMessages.append(LogMessage(text: message))
+		}
+	}
+
 	func start() {
 		if isStarted {
 			return
 		}
 
-		isStarted = true
 		logMessages = []
 
-		DispatchQueue.global(qos: .utility).async {
-			do {
-				try self.server.start(self.serverPort, forceIPv4: true)
-				self.log("Server has started.")
-				self.log("Send ':help' for the command list")
-			} catch {
-				self.log("Could not start server")
-				self.isStarted = false
-				return
-			}
+		let parameters = NWParameters.tcp
+		let wsOptions = NWProtocolWebSocket.Options()
+		parameters.defaultProtocolStack.applicationProtocols.insert(wsOptions, at: 0)
 
+		do {
+			listener = try NWListener(using: parameters, on: NWEndpoint.Port(rawValue: serverPort)!)
+		} catch {
+			log("Failed to create listener: \(error)")
+			return
+		}
+
+		listener?.stateUpdateHandler = handleListenerState
+		listener?.newConnectionHandler = handleConnection
+		listener?.start(queue: .main)
+
+		DispatchQueue.global(qos: .utility).async {
 			self.wifiPathMonitor.start(queue: DispatchQueue.global(qos: .utility))
 		}
+		isStarted = true
 	}
 
 	func stop() {
@@ -67,35 +65,94 @@ class WebsocketModeModel: ObservableObject {
 
 		log("Server has stopped")
 
+		listener?.cancel()
+		listener = nil
+		connection?.cancel()
+		connection = nil
 		isStarted = false
-		websocketSession = nil
-		server.stop()
 		AusweisApp2SDK.shared.stop()
 		wifiPathMonitor.cancel()
 	}
 
-	private func log(_ message: String) {
-		DispatchQueue.main.async {
-			self.logMessages.append(LogMessage(text: message))
+	private func handleListenerState(_ newState: NWListener.State) {
+		switch newState {
+		case .ready:
+			log("Server has started.")
+			log("Send ':help' for the command list")
+		case let .failed(error):
+			log("Could not start server: \(error)")
+			isStarted = false
+		default:
+			break
 		}
 	}
 
-	private func send(_ message: String) {
-		log(message)
-		websocketSession?.writeText(message)
-	}
-
-	private func ausweisAppDispatch(message: String?) {
-		guard let message = message else {
-			send("AusweisApp2 started")
+	private func handleConnection(_ connection: NWConnection) {
+		if self.connection != nil {
+			log("Connection already present, ignoring \(connection.endpoint)")
 			return
 		}
 
-		log(message)
-		send(message)
+		self.connection = connection
+		log("Client connected: \(connection.endpoint)")
+		connection.stateUpdateHandler = handleConnectionState
+		connection.start(queue: .main)
 	}
 
-	private func websocketDispatch(message: String) {
+	private func handleConnectionState(_ state: NWConnection.State) {
+		switch state {
+		case .ready:
+			receive()
+		case let .failed(error):
+			if connection == nil {
+				log("Connection failed: \(error)")
+				return
+			}
+
+			switch error {
+			case .posix(POSIXErrorCode.ENOTCONN),
+			     .posix(POSIXErrorCode.ETIMEDOUT),
+			     .posix(POSIXErrorCode.ECONNRESET):
+				log("Client disconnected")
+			default:
+				log("Connection closed: \(error)")
+			}
+
+			connection = nil
+		case .cancelled:
+			log("Connection cancelled")
+			connection = nil
+		default:
+			break
+		}
+	}
+
+	private func receive() {
+		connection?.receiveMessage { [weak self] data, context, isComplete, error in
+			self?.receiveMessage(data, context, isComplete, error)
+		}
+	}
+
+	private func receiveMessage(_ content: Data?, _: NWConnection.ContentContext?, _: Bool, _ error: NWError?) {
+		if case .posix(POSIXError.ENOTCONN) = error {
+			return
+		}
+
+		if let error {
+			log("Receive error: \(error)")
+			receive()
+			return
+		}
+
+		if let content, !content.isEmpty {
+			websocketDispatch(content)
+		}
+
+		receive()
+	}
+
+	private func websocketDispatch(_ data: Data) {
+		let message = String(data: data, encoding: .utf8) ?? ""
 		log(message)
 
 		switch message.trimmingCharacters(in: .whitespacesAndNewlines) {
@@ -127,6 +184,25 @@ class WebsocketModeModel: ObservableObject {
 				send("Not connected to SDK! Try :help for commands.")
 			}
 		}
+	}
+
+	private func send(_ message: String) {
+		log(message)
+
+		let metadata = NWProtocolWebSocket.Metadata(opcode: .text)
+		let context = NWConnection.ContentContext(identifier: "text", metadata: [metadata])
+
+		connection?.send(content: message.data(using: .utf8), contentContext: context,
+		                 isComplete: true, completion: .idempotent)
+	}
+
+	private func ausweisAppDispatch(message: String?) {
+		guard let message else {
+			send("AusweisApp started")
+			return
+		}
+
+		send(message)
 	}
 
 	func getIPAddress(for interace: String) -> String {
