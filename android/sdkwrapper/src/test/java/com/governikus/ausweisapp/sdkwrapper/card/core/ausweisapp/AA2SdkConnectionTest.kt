@@ -92,7 +92,7 @@ class AA2SdkConnectionBasicTest {
     @Test
     fun `send fails if sdk is null`() {
         connection.sdk = null
-        val result = connection.send(RunAuth("https://example.org", false, true), RunAuth::class.java)
+        val result = connection.send(RunAuth("https://example.org", false, true, null), RunAuth::class.java)
 
         assertFalse("Expected send to fail when SDK is null", result)
         assertNull(fakeSdk.capturedMessageFromClientAsString)
@@ -101,7 +101,7 @@ class AA2SdkConnectionBasicTest {
     @Test
     fun `send fails if sessionId is null`() {
         connection.sdkSessionId = null
-        val result = connection.send(RunAuth("https://example.org", false, true), RunAuth::class.java)
+        val result = connection.send(RunAuth("https://example.org", false, true, null), RunAuth::class.java)
 
         assertFalse("Expected send to fail when sessionId is null", result)
         assertNull(fakeSdk.capturedMessageFromClientAsString)
@@ -216,9 +216,9 @@ class AA2SdkConnectionNonSensitiveSerializationTest(
                     """{"name":"card123","cmd":"SET_CARD"}""",
                 ),
                 arrayOf(
-                    RunAuth("https://example.org", false, true),
+                    RunAuth("https://example.org", false, true, hashMapOf("Bearer" to "0123456789abcdef")),
                     RunAuth::class.java,
-                    """{"tcTokenURL":"https://example.org","developerMode":false,"status":true,"cmd":"RUN_AUTH"}""",
+                    """{"tcTokenURL":"https://example.org","developerMode":false,"status":true,"header":{"Bearer":"0123456789abcdef"},"cmd":"RUN_AUTH"}""",
                 ),
             )
     }
@@ -268,9 +268,19 @@ class AA2SdkConnectionSensitiveSerializationTest(
                     """{"cmd":"SET_CAN","value":"123456"}""",
                 ),
                 arrayOf(
+                    SetCan(null),
+                    SetCan::class.java,
+                    """{"cmd":"SET_CAN"}""",
+                ),
+                arrayOf(
                     SetNewPin("123456".toCharArray()),
                     SetNewPin::class.java,
                     """{"cmd":"SET_NEW_PIN","value":"123456"}""",
+                ),
+                arrayOf(
+                    SetNewPin(null),
+                    SetNewPin::class.java,
+                    """{"cmd":"SET_NEW_PIN"}""",
                 ),
                 arrayOf(
                     SetPin("123456".toCharArray()),
@@ -278,9 +288,19 @@ class AA2SdkConnectionSensitiveSerializationTest(
                     """{"cmd":"SET_PIN","value":"123456"}""",
                 ),
                 arrayOf(
+                    SetPin(null),
+                    SetPin::class.java,
+                    """{"cmd":"SET_PIN"}""",
+                ),
+                arrayOf(
                     SetPuk("1234567890".toCharArray()),
                     SetPuk::class.java,
                     """{"cmd":"SET_PUK","value":"1234567890"}""",
+                ),
+                arrayOf(
+                    SetPuk(null),
+                    SetPuk::class.java,
+                    """{"cmd":"SET_PUK"}""",
                 ),
             )
     }

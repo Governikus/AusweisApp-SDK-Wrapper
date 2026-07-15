@@ -42,7 +42,6 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
                     CharArray(0)
                 }
             viewModel.newPin.postValue(newPin)
-            newPin.fill('\u0000')
         }
 
         viewModel.pinErrorMessage.observe(viewLifecycleOwner) { viewBinding.tilConfirmNewPin.setError(it) }
@@ -57,7 +56,6 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
                     CharArray(0)
                 }
             viewModel.confirmationPin.postValue(confirmationPin)
-            confirmationPin.fill('\u0000')
         }
         viewBinding.etConfirmNewPin.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {

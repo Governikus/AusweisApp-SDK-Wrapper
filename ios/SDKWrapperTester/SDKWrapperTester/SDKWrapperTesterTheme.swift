@@ -115,6 +115,6 @@ public struct TextAppearance {
 
 private extension View {
 	func typeErase() -> AnyView {
-		return AnyView(self)
+		AnyView(self)
 	}
 }

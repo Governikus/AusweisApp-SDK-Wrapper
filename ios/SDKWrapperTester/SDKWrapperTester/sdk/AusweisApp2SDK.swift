@@ -27,7 +27,7 @@ class AusweisApp2SDK {
 
 		DispatchQueue.global().async {
 			ausweisapp_init({ (cString: UnsafePointer<CChar>?) in
-				if let cString = cString {
+				if let cString {
 					AusweisApp2SDK.shared.dispatch(message: String(cString: cString))
 				} else {
 					AusweisApp2SDK.shared.dispatch(message: nil)

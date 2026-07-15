@@ -14,11 +14,7 @@ Empty callback declarations are left out to increase readability.
 
             private val workflowCallbacks = object : WorkflowCallbacks {
                override fun onStarted() {
-                   workflowController.startAuthentication(
-                       Uri.parse("[...]"),
-                       false,
-                       false
-                   )
+                   workflowController.startAuthentication(Uri.parse("[...]"))
                }
 
                override fun onAuthenticationCompleted(authResult: AuthResult) {

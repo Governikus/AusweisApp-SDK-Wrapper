@@ -12,14 +12,12 @@ interface SensitiveCommand : Command {
     val value: CharArray?
 
     fun toJsonCharArray(): CharArray {
-        val prefixStr = "{\"cmd\":\"$cmd\",\"value\":"
-        val currentValue = value
-
-        if (currentValue == null) {
-            return "$prefixStr null}".toCharArray()
+        if (value == null) {
+            return "{\"cmd\":\"$cmd\"}".toCharArray()
         }
 
-        val prefix = "$prefixStr\"".toCharArray()
+        val prefix = "{\"cmd\":\"$cmd\",\"value\":\"".toCharArray()
+        val currentValue = value!!
         val suffix = "\"}".toCharArray()
 
         val result = CharArray(prefix.size + currentValue.size + suffix.size)
@@ -72,7 +70,7 @@ class GetReaderList(
 ) : Command
 
 class RunAuth(
-    val tcTokenURL: String = "https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet",
+    val tcTokenURL: String = "https://test.governikus-eid.de/Autent-DemoApplication/api/eid/request",
     override val cmd: String = "RUN_AUTH",
 ) : Command
 

@@ -8,7 +8,7 @@ struct TestModeView: View {
 	@ObservedObject var model = TestModeModel()
 	@State var pin: String = "123456"
 	@State var apiLevel: String = "3"
-	@State var tcTokenUrl = "https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet"
+	@State var tcTokenUrl = "https://test.governikus-eid.de/Autent-DemoApplication/api/eid/request"
 	@State var useCustomMessages = true
 	@State var handleInterrupt = true
 	@State var interruptScan = false
@@ -47,7 +47,8 @@ struct TestModeView: View {
 							useCustomMessages: useCustomMessages,
 							handleInterrupt: handleInterrupt,
 							interruptScan: interruptScan,
-							apiLevel: apiLevel
+							apiLevel: apiLevel,
+							header: ["Bearer": "0123456789ABCDEF"]
 						)
 					}, label: {
 						Text("Authenticate")

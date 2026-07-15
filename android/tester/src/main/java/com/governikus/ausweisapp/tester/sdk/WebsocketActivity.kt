@@ -92,7 +92,7 @@ class WebsocketActivity : AppCompatActivity() {
     }
 
     /**
-     * Establishes AusweisApp2 service connection.
+     * Establishes AusweisApp service connection.
      *
      * @param aa2package
      * @throws RemoteException
@@ -172,7 +172,7 @@ class WebsocketActivity : AppCompatActivity() {
 
                 "help" -> {
                     webSocketServer.send("---------Help---------")
-                    webSocketServer.send(":open - Open connection to SDK (optional: com.governikus.ausweisapp2.dev as parameter)")
+                    webSocketServer.send(":open - Open connection to SDK")
                     webSocketServer.send(":close - Close connection to SDK")
                     webSocketServer.send(":help - This help")
                 }

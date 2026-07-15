@@ -449,11 +449,11 @@ internal class WorkflowViewModel(
             }
 
             override fun onBadState(error: String) {
-                println("An BAD_STATE of the AusweisApp2 SDK occured: $error")
+                println("An BAD_STATE of the AusweisApp SDK occured: $error")
             }
 
             override fun onInternalError(error: String) {
-                println("An INTERNAL_ERROR of the AusweisApp2 SDK occured: $error")
+                println("An INTERNAL_ERROR of the AusweisApp SDK occured: $error")
                 showErrorMessageIfError(error)
             }
         }
@@ -471,7 +471,7 @@ internal class WorkflowViewModel(
 
     private fun startAuthentication() {
         val tcTokenUrl = tcTokenUrl ?: throw IllegalStateException("Missing tcTokenUrl")
-        workflowController.startAuthentication(tcTokenUrl, developerMode)
+        workflowController.startAuthentication(tcTokenUrl, developerMode, header = hashMapOf("Bearer" to "0123456789abcdef"))
     }
 
     private fun startChangePin() {

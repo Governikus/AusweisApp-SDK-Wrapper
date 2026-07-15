@@ -6,7 +6,7 @@ import Foundation
 
 extension String {
 	public var isNumber: Bool {
-		return !isEmpty && rangeOfCharacter(from: CharacterSet.decimalDigits.inverted) == nil
+		!isEmpty && rangeOfCharacter(from: CharacterSet.decimalDigits.inverted) == nil
 	}
 
 	func parseDate(format: String) -> Date? {

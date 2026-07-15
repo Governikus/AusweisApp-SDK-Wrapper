@@ -1,6 +1,17 @@
 Changelog
 =========
 
+Version 2.5.4
+^^^^^^^^^^^^^
+
+**Release date:** 15. July 2026
+
+- Update AusweisApp SDK to version 2.5.4.
+- Add parameter ``header`` to :ref:`wc-start-authentication`.
+- Fix a bug (present since version 2.5.0) in the JSON serialization of
+  requests used to set PIN, CAN, or PUK values on readers with a keypad.
+
+
 Version 2.5.3
 ^^^^^^^^^^^^^
 

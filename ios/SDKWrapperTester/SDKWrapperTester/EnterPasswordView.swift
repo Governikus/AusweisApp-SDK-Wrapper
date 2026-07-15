@@ -33,13 +33,13 @@ struct EnterPasswordView: View {
 	private var title: String {
 		switch passwordType {
 		case .pin:
-			return NSLocalizedString("Please enter the PIN.", comment: "PIN CTA")
+			NSLocalizedString("Please enter the PIN.", comment: "PIN CTA")
 		case .transportPin:
-			return NSLocalizedString("Please enter the Transport PIN.", comment: "Transport PIN CTA")
+			NSLocalizedString("Please enter the Transport PIN.", comment: "Transport PIN CTA")
 		case .puk:
-			return NSLocalizedString("Please enter the PUK.", comment: "PUK CTA")
+			NSLocalizedString("Please enter the PUK.", comment: "PUK CTA")
 		case .can:
-			return NSLocalizedString("Please enter the CAN.", comment: "CAN CTA")
+			NSLocalizedString("Please enter the CAN.", comment: "CAN CTA")
 		}
 	}
 
@@ -47,11 +47,11 @@ struct EnterPasswordView: View {
 		switch passwordType {
 		case .pin,
 		     .transportPin:
-			return NSLocalizedString("PIN required", comment: "PIN navigation title")
+			NSLocalizedString("PIN required", comment: "PIN navigation title")
 		case .puk:
-			return NSLocalizedString("PUK required", comment: "PUK navigation title")
+			NSLocalizedString("PUK required", comment: "PUK navigation title")
 		case .can:
-			return NSLocalizedString("CAN required", comment: "CAN navigation title")
+			NSLocalizedString("CAN required", comment: "CAN navigation title")
 		}
 	}
 
@@ -59,14 +59,14 @@ struct EnterPasswordView: View {
 		switch passwordType {
 		case .pin,
 		     .transportPin:
-			return ""
+			""
 		case .puk:
-			return NSLocalizedString(
+			NSLocalizedString(
 				"The ID card is blocked! Please enter the PUK to unblock it.",
 				comment: "PUK info"
 			)
 		case .can:
-			return NSLocalizedString(
+			NSLocalizedString(
 				"The CAN is needed to continue with the workflow. You can find the 6-digit CAN on the front of the ID card.",
 				comment: "CAN info"
 			)
@@ -76,31 +76,31 @@ struct EnterPasswordView: View {
 	private var passwordPlaceholder: String {
 		switch passwordType {
 		case .pin:
-			return NSLocalizedString("6-digit PIN", comment: "PIN input placeholder")
+			NSLocalizedString("6-digit PIN", comment: "PIN input placeholder")
 		case .transportPin:
-			return NSLocalizedString("5-digit PIN", comment: "Transport PIN input placeholder")
+			NSLocalizedString("5-digit PIN", comment: "Transport PIN input placeholder")
 		case .puk:
-			return NSLocalizedString("10-digit PUK", comment: "PUK input placeholder")
+			NSLocalizedString("10-digit PUK", comment: "PUK input placeholder")
 		case .can:
-			return NSLocalizedString("6-digit CAN", comment: "CAN input placeholder")
+			NSLocalizedString("6-digit CAN", comment: "CAN input placeholder")
 		}
 	}
 
 	private var passwordLength: Int {
 		switch passwordType {
 		case .pin:
-			return WorkflowController.pinLength
+			WorkflowController.pinLength
 		case .transportPin:
-			return WorkflowController.transportPinLength
+			WorkflowController.transportPinLength
 		case .can:
-			return WorkflowController.canLength
+			WorkflowController.canLength
 		case .puk:
-			return WorkflowController.pukLength
+			WorkflowController.pukLength
 		}
 	}
 
 	private var validPassword: Bool {
-		return password.text.count == passwordLength
+		password.text.count == passwordLength
 	}
 
 	private func acceptPassword() {
@@ -140,7 +140,7 @@ struct EnterPasswordView: View {
 
 			PasswordTextField(placeholder: passwordPlaceholder, password: password, error: .constant(false))
 
-			if [1, 2].contains(retryCounter) && self.passwordType == .pin {
+			if [1, 2].contains(retryCounter) && passwordType == .pin {
 				Text("\(retryCounter) PIN attempt(s) left.")
 					.textAppearance(theme.textAppearanceBody)
 			}
@@ -157,14 +157,14 @@ struct EnterPasswordView: View {
 		}
 		.navigationBarTitle(Text(navigationTitle))
 		.navigationBarItems(leading: AbortButton(), trailing: Button(action: {
-			self.acceptPassword()
+			acceptPassword()
 		}, label: {
 			Text("Continue")
 				.textAppearance(theme.textAppearanceButton)
 		}).disabled(!validPassword))
 		.onAppear {
-			self.clearPassword()
-			self.password.maxLength = self.passwordLength
+			clearPassword()
+			password.maxLength = passwordLength
 		}
 	}
 }

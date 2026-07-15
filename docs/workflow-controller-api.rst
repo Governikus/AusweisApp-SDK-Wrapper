@@ -156,6 +156,9 @@ Otherwise you will get a callback to :ref:`wc-on-bad-state`.
   True to enable automatic STATUS messages, which are delivered by callbacks to
   :ref:`wc-on-status`.
 
+- **headers**:
+  Optional map of custom header to send in requests to the eID service provider.
+
 .. note::
   *iOS only*.
 
@@ -170,7 +173,9 @@ Otherwise you will get a callback to :ref:`wc-on-bad-state`.
     fun startAuthentication(
       tcTokenUrl: Uri,
       developerMode: Boolean = false,
-      status: Boolean = true)
+      status: Boolean = true,
+      header: Map<String, String>? = null,
+    )
 
   .. code-tab:: swift
 
@@ -178,7 +183,9 @@ Otherwise you will get a callback to :ref:`wc-on-bad-state`.
       withTcTokenUrl tcTokenUrl: URL,
       withDeveloperMode developerMode: Bool = false,
       withUserInfoMessages userInfoMessages: AA2UserInfoMessages? = nil,
-      withStatusMsgEnabled status: Bool = true)
+      withStatusMsgEnabled status: Bool = true,
+      withCustomHeader header: [String: String]? = nil
+    )
 
 .. _wc-start-change-pin:
 

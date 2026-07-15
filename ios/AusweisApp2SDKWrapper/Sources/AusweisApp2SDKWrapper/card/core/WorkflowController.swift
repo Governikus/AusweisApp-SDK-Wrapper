@@ -175,7 +175,7 @@ public class WorkflowController {
 	}
 
 	/**
-	 Provides information about the utilized AusweisApp2.
+	 Provides information about the utilized AusweisApp.
 
 	 The SDK Wrapper will call WorkflowCallbacks.onInfo() as an answer.
 	 */
@@ -242,7 +242,7 @@ public class WorkflowController {
 	 optional access rights are disabled.
 	 */
 	public func setAccessRights(_ optionalAccessRights: [AccessRight]) {
-		send(command: SetAccessRights(chat: optionalAccessRights.map { $0.rawValue }))
+		send(command: SetAccessRights(chat: optionalAccessRights.map(\.rawValue)))
 	}
 
 	/**
@@ -370,17 +370,21 @@ public class WorkflowController {
 	 - Parameter userInfoMessages: Optional info messages to be display in the NFC dialog.
 	 - Parameter withStatusMsgEnabled: True to enable automatic STATUS messages, which are
 	  delivered by callbacks to WorkflowCallbacks.onStatus().
+	 - Parameter withCustomHeader: Optional custom header to send in requests to the eID
+	  service provider.
 	 */
 	public func startAuthentication(
 		withTcTokenUrl tcTokenUrl: URL,
 		withDeveloperMode developerMode: Bool = false,
 		withUserInfoMessages userInfoMessages: AA2UserInfoMessages? = nil,
-		withStatusMsgEnabled status: Bool = true
+		withStatusMsgEnabled status: Bool = true,
+		withCustomHeader header: [String: String]? = nil
 	) {
 		send(command: RunAuth(tcTokenURL: tcTokenUrl.absoluteString,
 		                      developerMode: developerMode,
 		                      messages: userInfoMessages,
-		                      status: status))
+		                      status: status,
+		                      header: header))
 	}
 
 	/**
@@ -411,9 +415,9 @@ public class WorkflowController {
 
 	// swiftformat:sort:end
 
-	private func send<T: Command>(command: T) {
+	private func send(command: some Command) {
 		guard isStarted else {
-			let error = WrapperError(msg: command.cmd, error: "AusweisApp2 SDK Wrapper not started")
+			let error = WrapperError(msg: command.cmd, error: "AusweisApp SDK Wrapper not started")
 			callback { $0.onWrapperError(error: error) }
 			return
 		}

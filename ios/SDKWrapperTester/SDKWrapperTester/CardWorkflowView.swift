@@ -17,12 +17,12 @@ struct CardWorkflowView: View {
 				} else if viewModel.state == .abort {
 					AbortView()
 				} else if viewModel.state == .accessRights {
-					if self.viewModel.accessRights != nil {
+					if viewModel.accessRights != nil {
 						AccessRightsView(
-							accessRights: self.viewModel.accessRights!,
-							certificateDescription: self.$viewModel.certificateDescription,
-							onAcceptAccessRights: self.viewModel.acceptAccessRights,
-							onSetAccessRights: self.viewModel.onSetAccessRights
+							accessRights: viewModel.accessRights!,
+							certificateDescription: $viewModel.certificateDescription,
+							onAcceptAccessRights: viewModel.acceptAccessRights,
+							onSetAccessRights: viewModel.onSetAccessRights
 						)
 					} else {
 						Text("Access rights could not be loaded")
@@ -42,11 +42,11 @@ struct CardWorkflowView: View {
 					viewModel.state == .unknownCard ||
 					viewModel.state == .pause
 				{ // swiftlint:disable:this opening_brace
-					ErrorView(viewModel: self.viewModel)
+					ErrorView(viewModel: viewModel)
 				} else if viewModel.state == .cardRequested {
-					CardRequestedView(viewModel: self.viewModel)
+					CardRequestedView(viewModel: viewModel)
 				} else {
-					DummyView(state: self.viewModel.state)
+					DummyView(state: viewModel.state)
 				}
 			}
 		}
@@ -60,7 +60,7 @@ struct DummyView: View {
 
 	var body: some View {
 		VStack {
-			Text("viewModel.state = \(String(describing: self.state))")
+			Text("viewModel.state = \(String(describing: state))")
 				.textAppearance(theme.textAppearanceBody)
 			Spacer()
 		}
@@ -73,7 +73,7 @@ struct AbortButton: View {
 	@EnvironmentObject var viewModel: CardWorkflowViewModel
 
 	var body: some View {
-		Button(action: { self.viewModel.cancelWorkflow() }, label: {
+		Button(action: { viewModel.cancelWorkflow() }, label: {
 			Text("Abort")
 				.textAppearance(theme.textAppearanceButton)
 		})

@@ -6,7 +6,7 @@ import Foundation
 
 public extension URL {
 	var isValidHttpsURL: Bool {
-		guard let scheme = scheme, scheme == "https" else { return false }
+		guard let scheme, scheme == "https" else { return false }
 
 		let string = absoluteString
 

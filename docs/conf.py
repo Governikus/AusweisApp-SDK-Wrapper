@@ -7,7 +7,7 @@ import sys
 
 # -- General configuration ------------------------------------------------
 
-AA2_SDKWRAPPER_VERSION = '2.5.3'
+AA2_SDKWRAPPER_VERSION = '2.5.4'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.3'

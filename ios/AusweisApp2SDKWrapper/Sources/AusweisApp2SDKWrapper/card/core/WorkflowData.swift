@@ -127,7 +127,7 @@ public struct Card {
 
 	/// Convenience method to check if an unknown card (without eID function) was detected.
 	public func isUnknown() -> Bool {
-		return inoperative == nil && deactivated == nil && pinRetryCounter == nil
+		inoperative == nil && deactivated == nil && pinRetryCounter == nil
 	}
 }
 
@@ -210,7 +210,7 @@ public struct WorkflowProgress {
 	}
 }
 
-/// Provides information about the underlying AusweisApp2
+/// Provides information about the underlying AusweisApp
 public struct VersionInfo {
 	/// Application name.
 	public let name: String

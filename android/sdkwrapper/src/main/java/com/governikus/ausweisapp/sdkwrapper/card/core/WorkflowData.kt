@@ -228,7 +228,7 @@ data class Reader(
 ) : Parcelable
 
 /**
- * Provides information about the underlying AusweisApp2.
+ * Provides information about the underlying AusweisApp.
  *
  * @property name Application name.
  * @property implementationTitle Title of implementation.

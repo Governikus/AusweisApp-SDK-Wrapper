@@ -10,8 +10,8 @@ plugins {
 }
 
 ext {
-    ausweisapp_version = '2.5.3'
-    sdkwrapper_version = '2.5.3'
+    ausweisapp_version = '2.5.4'
+    sdkwrapper_version = '2.5.4'
     java_version = 21
 
     configureRename = { Project module, String suffix ->
@@ -43,16 +43,9 @@ subprojects { subproject ->
             compilerOptions {
                 allWarningsAsErrors.set(true)
                 freeCompilerArgs.add("-Xstring-concat=inline")
-                freeCompilerArgs.add("-Xannotation-default-target=param-property")
             }
         }
     }
-}
-
-def isNonStable = { String version ->
-  def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
-  def regex = /^[0-9,.v-]+(-r)?$/
-  return !stableKeyword && !(version ==~ regex)
 }
 
 sonarqube {
@@ -84,10 +77,60 @@ allprojects {
     }
 }
 
+def isNonStable = { String version ->
+    ['alpha', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea', 'dev', 'snapshot'].any { qualifier ->
+        version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+    }
+}
+
 tasks.named("dependencyUpdates").configure {
     checkForGradleUpdate = false
-    rejectVersionIf {
-        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+    outputFormatter = { result ->
+        if (!result.outdated.dependencies.isEmpty()) {
+            def outdatedLibs = result.outdated.dependencies.collect { dep ->
+                " - ${dep.group}:${dep.name} [${dep.version} -> ${dep.available.release ?: dep.available.milestone}]"
+            }.join('\n')
+
+            throw new GradleException("Build failed! The following outdated dependencies were found:\n$outdatedLibs")
+        } else {
+            println "All dependencies are up to date."
+        }
+    }
+    rejectVersionIf { selection ->
+        if (selection.candidate.group == "androidx.core" && selection.candidate.module == "core-ktx") {
+            if (selection.candidate.version == "1.19.0") {
+                return true // Requires Gradle upgrade incompatible with SonarQube plugin
+            }
+        }
+        if (selection.candidate.group == "com.android.application" && selection.candidate.module == "com.android.application.gradle.plugin") {
+            if (selection.candidate.version in ["9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0", "9.2.1"]) {
+                return true // Requires Gradle upgrade incompatible with SonarQube plugin
+            }
+        }
+        if (selection.candidate.group == "androidx.databinding" && selection.candidate.module == "viewbinding") {
+            if (selection.candidate.version in ["9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0", "9.2.1"]) {
+                return true // Requires Gradle upgrade incompatible with SonarQube plugin
+            }
+        }
+        if (selection.candidate.group == "org.jetbrains.kotlin" || selection.candidate.group == "org.jetbrains.kotlin.android") {
+            if (selection.candidate.version == "2.4.10") {
+                return true // Needed because there seems to be a transitive dependency on 2.4.0 somewhere, which currently cannot be updated
+            }
+            if (isNonStable(selection.candidate.version)) {
+                return true // Needed because the beta versions show up as false positives even when the stable version 2.4.0 is used
+            }
+        }
+        if (selection.candidate.group == "com.google.testing.platform") {
+            return true // Transitive dependency managed by Android Gradle Plugin
+        }
+        if (selection.candidate.group == "com.android.tools.utp") {
+            return true // Transitive dependency managed by Android Gradle Plugin
+        }
+
+        if (isNonStable(selection.candidate.version) && !isNonStable(selection.currentVersion)) {
+            return true
+        }
+        return false
     }
 }
 

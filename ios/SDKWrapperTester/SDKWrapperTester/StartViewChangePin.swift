@@ -13,7 +13,7 @@ struct StartViewChangePin: View {
 	var body: some View {
 		VStack(spacing: 20) {
 			Button(action: {
-				guard let viewController = self.viewController else { return }
+				guard let viewController else { return }
 				SDKWrapperTesterSDK.changePin(
 					parentViewController: viewController,
 					userInfoMessages: AA2UserInfoMessages(
@@ -23,25 +23,25 @@ struct StartViewChangePin: View {
 						sessionInProgress: "Session in progress"
 					)
 				) { result in
-					self.changePinResult = result
+					changePinResult = result
 				}
 			}, label: {
 				Text("Change PIN")
 			})
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
+				guard let viewController else { return }
 				SDKWrapperTesterSDK.changeTransportPin(parentViewController: viewController) { result in
-					self.changePinResult = result
+					changePinResult = result
 				}
 			}, label: {
 				Text("Change Transport PIN")
 			})
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
+				guard let viewController else { return }
 				SDKWrapperTesterSDK.changePin(parentViewController: viewController, simulatorMode: .defaultData) { result in
-					self.changePinResult = result
+					changePinResult = result
 				}
 			}, label: {
 				Text("Change PIN with Simulator")
@@ -49,20 +49,20 @@ struct StartViewChangePin: View {
 
 			Spacer()
 
-			if self.changePinResult != nil {
+			if changePinResult != nil {
 				VStack(spacing: 20) {
 					Text("Change PIN result")
 						.bold()
 
-					if self.changePinResult?.success == true {
+					if changePinResult?.success == true {
 						Text("PIN successfully changed.")
 					} else {
 						Text("PIN change failed or aborted!")
-						Text("Reason: \(self.changePinResult?.reason ?? "Missing Reason")")
+						Text("Reason: \(changePinResult?.reason ?? "Missing Reason")")
 					}
 				}
 				.padding(20)
-				.border(self.changePinResult!.success ? Color.green : Color.red, width: 4)
+				.border(changePinResult!.success ? Color.green : Color.red, width: 4)
 			}
 		}
 		.padding(20)

@@ -11,13 +11,13 @@ import SwiftUI
 struct StartViewOnlineAuthentication: View {
 	weak var viewController: UIViewController?
 	@State private var tcTokenUrl
-		= URL(string: "https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json")!
+		= URL(string: "https://test.governikus-eid.de/Autent-DemoApplication/api/eid/request")!
 	@State private var tcTokenUrlAllRightsRequired
-		= URL(string: "https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json")!
+		= URL(string: "https://test.governikus-eid.de/Autent-DemoApplication/api/eid/request")!
 	@State private var tcTokenUrlCanAllowed
-		= URL(string: "https://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_can&redirect=true")!
+		= URL(string: "https://test.governikus-eid.de/Vorort-DemoApplication/api/eid/request")!
 	@State private var tcTokenUrlDeveloperMode
-		= "http://demo.governikus-eid.de/Autent-DemoApplication/RequestServlet?provider=demo_epa_20&redirect=true"
+		= "http://test.governikus-eid.de/Autent-DemoApplication/api/eid/request"
 
 	@State private var authResult: AuthResult?
 	private let abortedMessage = "Workflow aborted"
@@ -25,58 +25,60 @@ struct StartViewOnlineAuthentication: View {
 	var body: some View {
 		VStack(spacing: 20) {
 			Button(action: {
-				guard let viewController = self.viewController else { return }
-				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: self.tcTokenUrl, parentViewController: viewController, userInfoMessages: AA2UserInfoMessages(
-					sessionStarted: "Session started",
+				guard let viewController else { return }
+				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: tcTokenUrl, parentViewController: viewController, userInfoMessages: AA2UserInfoMessages(
+					sessionStarted: "Session started\nPlease present the eID card",
 					sessionFailed: "Session failed",
 					sessionSucceeded: "Session succeeded",
 					sessionInProgress: "Session in progress"
-				)) { result in
+				),
+				header: ["Bearer": "0123456789abcdef"]) { result in
 					print(result ?? abortedMessage)
-					self.authResult = result
+					authResult = result
 				}
 			}, label: {
 				Text("Start Authentication")
 			})
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
-				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: self.tcTokenUrl, parentViewController: viewController, simulatorMode: .defaultData) { result in
+				guard let viewController else { return }
+				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: tcTokenUrl, parentViewController: viewController, simulatorMode: .defaultData, header: ["Bearer": "0123456789abcdef"]) { result in
 					print(result ?? abortedMessage)
-					self.authResult = result
+					authResult = result
 				}
 			}, label: {
 				Text("Start Authentication with Simulator")
 			})
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
-				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: self.tcTokenUrl, parentViewController: viewController, simulatorMode: .differentFirstName) { result in
+				guard let viewController else { return }
+				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: tcTokenUrl, parentViewController: viewController, simulatorMode: .differentFirstName, header: ["Bearer": "0123456789abcdef"]) { result in
 					print(result ?? abortedMessage)
-					self.authResult = result
+					authResult = result
 				}
 			}, label: {
 				Text("Start Authentication with Simulator (Different First Name)")
 			})
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
-				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: self.tcTokenUrl, parentViewController: viewController, simulatorMode: .differentPseudonym) { result in
+				guard let viewController else { return }
+				SDKWrapperTesterSDK.authenticate(withTcTokenUrl: tcTokenUrl, parentViewController: viewController, simulatorMode: .differentPseudonym, header: ["Bearer": "0123456789abcdef"]) { result in
 					print(result ?? abortedMessage)
-					self.authResult = result
+					authResult = result
 				}
 			}, label: {
 				Text("Start Authentication with Simulator (Different Pseudonym)")
 			})
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
+				guard let viewController else { return }
 				SDKWrapperTesterSDK.authenticate(
-					withTcTokenUrl: self.tcTokenUrlAllRightsRequired,
-					parentViewController: viewController
+					withTcTokenUrl: tcTokenUrlAllRightsRequired,
+					parentViewController: viewController,
+					header: ["Bearer": "0123456789abcdef"]
 				) { result in
 					print(result ?? abortedMessage)
-					self.authResult = result
+					authResult = result
 				}
 			}, label: {
 				VStack {
@@ -86,13 +88,14 @@ struct StartViewOnlineAuthentication: View {
 			})
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
+				guard let viewController else { return }
 				SDKWrapperTesterSDK.authenticate(
-					withTcTokenUrl: self.tcTokenUrlCanAllowed,
-					parentViewController: viewController
+					withTcTokenUrl: tcTokenUrlCanAllowed,
+					parentViewController: viewController,
+					header: ["Bearer": "0123456789abcdef"]
 				) { result in
 					print(result ?? abortedMessage)
-					self.authResult = result
+					authResult = result
 				}
 			}, label: {
 				Text("Start CAN-allowed Authentication")
@@ -108,14 +111,15 @@ struct StartViewOnlineAuthentication: View {
 			).textFieldStyle(.roundedBorder)
 
 			Button(action: {
-				guard let viewController = self.viewController else { return }
+				guard let viewController else { return }
 				SDKWrapperTesterSDK.authenticate(
-					withTcTokenUrl: URL(string: self.tcTokenUrlDeveloperMode)!,
+					withTcTokenUrl: URL(string: tcTokenUrlDeveloperMode)!,
 					parentViewController: viewController,
-					developerMode: true
+					developerMode: true,
+					header: ["Bearer": "0123456789abcdef"]
 				) { result in
 					print(result ?? abortedMessage)
-					self.authResult = result
+					authResult = result
 				}
 			}, label: {
 				VStack {
@@ -125,20 +129,20 @@ struct StartViewOnlineAuthentication: View {
 
 			Spacer()
 
-			if self.authResult?.result != nil || self.authResult?.url != nil {
+			if authResult?.result != nil || authResult?.url != nil {
 				VStack(spacing: 20) {
 					Text("Authentication result")
 						.bold()
 
-					if self.authResult?.result != nil && self.authResult?.hasError ?? true {
+					if authResult?.result != nil && authResult?.hasError ?? true {
 						Text("Error message:")
 							.bold()
-						Text(self.authResult!.result!.message ?? "Missing error message")
+						Text(authResult!.result!.message ?? "Missing error message")
 					}
 
-					if self.authResult?.url != nil {
+					if authResult?.url != nil {
 						Button(action: {
-							guard let resultUrl = self.authResult?.url else { return }
+							guard let resultUrl = authResult?.url else { return }
 							UIApplication.shared.open(resultUrl)
 						}, label: {
 							Text("Open result URL")
@@ -146,7 +150,7 @@ struct StartViewOnlineAuthentication: View {
 					}
 				}
 				.padding(20)
-				.border(self.authResult?.hasError ?? false ? Color.red : Color.green, width: 4)
+				.border(authResult?.hasError ?? false ? Color.red : Color.green, width: 4)
 			}
 		}
 		.padding(20)

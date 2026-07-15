@@ -11,8 +11,8 @@ extension AA2Message {
 
 	func getCertificateDescription() -> CertificateDescription? {
 		guard
-			let description = description,
-			let validity = validity,
+			let description,
+			let validity,
 			let effectiveDate = validity.effectiveDate.parseDate(format: aa2DateFormat),
 			let expirationDate = validity.expirationDate.parseDate(format: aa2DateFormat)
 		else { return nil }
@@ -32,21 +32,21 @@ extension AA2Message {
 	}
 
 	func getReaders() -> [Reader]? {
-		guard let readers = readers else { return nil }
+		guard let readers else { return nil }
 
 		return readers.compactMap { reader -> Reader? in Reader(reader: reader)
 		}
 	}
 
 	func getReader() -> Reader? {
-		if let reader = reader {
+		if let reader {
 			return Reader(reader: reader)
 		}
 
-		guard let name = name else { return nil }
-		guard let insertable = insertable else { return nil }
-		guard let attached = attached else { return nil }
-		guard let keypad = keypad else { return nil }
+		guard let name else { return nil }
+		guard let insertable else { return nil }
+		guard let attached else { return nil }
+		guard let keypad else { return nil }
 
 		return Reader(
 			name: name,
@@ -64,10 +64,10 @@ extension AA2Message {
 	}
 
 	func getAccessRights() -> AccessRights? {
-		guard let chat = chat else { return nil }
+		guard let chat else { return nil }
 
 		var auxiliaryData: AuxiliaryData?
-		if let aux = aux {
+		if let aux {
 			auxiliaryData = AuxiliaryData(
 				ageVerificationDate: aux.ageVerificationDate?.parseDate(format: aa2DateFormat),
 				requiredAge: Int(aux.requiredAge ?? ""),
@@ -99,7 +99,7 @@ extension AA2Message {
 		let result = getAuthResultData()
 
 		var resultUrl: URL?
-		if let url = url {
+		if let url {
 			resultUrl = URL(string: url)
 		}
 

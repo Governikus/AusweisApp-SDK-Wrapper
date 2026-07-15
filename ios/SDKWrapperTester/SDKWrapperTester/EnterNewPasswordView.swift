@@ -23,7 +23,7 @@ struct EnterNewPasswordView: View {
 
 	var body: some View {
 		let confirmationMismatchBinding = Binding(
-			get: { self.confirmationMismatch },
+			get: { confirmationMismatch },
 			set: { _ = $0 }
 		)
 
@@ -68,7 +68,7 @@ struct EnterNewPasswordView: View {
 		}
 		.navigationBarTitle(Text("Change PIN"))
 		.navigationBarItems(leading: AbortButton(), trailing: Button(action: {
-			self.viewModel.setNewPin(newPin: self.newPassword.text)
+			viewModel.setNewPin(newPin: newPassword.text)
 		}, label: {
 			Text("Continue")
 				.textAppearance(theme.textAppearanceButton)

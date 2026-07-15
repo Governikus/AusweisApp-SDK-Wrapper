@@ -16,7 +16,7 @@ class AA2SdkConnection: SdkConnection {
 	var onMessageReceived: ((_ message: AA2Message) -> Void)?
 
 	private let ausweisAppCallback: AusweisAppCallback = { (msg: UnsafePointer<CChar>?) in
-		guard let msg = msg else {
+		guard let msg else {
 			AA2SdkConnection.shared.onNewMessage(messageJson: nil)
 			return
 		}
@@ -39,7 +39,7 @@ class AA2SdkConnection: SdkConnection {
 		ausweisapp_shutdown()
 	}
 
-	func send<T: Command>(command: T) {
+	func send(command: some Command) {
 		do {
 			let messageData = try jsonEncoder.encode(command)
 			if let messageJson = String(data: messageData, encoding: .utf8) {
@@ -51,19 +51,19 @@ class AA2SdkConnection: SdkConnection {
 	}
 
 	private func onNewMessage(messageJson: String?) {
-		guard let messageJson = messageJson else {
-			if let onConnected = onConnected {
+		guard let unwrappedMessageJson = messageJson else {
+			if let onConnected {
 				onConnected()
 			}
 			return
 		}
 
-		print("Received message: \(messageJson)")
+		print("Received message: \(unwrappedMessageJson)")
 		do {
-			let messageData = Data(messageJson.utf8)
+			let messageData = Data(unwrappedMessageJson.utf8)
 			let message = try jsonDecoder.decode(AA2Message.self, from: messageData)
 
-			if let onMessageReceived = onMessageReceived {
+			if let onMessageReceived {
 				onMessageReceived(message)
 			}
 		} catch {

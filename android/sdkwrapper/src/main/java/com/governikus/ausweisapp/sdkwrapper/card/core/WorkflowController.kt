@@ -192,13 +192,16 @@ class WorkflowController internal constructor(
      *
      * @param status True to enable automatic STATUS messages, which are delivered by
      * callbacks to [WorkflowCallbacks.onStatus].
+     *
+     * @param header Optional custom header to send in requests to the eID service provider.
      */
     fun startAuthentication(
         tcTokenUrl: Uri,
         developerMode: Boolean = false,
         status: Boolean = true,
+        header: Map<String, String>? = null,
     ) {
-        send(RunAuth(tcTokenUrl.toString(), developerMode, status))
+        send(RunAuth(tcTokenUrl.toString(), developerMode, status, header))
     }
 
     /**
@@ -252,7 +255,7 @@ class WorkflowController internal constructor(
     }
 
     /**
-     * Provides information about the utilized AusweisApp2.
+     * Provides information about the utilized AusweisApp.
      *
      * The SDK Wrapper will call [WorkflowCallbacks.onInfo] as an answer.
      */

@@ -124,11 +124,11 @@ public protocol WorkflowCallbacks: AnyObject {
 	func onEnterPuk(error: String?, reader: Reader)
 
 	/**
-	 Provides information about the AusweisApp2 that is used in the SDK Wrapper.
+	 Provides information about the AusweisApp that is used in the SDK Wrapper.
 
 	 Response to a call to WorkflowController.getInfo().
 
-	 - Parameter versionInfo: Holds information about the currently utilized AusweisApp2.
+	 - Parameter versionInfo: Holds information about the currently utilized AusweisApp.
 	 */
 	func onInfo(versionInfo: VersionInfo)
 
@@ -145,7 +145,7 @@ public protocol WorkflowCallbacks: AnyObject {
 	func onInsertCard(error: String?)
 
 	/**
-	 Called if an error within the AusweisApp2 SDK occurred. Please report this as it indicates a bug.
+	 Called if an error within the AusweisApp SDK occurred. Please report this as it indicates a bug.
 
 	 - Parameter error: Information about the error.
 	 */
@@ -183,7 +183,7 @@ public protocol WorkflowCallbacks: AnyObject {
 
 	/**
 	 Provides information about the current workflow and state. This callback indicates if a
-	 workflow is in progress or the workflow is paused. This can occur if the AusweisApp2 needs
+	 workflow is in progress or the workflow is paused. This can occur if the AusweisApp needs
 	 additional data like ACCESS_RIGHTS or INSERT_CARD.
 
 	 - Parameter workflowProgress: Holds information about the current workflow progress.

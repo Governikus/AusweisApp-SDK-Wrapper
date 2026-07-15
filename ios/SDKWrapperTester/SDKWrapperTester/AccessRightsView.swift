@@ -88,24 +88,24 @@ struct AccessRightsView: View {
 				}
 			}
 
-			if !self.accessRights.requiredRights.isEmpty {
+			if !accessRights.requiredRights.isEmpty {
 				Section(header:
 					Text("Required Data")
 						.textAppearance(theme.textAppearanceListTitle))
 				{ // swiftlint:disable:this opening_brace
 					ForEach(accessRights.requiredRights, id: \.self) { right in
 						Text(AccessRightNames.pretty[right] ?? right.rawValue)
-							.textAppearance(self.theme.textAppearanceListItemCaption)
+							.textAppearance(theme.textAppearanceListItemCaption)
 					}
 				}
 			}
 
-			if !self.optionalRights.isEmpty {
+			if !optionalRights.isEmpty {
 				Section(header:
 					Text("Optional Data")
 						.textAppearance(theme.textAppearanceListTitle))
 				{ // swiftlint:disable:this opening_brace
-					ForEach(self.optionalRights, id: \.self.display) { right in
+					ForEach(optionalRights, id: \.display) { right in
 						OptionalRightToggle(optionalRight: right)
 					}
 				}
@@ -113,11 +113,11 @@ struct AccessRightsView: View {
 		}
 		.navigationBarTitle(Text("Requested Data"))
 		.navigationBarItems(leading: AbortButton(), trailing: Button(action: {
-			if self.optionalRights.isEmpty {
-				self.onAcceptAccessRights()
+			if optionalRights.isEmpty {
+				onAcceptAccessRights()
 			} else {
-				let selectedRights = self.optionalRights.filter { $0.selected }.map { $0.right }
-				self.onSetAccessRights(selectedRights)
+				let selectedRights = optionalRights.filter(\.selected).map(\.right)
+				onSetAccessRights(selectedRights)
 			}
 		}, label: {
 			Text("Accept")

@@ -73,7 +73,6 @@ internal class EnterPasswordFragment : BaseFragment<FragmentEnterPasswordBinding
                     CharArray(0)
                 }
             viewModel.password.postValue(password)
-            password.fill('\u0000')
         }
         viewBinding.etPassword.setOnEditorActionListener { _, actionId, _ ->
             when (actionId) {

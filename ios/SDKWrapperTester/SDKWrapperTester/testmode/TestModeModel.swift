@@ -12,7 +12,8 @@ class TestModeModel: ObservableObject {
 			tcTokenURL: String? = nil,
 			messages: Messages? = nil,
 			handleInterrupt: Bool? = nil,
-			level: Int? = nil
+			level: Int? = nil,
+			header: [String: String]? = nil
 		) {
 			self.cmd = cmd
 			self.value = value
@@ -20,6 +21,7 @@ class TestModeModel: ObservableObject {
 			self.messages = messages
 			self.handleInterrupt = handleInterrupt
 			self.level = level
+			self.header = header
 		}
 
 		let cmd: String
@@ -28,6 +30,7 @@ class TestModeModel: ObservableObject {
 		let messages: Messages?
 		let handleInterrupt: Bool?
 		let level: Int?
+		let header: [String: String]?
 	}
 
 	struct Messages: Encodable {
@@ -43,7 +46,7 @@ class TestModeModel: ObservableObject {
 		let retryCounter: Int?
 
 		func isEmpty() -> Bool {
-			return inoperative == nil && deactivated == nil && retryCounter == nil
+			inoperative == nil && deactivated == nil && retryCounter == nil
 		}
 	}
 
@@ -64,6 +67,7 @@ class TestModeModel: ObservableObject {
 	@Published var interruptScan: Bool = false
 	@Published var logMessages: [LogMessage] = []
 	@Published var redirectUrl: URL?
+	@Published var header: [String: String]?
 
 	private var pin: String?
 	private var tcTokenUrl: String?
@@ -76,7 +80,8 @@ class TestModeModel: ObservableObject {
 		useCustomMessages: Bool,
 		handleInterrupt: Bool,
 		interruptScan: Bool,
-		apiLevel: String
+		apiLevel: String,
+		header: [String: String]?
 	) {
 		if isStarted {
 			return
@@ -86,6 +91,7 @@ class TestModeModel: ObservableObject {
 		self.useCustomMessages = useCustomMessages
 		self.handleInterrupt = handleInterrupt
 		self.interruptScan = interruptScan
+		self.header = header
 		logMessages = []
 
 		self.tcTokenUrl = tcTokenUrl
@@ -139,14 +145,15 @@ class TestModeModel: ObservableObject {
 				sessionSucceeded: "SDKTester: sessionSucceeded",
 				sessionInProgress: "SDKTester: sessionInProgress - "
 			) : nil,
-			handleInterrupt: handleInterrupt
+			handleInterrupt: handleInterrupt,
+			header: header
 		))
 	}
 
 	// swiftlint: disable cyclomatic_complexity function_body_length
 	private func dispatch(message: String?) {
 		var msg: Message?
-		if let message = message {
+		if let message {
 			do {
 				msg = try jsonDecoder.decode(Message.self, from: Data(message.utf8))
 			} catch {
@@ -154,7 +161,7 @@ class TestModeModel: ObservableObject {
 			}
 		}
 
-		log(message ?? "AusweisApp2 started")
+		log(message ?? "AusweisApp started")
 
 		switch msg?.msg {
 		case nil:

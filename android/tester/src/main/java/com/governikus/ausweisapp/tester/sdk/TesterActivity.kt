@@ -28,8 +28,8 @@ import com.governikus.ausweisapp.tester.wrapper.databinding.ActivityTesterBindin
  * SDK Tester activity supports two modes to use SDK (as integrated Dependency and as External Application)
  * to do so you have to the set the package name of the service intent to the package name of the application
  * which has integrated the sdk as a dependency.
- * Otherwise if you want to use the AusweisApp2 you need to set the package name to
- * 'com.governikus.ausweisapp2' this requires an installed AusweisApp2.
+ * Otherwise if you want to use the AusweisApp you need to set the package name to
+ * 'com.governikus.ausweisapp2' this requires an installed AusweisApp.
  */
 class TesterActivity : AppCompatActivity() {
     private enum class State {

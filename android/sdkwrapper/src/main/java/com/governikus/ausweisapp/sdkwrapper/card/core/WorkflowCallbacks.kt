@@ -180,7 +180,7 @@ interface WorkflowCallbacks {
 
     /**
      * Provides information about the current workflow and state. This callback indicates if a
-     * workflow is in progress or the workflow is paused. This can occur if the AusweisApp2 needs
+     * workflow is in progress or the workflow is paused. This can occur if the AusweisApp needs
      * additional data like ACCESS_RIGHTS or INSERT_CARD.
      *
      * @param workflowProgress Holds information about the current workflow progress.
@@ -188,12 +188,12 @@ interface WorkflowCallbacks {
     fun onStatus(workflowProgress: WorkflowProgress)
 
     /**
-     * Provides information about the AusweisApp2 that is used in the SDK Wrapper.
+     * Provides information about the AusweisApp that is used in the SDK Wrapper.
      *
      * Response to a call to [WorkflowController.getInfo].
      *
-     * @param versionInfo Holds information about the currently utilized AusweisApp2.
-     * @param connectionInfo Holds information about the LocalIfd connection to the installed AusweisApp2.
+     * @param versionInfo Holds information about the currently utilized AusweisApp.
+     * @param connectionInfo Holds information about the LocalIfd connection to the installed AusweisApp.
      */
     fun onInfo(
         versionInfo: VersionInfo,
@@ -201,7 +201,7 @@ interface WorkflowCallbacks {
     )
 
     /**
-     * Called if an error within the AusweisApp2 SDK occurred. Please report this as it indicates a bug.
+     * Called if an error within the AusweisApp SDK occurred. Please report this as it indicates a bug.
      *
      * @param error Information about the error.
      */

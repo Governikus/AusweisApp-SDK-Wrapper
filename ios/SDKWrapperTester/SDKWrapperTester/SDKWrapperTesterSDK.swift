@@ -15,6 +15,7 @@ public enum SDKWrapperTesterSDK {
 		developerMode: Bool = false,
 		userInfoMessages: AA2UserInfoMessages? = nil,
 		simulatorMode: SimulatorMode = .disabled,
+		header: [String: String]? = nil,
 		completion: @escaping (AuthResult?) -> Void
 	) {
 		let viewModel = CardWorkflowViewModel(workflowType: .authentication)
@@ -22,6 +23,7 @@ public enum SDKWrapperTesterSDK {
 		viewModel.developerMode = developerMode
 		viewModel.userInfoMessages = userInfoMessages
 		viewModel.simulatorMode = simulatorMode
+		viewModel.header = header
 
 		let contentView = CardWorkflowView()
 			.environmentObject(sdkTheme)

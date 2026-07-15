@@ -52,6 +52,7 @@ class CardWorkflowViewModel: ObservableObject {
 
 	@Published var developerMode: Bool = false
 	@Published var userInfoMessages: AA2UserInfoMessages?
+	@Published var header: [String: String]?
 	@Published var lastAttempt: PasswordType?
 
 	@Published var workflowProgress: WorkflowProgress = .init()
@@ -133,7 +134,7 @@ class CardWorkflowViewModel: ObservableObject {
 	}
 
 	private func finishWithResult(result: Any?) {
-		if let onFinished = onFinished {
+		if let onFinished {
 			onFinished(result)
 		}
 		cleanup()
@@ -148,7 +149,7 @@ class CardWorkflowViewModel: ObservableObject {
 	}
 
 	private func initSimulatorFiles() -> [SimulatorFile] {
-		return [
+		[
 			// swiftlint:disable line_length
 			SimulatorFile(withFileId: "0101", withShortFileId: "01", withContent: "610413024944"),
 			SimulatorFile(withFileId: "0102", withShortFileId: "02", withContent: "6203130144"),
@@ -188,7 +189,7 @@ extension CardWorkflowViewModel: WorkflowCallbacks {
 	}
 
 	func onInfo(versionInfo: VersionInfo) {
-		print("VersionInfo about AusweisApp2: \(versionInfo)")
+		print("VersionInfo about AusweisApp: \(versionInfo)")
 	}
 
 	func onReaderList(readers: [Reader]?) {
@@ -225,7 +226,8 @@ extension CardWorkflowViewModel: WorkflowCallbacks {
 			if let tcTokenUrl = tcTokenURL {
 				AA2SDKWrapper.workflowController.startAuthentication(withTcTokenUrl: tcTokenUrl,
 				                                                     withDeveloperMode: developerMode,
-				                                                     withUserInfoMessages: userInfoMessages)
+				                                                     withUserInfoMessages: userInfoMessages,
+				                                                     withCustomHeader: header)
 			}
 		case .changePin,
 		     .changeTransportPin:
@@ -246,7 +248,7 @@ extension CardWorkflowViewModel: WorkflowCallbacks {
 	}
 
 	func onAccessRights(error: String?, accessRights: AccessRights?) {
-		if let error = error {
+		if let error {
 			setErrorState(error: error)
 			return
 		}

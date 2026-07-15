@@ -30,6 +30,7 @@ struct RunAuth: Command {
 	let developerMode: Bool
 	let messages: AA2UserInfoMessages?
 	let status: Bool
+	let header: [String: String]?
 }
 
 struct RunChangePin: Command {

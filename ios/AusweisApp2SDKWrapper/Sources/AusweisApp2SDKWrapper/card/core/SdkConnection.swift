@@ -11,5 +11,5 @@ protocol SdkConnection {
 
 	func start()
 	func stop()
-	func send<T: Command>(command: T)
+	func send(command: some Command)
 }

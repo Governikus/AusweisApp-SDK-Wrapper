@@ -34,7 +34,7 @@ struct ErrorView: View {
 		.padding(theme.itemSpacing)
 		.navigationBarTitle(Text("Error"))
 		.navigationBarItems(leading: EmptyView(), trailing: Button(action: {
-			self.viewModel.acceptError()
+			viewModel.acceptError()
 		}, label: {
 			if viewModel.state != .unknownCard {
 				Text("Continue")

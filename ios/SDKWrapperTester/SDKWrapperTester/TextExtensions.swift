@@ -7,7 +7,7 @@ import SwiftUI
 
 extension Text {
 	func textAppearance(_ textAppearance: TextAppearance) -> Text {
-		return font(textAppearance.font)
+		font(textAppearance.font)
 			.foregroundColor(textAppearance.color)
 	}
 }

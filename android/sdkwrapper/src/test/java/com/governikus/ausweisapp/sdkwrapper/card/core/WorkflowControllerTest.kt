@@ -234,7 +234,7 @@ class WorkflowControllerTest {
                                 "           {" +
                                 "            \"major\": \"http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok\"" +
                                 "           }," +
-                                "  \"url\": \"https://test.governikus-eid.de/gov_autent/async?refID=_123456789\"" +
+                                "  \"url\": \"https://test.governikus-eid.de/Autent-DemoApplication/refresh-address?sessionId=123456789&ResultMajor=ok\"" +
                                 "}",
                         )
                     }

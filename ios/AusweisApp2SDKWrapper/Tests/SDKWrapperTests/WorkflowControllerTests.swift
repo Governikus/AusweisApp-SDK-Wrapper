@@ -114,6 +114,7 @@ class WorkflowControllerTests: XCTestCase {
 
 				XCTAssertEqual(setPinCommand.value, pin)
 
+				// swiftlint:disable line_length
 				self.connection.receive(messageJson:
 					"{" +
 						"  \"msg\": \"AUTH\"," +
@@ -121,8 +122,9 @@ class WorkflowControllerTests: XCTestCase {
 						"           {" +
 						"            \"major\": \"http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok\"" +
 						"           }," +
-						"  \"url\": \"https://test.governikus-eid.de/gov_autent/async?refID=_123456789\"" +
+						"  \"url\": \"https://test.governikus-eid.de/Autent-DemoApplication/refresh-address?sessionId=123456789&ResultMajor=ok\"" +
 						"}")
+				// swiftlint:enable line_length
 			}
 		}
 
@@ -210,7 +212,7 @@ class WorkflowControllerTests: XCTestCase {
 		}
 
 		workflowController.start()
-		workflowController.startAuthentication(withTcTokenUrl: testUrl)
+		workflowController.startAuthentication(withTcTokenUrl: testUrl, withCustomHeader: ["Bearer": "0123456789abcdef"])
 		waitForExpectations(timeout: 2, handler: nil)
 	}
 
@@ -227,7 +229,7 @@ class MockSdkConnection: SdkConnection {
 
 	func start() {
 		isStarted = true
-		if let onConnected = onConnected {
+		if let onConnected {
 			onConnected()
 		}
 	}
@@ -236,8 +238,8 @@ class MockSdkConnection: SdkConnection {
 		isStarted = false
 	}
 
-	func send<T: Command>(command: T) {
-		if let onCommandSend = onCommandSend {
+	func send(command: some Command) {
+		if let onCommandSend {
 			DispatchQueue.global().async {
 				onCommandSend(command)
 			}
@@ -248,7 +250,7 @@ class MockSdkConnection: SdkConnection {
 		let messageData = Data(messageJson.utf8)
 		let message = try? JSONDecoder().decode(AA2Message.self, from: messageData)
 
-		if let onMessageReceived = onMessageReceived {
+		if let onMessageReceived {
 			onMessageReceived(message!)
 		}
 	}
@@ -269,7 +271,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 	}
 
 	func onReader(reader: Reader?) {
-		if let doOnRecognizedCard = doOnRecognizedCard, let card = reader?.card {
+		if let doOnRecognizedCard, let card = reader?.card {
 			DispatchQueue.global().async {
 				doOnRecognizedCard(card)
 			}
@@ -281,7 +283,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 	}
 
 	func onStarted() {
-		if let doOnStarted = doOnStarted {
+		if let doOnStarted {
 			DispatchQueue.global().async {
 				doOnStarted()
 			}
@@ -289,7 +291,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 	}
 
 	func onAuthenticationStarted() {
-		if let doOnAuthenticationStarted = doOnAuthenticationStarted {
+		if let doOnAuthenticationStarted {
 			DispatchQueue.global().async {
 				doOnAuthenticationStarted()
 			}
@@ -305,7 +307,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 			return
 		}
 
-		if let doOnRequestAccessRights = doOnRequestAccessRights {
+		if let doOnRequestAccessRights {
 			DispatchQueue.global().async {
 				doOnRequestAccessRights(accessRights!)
 			}
@@ -317,7 +319,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 	}
 
 	func onInsertCard(error _: String?) {
-		if let doOnRequestCard = doOnRequestCard {
+		if let doOnRequestCard {
 			DispatchQueue.global().async {
 				doOnRequestCard()
 			}
@@ -333,7 +335,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 	}
 
 	func onEnterPin(error _: String?, reader: Reader) {
-		if let doOnRequestPin = doOnRequestPin, let card = reader.card {
+		if let doOnRequestPin, let card = reader.card {
 			DispatchQueue.global().async {
 				doOnRequestPin(card)
 			}
@@ -353,7 +355,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 	}
 
 	func onAuthenticationCompleted(authResult: AuthResult) {
-		if let doOnAuthenticationCompleted = doOnAuthenticationCompleted {
+		if let doOnAuthenticationCompleted {
 			DispatchQueue.global().async {
 				doOnAuthenticationCompleted(authResult)
 			}
@@ -373,7 +375,7 @@ class TestWorkflowCallbacks: WorkflowCallbacks {
 	}
 
 	func onWrapperError(error _: AusweisApp2SDKWrapper.WrapperError) {
-		if let doOnError = doOnError {
+		if let doOnError {
 			DispatchQueue.global().async {
 				doOnError()
 			}

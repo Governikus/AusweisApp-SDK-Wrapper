@@ -25,16 +25,16 @@ struct PasswordTextField: View {
 			}
 
 			Button(action: {
-				if !self.error {
-					self.hidden.toggle()
+				if !error {
+					hidden.toggle()
 				}
 			}, label: {
-				if self.error {
+				if error {
 					theme.passwordErrorIcon
 						.scaledToFit()
 						.frame(width: theme.iconSizeSmall, height: theme.iconSizeSmall)
 				} else {
-					if self.hidden {
+					if hidden {
 						theme.passwordHiddenIcon
 							.scaledToFit()
 							.frame(width: theme.iconSizeSmall, height: theme.iconSizeSmall)
@@ -50,7 +50,7 @@ struct PasswordTextField: View {
 		.background(ZStack {
 			Capsule()
 				.fill(Color("text_field_background"))
-			if self.error {
+			if error {
 				Capsule(style: .continuous)
 					.stroke(Color.red, lineWidth: 2)
 			}
