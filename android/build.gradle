@@ -1,17 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-    id("com.github.ben-manes.versions")
+    id("io.github.ben-manes.versions")
+    id("org.jetbrains.kotlin.plugin.parcelize") apply false
     id("org.jetbrains.kotlinx.kover")
     id("org.sonarqube")
 
     id("com.android.application") apply false
-    id("org.jetbrains.kotlin.android") apply false
 }
 
 ext {
-    ausweisapp_version = '2.5.4'
-    sdkwrapper_version = '2.5.4'
+    ausweisapp_version = '2.5.5'
+    sdkwrapper_version = '2.5.5'
     java_version = 21
 
     configureRename = { Project module, String suffix ->
@@ -99,34 +99,16 @@ tasks.named("dependencyUpdates").configure {
     rejectVersionIf { selection ->
         if (selection.candidate.group == "androidx.core" && selection.candidate.module == "core-ktx") {
             if (selection.candidate.version == "1.19.0") {
-                return true // Requires Gradle upgrade incompatible with SonarQube plugin
+                return true // Requires compileSdk >36, which we not yet use
             }
         }
-        if (selection.candidate.group == "com.android.application" && selection.candidate.module == "com.android.application.gradle.plugin") {
-            if (selection.candidate.version in ["9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0", "9.2.1"]) {
-                return true // Requires Gradle upgrade incompatible with SonarQube plugin
+        if (selection.candidate.module == "kotlin-build-tools-impl") {
+            if (selection.currentVersion == "2.4.0") {
+                return true
+                // Needed because the 2.4.10 of the Kotlin Gradle Plugin seems to also include 2.4.0 for backwards compatibility.
+                // We need to check currentVersion here as there are false positives if only the candidate version gets checked.
             }
         }
-        if (selection.candidate.group == "androidx.databinding" && selection.candidate.module == "viewbinding") {
-            if (selection.candidate.version in ["9.0.0", "9.0.1", "9.1.0", "9.1.1", "9.2.0", "9.2.1"]) {
-                return true // Requires Gradle upgrade incompatible with SonarQube plugin
-            }
-        }
-        if (selection.candidate.group == "org.jetbrains.kotlin" || selection.candidate.group == "org.jetbrains.kotlin.android") {
-            if (selection.candidate.version == "2.4.10") {
-                return true // Needed because there seems to be a transitive dependency on 2.4.0 somewhere, which currently cannot be updated
-            }
-            if (isNonStable(selection.candidate.version)) {
-                return true // Needed because the beta versions show up as false positives even when the stable version 2.4.0 is used
-            }
-        }
-        if (selection.candidate.group == "com.google.testing.platform") {
-            return true // Transitive dependency managed by Android Gradle Plugin
-        }
-        if (selection.candidate.group == "com.android.tools.utp") {
-            return true // Transitive dependency managed by Android Gradle Plugin
-        }
-
         if (isNonStable(selection.candidate.version) && !isNonStable(selection.currentVersion)) {
             return true
         }

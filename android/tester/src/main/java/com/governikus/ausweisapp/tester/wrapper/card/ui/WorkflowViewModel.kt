@@ -417,7 +417,11 @@ internal class WorkflowViewModel(
             override fun onChangePinCompleted(changePinResult: ChangePinResult) {
                 workflowStatus = WorkflowStatus.COMPLETED
                 toast.show(application.getString(R.string.card_workflow_pin_finished_remove_card_message))
-
+                if (changePinResult.success) {
+                    toast.show(application.getString(R.string.change_pin_result_true))
+                } else {
+                    toast.show(application.getString(R.string.change_pin_result_false, changePinResult.reason))
+                }
                 this@WorkflowViewModel.changePinResult = changePinResult
 
                 if (navigation.value?.peekContent()?.action != R.id.error) {
@@ -524,7 +528,7 @@ internal class WorkflowViewModel(
     }
 
     fun acceptAccessRights(acceptedOptionalRights: List<AccessRight>) {
-        if (!acceptedOptionalRights.isEmpty()) {
+        if (acceptedOptionalRights.isNotEmpty()) {
             workflowController.setAccessRights(acceptedOptionalRights)
         }
 

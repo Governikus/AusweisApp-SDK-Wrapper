@@ -32,7 +32,8 @@
     <string name="change_pin_title">Tester App - Change PIN</string>
     <string name="change_pin_start">Change PIN</string>
     <string name="change_transport_pin_start">Change Transport PIN</string>
-    <string name="change_pin_result">Change PIN result: %1$b (Reason: %2$s)</string>
+    <string name="change_pin_result_false">Change PIN result: false (Reason: %1$s)</string>
+    <string name="change_pin_result_true">Change PIN result: true</string>
 
     <string name="start_workflow_info">Clicking any of the buttons will start the SDK Wrapper</string>
 

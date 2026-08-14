@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("androidx.navigation.safeargs.kotlin")
     id("org.jmailen.kotlinter")
 }
@@ -10,16 +9,13 @@ kotlin {
 }
 
 android {
-    //noinspection GradleDependency
     compileSdk = 36
     buildToolsVersion = "37.0.0"
     namespace = "com.governikus.ausweisapp.tester.wrapper"
 
     defaultConfig {
         applicationId "com.governikus.ausweisapp.tester.wrapper"
-        minSdkVersion 28
-        //noinspection OldTargetApi
-        targetSdkVersion 36
+        minSdk 28
         versionCode 1
         versionName sdkwrapper_version
 
@@ -68,18 +64,18 @@ android {
         release {
             signingConfig = signingConfigs.release
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
 
-archivesBaseName = "SDKWrapperTester"
+base {
+    archivesName = "SDKWrapperTester"
+}
 
 sonarqube {
-    properties {
-        property "sonar.sources", ""
-        property "sonar.tests", "src"
-    }
+    skipProject = true
 }
 
 configureRename(project, 'apk')
@@ -88,9 +84,9 @@ def useLocal = file("${rootDir}/ausweisapp/ausweisapp.aar").exists();
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
     implementation 'androidx.core:core-ktx:1.18.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.9.8'
     implementation 'androidx.navigation:navigation-ui-ktx:2.9.8'
     implementation 'com.google.android.material:material:1.14.0'
@@ -115,9 +111,9 @@ dependencies {
     implementation 'com.squareup.moshi:moshi:1.15.2'
     implementation 'com.squareup.moshi:moshi-kotlin:1.15.2'
 
-    implementation 'io.ktor:ktor-server-core:3.5.1'
-    implementation 'io.ktor:ktor-server-netty:3.5.1'
-    implementation 'io.ktor:ktor-server-websockets:3.5.1'
+    implementation 'io.ktor:ktor-server-core:3.5.2'
+    implementation 'io.ktor:ktor-server-netty:3.5.2'
+    implementation 'io.ktor:ktor-server-websockets:3.5.2'
 
     testImplementation 'junit:junit:4.13.2'
 

@@ -9,7 +9,6 @@ import okhttp3.RequestBody
 plugins {
     id("com.android.library")
     id("maven-publish")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.parcelize")
     id("org.jmailen.kotlinter")
     id("org.jetbrains.kotlinx.kover")
@@ -26,8 +25,7 @@ android {
     namespace = "com.governikus.ausweisapp.sdkwrapper"
 
     defaultConfig {
-        minSdkVersion 28
-        targetSdkVersion 36
+        minSdk 28
 
         consumerProguardFiles 'consumer-rules.pro'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -70,13 +68,6 @@ android {
                 showStackTraces = true
             }
         }
-    }
-}
-
-sonarqube {
-    properties {
-        property "sonar.sources", "src/main"
-        property "sonar.tests", "src/test"
     }
 }
 

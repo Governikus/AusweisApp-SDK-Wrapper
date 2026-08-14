@@ -74,6 +74,8 @@ internal class WorkflowActivity : AppCompatActivity() {
             title = destination.label
             when (destination.id) {
                 R.id.certificate_description -> viewBinding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp)
+                R.id.enter_new_pin -> viewBinding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp)
+                R.id.enter_pin_start -> viewBinding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp)
                 R.id.error, R.id.authentication_aborted -> viewBinding.toolbar.navigationIcon = null
                 else -> viewBinding.toolbar.setNavigationIcon(R.drawable.ic_close_24dp)
             }

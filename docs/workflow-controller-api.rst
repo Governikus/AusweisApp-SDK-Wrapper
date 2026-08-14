@@ -156,7 +156,7 @@ Otherwise you will get a callback to :ref:`wc-on-bad-state`.
   True to enable automatic STATUS messages, which are delivered by callbacks to
   :ref:`wc-on-status`.
 
-- **headers**:
+- **header**:
   Optional map of custom header to send in requests to the eID service provider.
 
 .. note::
