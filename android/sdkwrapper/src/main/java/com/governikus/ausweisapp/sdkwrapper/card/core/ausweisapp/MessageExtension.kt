@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp
@@ -34,16 +34,17 @@ internal fun Message.getCertificateDescription(): CertificateDescription? {
     val subjectUrl = if (description.subjectUrl.isNotBlank()) Uri.parse(description.subjectUrl) else null
 
     return CertificateDescription(
-        description.issuerName,
-        issuerUrl,
-        description.purpose,
-        description.subjectName,
-        subjectUrl,
-        description.termsOfUsage,
-        CertificateValidity(
-            issueDate,
-            expirationDate,
-        ),
+        issuerName = description.issuerName,
+        issuerUrl = issuerUrl,
+        purpose = description.purpose,
+        subjectName = description.subjectName,
+        subjectUrl = subjectUrl,
+        termsOfUsage = description.termsOfUsage,
+        validity =
+            CertificateValidity(
+                effectiveDate = issueDate,
+                expirationDate = expirationDate,
+            ),
     )
 }
 
@@ -51,9 +52,9 @@ internal fun Message.getCard(): Card? {
     val card = card ?: reader?.card ?: return null
 
     return Card(
-        card.deactivated,
-        card.inoperative,
-        card.retryCounter,
+        deactivated = card.deactivated,
+        inoperative = card.inoperative,
+        pinRetryCounter = card.retryCounter,
     )
 }
 
@@ -64,11 +65,11 @@ internal fun Message.getReaderFromRoot(): Reader? {
     val keypad = keypad ?: false
 
     return Reader(
-        name,
-        insertable,
-        attached,
-        keypad,
-        getCard(),
+        name = name,
+        insertable = insertable,
+        attached = attached,
+        keypad = keypad,
+        card = getCard(),
     )
 }
 
@@ -80,11 +81,11 @@ internal fun Message.getReaderFromReaderMember(): Reader? {
     val attached = reader.attached
 
     return Reader(
-        name,
-        insertable,
-        attached,
-        keypad,
-        getCard(),
+        name = name,
+        insertable = insertable,
+        attached = attached,
+        keypad = keypad,
+        card = getCard(),
     )
 }
 
@@ -97,17 +98,17 @@ internal fun Message.getReaderList(): List<Reader>? {
                 null
             } else {
                 Card(
-                    it.card.deactivated,
-                    it.card.inoperative,
-                    it.card.retryCounter,
+                    deactivated = it.card.deactivated,
+                    inoperative = it.card.inoperative,
+                    pinRetryCounter = it.card.retryCounter,
                 )
             }
         Reader(
-            it.name,
-            it.insertable,
-            it.attached,
-            it.keypad,
-            card,
+            name = it.name,
+            insertable = it.insertable,
+            attached = it.attached,
+            keypad = it.keypad,
+            card = card,
         )
     }
 }
@@ -116,13 +117,13 @@ internal fun Message.getVersionInfo(): VersionInfo? {
     val info = versionInfo ?: return null
 
     return VersionInfo(
-        info.name,
-        info.implementationTitle,
-        info.implementationVendor,
-        info.implementationVersion,
-        info.specificationTitle,
-        info.specificationVendor,
-        info.specificationVersion,
+        name = info.name,
+        implementationTitle = info.implementationTitle,
+        implementationVendor = info.implementationVendor,
+        implementationVersion = info.implementationVersion,
+        specificationTitle = info.specificationTitle,
+        specificationVendor = info.specificationVendor,
+        specificationVersion = info.specificationVersion,
     )
 }
 
@@ -132,23 +133,23 @@ internal fun Message.getAccessRights(): AccessRights? {
     val auxiliaryData =
         aux?.run {
             AuxiliaryData(
-                if (ageVerificationDate != null) dateFormat.parse(ageVerificationDate) else null,
-                requiredAge?.toInt(),
-                if (validityDate != null) dateFormat.parse(validityDate) else null,
-                communityId,
+                ageVerificationDate = if (ageVerificationDate != null) dateFormat.parse(ageVerificationDate) else null,
+                requiredAge = requiredAge?.toInt(),
+                validityDate = if (validityDate != null) dateFormat.parse(validityDate) else null,
+                communityId = communityId,
             )
         }
 
-    val requiredRights = chat.required.mapNotNull { AccessRight.fromRawName(it) }
-    val optionalRights = chat.optional.mapNotNull { AccessRight.fromRawName(it) }
-    val effectiveRights = chat.effective.mapNotNull { AccessRight.fromRawName(it) }
+    val requiredRights = chat.required.mapNotNull { AccessRight.fromRawName(rawName = it) }
+    val optionalRights = chat.optional.mapNotNull { AccessRight.fromRawName(rawName = it) }
+    val effectiveRights = chat.effective.mapNotNull { AccessRight.fromRawName(rawName = it) }
 
     return AccessRights(
-        requiredRights,
-        optionalRights,
-        effectiveRights,
-        transactionInfo,
-        auxiliaryData,
+        requiredRights = requiredRights,
+        optionalRights = optionalRights,
+        effectiveRights = effectiveRights,
+        transactionInfo = transactionInfo,
+        auxiliaryData = auxiliaryData,
     )
 }
 
@@ -157,7 +158,7 @@ internal fun Message.getAuthResult(): AuthResult? {
     val resultData = getAuthResultData()
 
     if (resultData != null || uri != null) {
-        return AuthResult(uri, resultData)
+        return AuthResult(url = uri, result = resultData)
     }
 
     return null
@@ -168,16 +169,16 @@ internal fun Message.getAuthResultData(): AuthResultData? {
     if (result.major == null) return null
 
     return AuthResultData(
-        result.major,
-        result.minor,
-        result.language,
-        result.description,
-        result.message,
-        result.reason,
+        major = result.major,
+        minor = result.minor,
+        language = result.language,
+        description = result.description,
+        message = result.message,
+        reason = result.reason,
     )
 }
 
 internal fun Message.getWorkflowProgress(): WorkflowProgress {
-    val workflowType = WorkflowProgressType.fromRawName(workflow)
-    return WorkflowProgress(workflowType, progress, state)
+    val workflowType = WorkflowProgressType.fromRawName(rawName = workflow)
+    return WorkflowProgress(workflow = workflowType, progress = progress, state = state)
 }

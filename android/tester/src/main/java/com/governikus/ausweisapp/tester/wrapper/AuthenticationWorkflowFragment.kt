@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper
@@ -37,22 +37,22 @@ class AuthenticationWorkflowFragment : Fragment(R.layout.fragment_authentication
             FragmentAuthenticationWorkflowBinding.bind(view).apply {
                 btnAuthenticationStart.setOnClickListener {
                     authLauncher.authenticate(
-                        getString(R.string.test_eid_tc_token_url).toUri(),
+                        tcTokenUrl = getString(R.string.test_eid_tc_token_url).toUri(),
                     )
                 }
                 btnAuthenticationStartRequiredRights.setOnClickListener {
                     authLauncher.authenticate(
-                        getString(R.string.test_eid_tc_token_url_required_rights).toUri(),
+                        tcTokenUrl = getString(R.string.test_eid_tc_token_url_required_rights).toUri(),
                     )
                 }
                 btnAuthenticationStartCanAllowed.setOnClickListener {
                     authLauncher.authenticate(
-                        getString(R.string.test_eid_can_tc_token_url).toUri(),
+                        tcTokenUrl = getString(R.string.test_eid_can_tc_token_url).toUri(),
                     )
                 }
                 btnAuthenticationStartDeveloperMode.setOnClickListener {
                     authLauncher.authenticate(
-                        getString(R.string.test_eid_developerMode_tc_token_url).toUri(),
+                        tcTokenUrl = getString(R.string.test_eid_developerMode_tc_token_url).toUri(),
                         developerMode = true,
                     )
                 }
@@ -66,7 +66,7 @@ class AuthenticationWorkflowFragment : Fragment(R.layout.fragment_authentication
                         }
 
                     authLauncher.authenticate(
-                        getString(R.string.test_eid_cardSimulator_tc_token_url).toUri(),
+                        tcTokenUrl = getString(R.string.test_eid_cardSimulator_tc_token_url).toUri(),
                         cardSimulatorMode = simulatorMode,
                     )
                 }

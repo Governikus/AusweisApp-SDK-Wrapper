@@ -7,7 +7,7 @@ import sys
 
 # -- General configuration ------------------------------------------------
 
-AA2_SDKWRAPPER_VERSION = '2.5.5'
+AA2_SDKWRAPPER_VERSION = '2.6.0'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.3'
@@ -42,8 +42,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'AusweisApp SDK Wrapper'
-copyright = '2023-2026, Governikus GmbH & Co. KG'  # noqa: A001
-author = 'Governikus GmbH & Co. KG'
+copyright = '2023-2026, Governikus Service GmbH'  # noqa: A001
+author = 'Governikus Service GmbH'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -114,7 +114,7 @@ latex_elements = {
     'pointsize': '11pt',
     # Additional stuff for the LaTeX preamble.
     'preamble': r"""
-\hypersetup{pdfauthor={Governikus GmbH \& Co. KG},
+\hypersetup{pdfauthor={Governikus Service GmbH},
             pdftitle={AusweisApp SDK Wrapper},
             pdfsubject={Handbuch},
             pdfkeywords={id, handbuch},
@@ -141,7 +141,7 @@ latex_documents = [
         master_doc,
         f'AusweisApp-SDKWrapper-{AA2_SDKWRAPPER_VERSION}-Manual.tex',
         'AusweisApp SDK Wrapper Manual',
-        r'Governikus GmbH & Co. KG',
+        r'Governikus Service GmbH',
         'howto',
     ),
 ]

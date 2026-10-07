@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper
@@ -10,5 +10,5 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 
 object SDKWrapper : CoroutineScope by MainScope() {
-    val workflowController = WorkflowController(AA2SdkConnection())
+    val workflowController = WorkflowController(sdkConnection = AA2SdkConnection())
 }

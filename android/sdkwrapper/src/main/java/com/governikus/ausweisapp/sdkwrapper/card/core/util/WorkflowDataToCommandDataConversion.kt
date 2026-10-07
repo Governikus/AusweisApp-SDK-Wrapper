@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2023-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core.util
@@ -15,20 +15,20 @@ internal typealias CommandSimulatorKey = com.governikus.ausweisapp.sdkwrapper.ca
 internal fun workflowSimulatorToCommandSimulator(simulator: WorkflowSimulator?): CommandSimulator? {
     simulator ?: return null
     return CommandSimulator(
-        simulator.files.map { workflowSimulatorFileToCommandSimulatorFile(it) },
-        simulator.keys?.map { workflowSimulatorKeyToCommandSimulatorKey(it) },
+        files = simulator.files.map { workflowSimulatorFileToCommandSimulatorFile(file = it) },
+        keys = simulator.keys?.map { workflowSimulatorKeyToCommandSimulatorKey(key = it) },
     )
 }
 
 internal fun workflowSimulatorFileToCommandSimulatorFile(file: WorkflowSimulatorFile): CommandSimulatorFile =
     CommandSimulatorFile(
-        file.fileId,
-        file.shortFileId,
-        file.content,
+        fileId = file.fileId,
+        shortFileId = file.shortFileId,
+        content = file.content,
     )
 
 internal fun workflowSimulatorKeyToCommandSimulatorKey(key: WorkflowSimulatorKey): CommandSimulatorKey =
     CommandSimulatorKey(
-        key.id,
-        key.content,
+        id = key.id,
+        content = key.content,
     )

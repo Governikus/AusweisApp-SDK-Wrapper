@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core
@@ -40,8 +40,8 @@ class NfcForegroundDispatcher(
         nfcAdapter?.enableReaderMode(
             activity,
             { tag: Tag ->
-                if (tag.techList.contains(nfcTechnology)) {
-                    workflowController.onNfcTagDetected(tag)
+                if (tag.techList.contains(element = nfcTechnology)) {
+                    workflowController.onNfcTagDetected(tag = tag)
                 }
             },
             nfcReaderFlags,

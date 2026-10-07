@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 2.6.0
+^^^^^^^^^^^^^
+
+**Release date:** 6. October 2026
+
+- Update AusweisApp SDK to version 2.6.0.
+- Add iOS/iPadOS ABI arm64e in addition to arm64.
+
+
 Version 2.5.5
 ^^^^^^^^^^^^^
 

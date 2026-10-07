@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2024-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.sdk
@@ -34,13 +34,11 @@ class SdkConnection internal constructor(
         try {
             aa2SDKCallback = IAusweisApp2Sdk.Stub.asInterface(service)?.apply { connectSdk(callback) }
         } catch (e: ClassCastException) {
-            Log.d(tag, "Unable to perform binder cast")
-            e.printStackTrace()
+            Log.d(tag, "Unable to perform binder cast", e)
         } catch (e: RemoteException) {
-            Log.d(tag, "Unable to perform binder cast")
-            e.printStackTrace()
+            Log.d(tag, "Unable to perform binder cast", e)
         } finally {
-            send(SetApiLevel(3), SetApiLevel::class.java)
+            send(command = SetApiLevel(level = 3), clazz = SetApiLevel::class.java)
         }
     }
 
@@ -57,24 +55,27 @@ class SdkConnection internal constructor(
 
         var messagePayload: CharArray? = null
 
-        return try {
-            messagePayload =
-                if (command is SensitiveCommand) {
-                    command.toJsonCharArray()
-                } else {
-                    moshi.adapter(clazz).toJson(command).toCharArray()
-                }
+        val result =
+            runCatching {
+                messagePayload =
+                    if (command is SensitiveCommand) {
+                        command.toJsonCharArray()
+                    } else {
+                        moshi.adapter(clazz).toJson(command).toCharArray()
+                    }
 
-            sdk.transmit(sessionId, messagePayload)
-        } catch (e: Exception) {
-            Log.d(tag, "Could not send command", e)
-            false
-        } finally {
-            messagePayload?.fill('\u0000')
-            if (command is SensitiveCommand) {
-                command.clear()
+                sdk.transmit(sessionId, messagePayload)
             }
+
+        result.onFailure { throwable ->
+            Log.d(tag, "Could not send command", throwable)
         }
+        messagePayload?.fill(element = '\u0000')
+        if (command is SensitiveCommand) {
+            command.clear()
+        }
+
+        return result.isSuccess
     }
 
     fun send(

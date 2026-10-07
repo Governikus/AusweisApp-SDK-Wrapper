@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2024-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.sdk
@@ -35,10 +35,10 @@ class WebSocketServer(
 ) : CoroutineScope by MainScope() {
     private var webSocketSession: WebSocketServerSession? = null
     private val server =
-        embeddedServer(Netty, port = 8080) {
-            install(WebSockets)
+        embeddedServer(factory = Netty, port = 8080) {
+            install(plugin = WebSockets)
             routing {
-                webSocket("/") {
+                webSocket(path = "/") {
                     webSocketSession = this
                     onConnected?.invoke()
                     try {
@@ -47,11 +47,8 @@ class WebSocketServer(
                             val receivedText = frame.readText()
                             onNewMessage?.invoke(receivedText)
                         }
-                    } catch (e: ClosedReceiveChannelException) {
-                        println("onClose ${closeReason.await()}")
-                    } catch (e: Throwable) {
-                        println("onError ${closeReason.await()}")
-                        e.printStackTrace()
+                    } catch (_: ClosedReceiveChannelException) {
+                        println(message = "onClose ${closeReason.await()}")
                     } finally {
                         webSocketSession = null
                     }
@@ -66,22 +63,22 @@ class WebSocketServer(
     var onConnected: (() -> Unit)? = null
 
     fun send(message: String) {
-        launch(ioDispatcher) {
-            webSocketSession?.send(Frame.Text(message))
+        launch(context = ioDispatcher) {
+            webSocketSession?.send(frame = Frame.Text(text = message))
         }
     }
 
     init {
-        server.application.monitor.subscribe(ApplicationStarted) {
-            val wifiIp = getLocalWifiIpAddress(context)
-            launch(mainDispatcher) {
+        server.application.monitor.subscribe(definition = ApplicationStarted) {
+            val wifiIp = getLocalWifiIpAddress(context = context)
+            launch(context = mainDispatcher) {
                 ip = "Websocket IP ${wifiIp?.hostAddress} Port: 8080"
                 isStarted = true
                 onStarted?.invoke(isStarted)
             }
         }
-        server.application.monitor.subscribe(ApplicationStopped) {
-            launch(mainDispatcher) {
+        server.application.monitor.subscribe(definition = ApplicationStopped) {
+            launch(context = mainDispatcher) {
                 ip = "/"
                 isStarted = false
                 onStarted?.invoke(isStarted)
@@ -94,7 +91,7 @@ class WebSocketServer(
             return
         }
 
-        launch(ioDispatcher) {
+        launch(context = ioDispatcher) {
             server.start(wait = true)
         }
     }
@@ -104,8 +101,8 @@ class WebSocketServer(
             return
         }
 
-        launch(ioDispatcher) {
-            server.stop(1000, 5000)
+        launch(context = ioDispatcher) {
+            server.stop(gracePeriodMillis = 1000, timeoutMillis = 5000)
         }
     }
 
@@ -120,7 +117,7 @@ class WebSocketServer(
         val ipByteArray: ByteArray = ipAddress.toBigInteger().toByteArray()
         return try {
             InetAddress.getByAddress(ipByteArray)
-        } catch (ex: UnknownHostException) {
+        } catch (_: UnknownHostException) {
             null
         }
     }

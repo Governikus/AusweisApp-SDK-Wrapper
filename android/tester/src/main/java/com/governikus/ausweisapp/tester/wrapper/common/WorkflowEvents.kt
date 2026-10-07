@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.common
@@ -23,16 +23,16 @@ internal fun NavLiveEvent.navigate(
     @IdRes action: Int,
     data: Bundle? = null,
 ) {
-    value = LiveDataEvent(NavEvent(action, data))
+    value = LiveDataEvent(content = NavEvent(action = action, data = data))
 }
 
 internal fun WorkflowLiveEvent.finished(
     resultCode: Int,
     data: Bundle? = null,
 ) {
-    value = LiveDataEvent(NavEvent(resultCode, data))
+    value = LiveDataEvent(content = NavEvent(action = resultCode, data = data))
 }
 
 internal fun ToastLiveEvent.show(text: String) {
-    value = LiveDataEvent(text)
+    value = LiveDataEvent(content = text)
 }

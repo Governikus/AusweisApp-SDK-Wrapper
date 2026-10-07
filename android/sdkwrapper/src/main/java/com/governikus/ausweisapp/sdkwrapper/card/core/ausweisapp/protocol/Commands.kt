@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol
@@ -12,24 +12,21 @@ internal interface SensitiveCommand : Command {
     val value: CharArray?
 
     fun toJsonCharArray(): CharArray {
-        if (value == null) {
-            return "{\"cmd\":\"$cmd\"}".toCharArray()
-        }
+        val currentValue = value ?: return "{\"cmd\":\"$cmd\"}".toCharArray()
 
         val prefix = "{\"cmd\":\"$cmd\",\"value\":\"".toCharArray()
-        val currentValue = value!!
         val suffix = "\"}".toCharArray()
 
-        val result = CharArray(prefix.size + currentValue.size + suffix.size)
-        prefix.copyInto(result, destinationOffset = 0)
-        currentValue.copyInto(result, destinationOffset = prefix.size)
-        suffix.copyInto(result, destinationOffset = prefix.size + currentValue.size)
+        val result = CharArray(size = prefix.size + currentValue.size + suffix.size)
+        prefix.copyInto(destination = result, destinationOffset = 0)
+        currentValue.copyInto(destination = result, destinationOffset = prefix.size)
+        suffix.copyInto(destination = result, destinationOffset = prefix.size + currentValue.size)
 
         return result
     }
 
     fun clear() {
-        value?.fill('\u0000')
+        value?.fill(element = '\u0000')
     }
 }
 

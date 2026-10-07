@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2024-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.sdk
@@ -23,6 +23,7 @@ import com.governikus.ausweisapp.tester.sdk.jsonobjects.RunAuth
 import com.governikus.ausweisapp.tester.sdk.jsonobjects.SetPin
 import com.governikus.ausweisapp.tester.wrapper.R
 import com.governikus.ausweisapp.tester.wrapper.databinding.ActivityTesterBinding
+import okio.IOException
 
 /**
  * SDK Tester activity supports two modes to use SDK (as integrated Dependency and as External Application)
@@ -50,7 +51,7 @@ class TesterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityTesterBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        dispatcher = ForegroundDispatcher(this) { nfcIntent -> sdkConnection?.send(nfcIntent) }
+        dispatcher = ForegroundDispatcher(activity = this) { nfcIntent -> sdkConnection?.send(intent = nfcIntent) }
         viewBinding.logView.movementMethod = ScrollingMovementMethod()
 
         createServiceConnection()
@@ -68,13 +69,13 @@ class TesterActivity : AppCompatActivity() {
      * Creates the connection to the sdk and binds the service.
      */
     private fun createServiceConnection() {
-        addLineOfText("Tester Mode")
+        addLineOfText(text = "Tester Mode")
         sdkConnection =
-            SdkConnection(localCallback).also { connection ->
+            SdkConnection(callback = localCallback).also { connection ->
                 val serviceIntent = Intent("com.governikus.ausweisapp2.START_SERVICE")
                 serviceIntent.setPackage(applicationContext.packageName)
                 bindService(serviceIntent, connection, BIND_AUTO_CREATE)
-                connection.send(intent)
+                connection.send(intent = intent)
             }
     }
 
@@ -101,8 +102,8 @@ class TesterActivity : AppCompatActivity() {
      */
     @Suppress("UNUSED_PARAMETER")
     fun sendRunAuth(view: View) {
-        parseAndShow(null, true)
-        sdkConnection?.send(RunAuth(), RunAuth::class.java)
+        parseAndShow(url = null, ok = true)
+        sdkConnection?.send(command = RunAuth(), clazz = RunAuth::class.java)
     }
 
     /**
@@ -110,7 +111,7 @@ class TesterActivity : AppCompatActivity() {
      * @throws RemoteException
      */
     fun sendAccept() {
-        sdkConnection?.send(Accept(), Accept::class.java)
+        sdkConnection?.send(command = Accept(), clazz = Accept::class.java)
     }
 
     /**
@@ -120,17 +121,17 @@ class TesterActivity : AppCompatActivity() {
     fun sendSetPin() {
         val length = viewBinding.pin.text.length
         if (length == 0) {
-            sdkConnection?.send(SetPin(null), SetPin::class.java)
+            sdkConnection?.send(command = SetPin(value = null), clazz = SetPin::class.java)
         } else {
-            val pin = CharArray(length)
+            val pin = CharArray(size = length)
             viewBinding.pin.text.getChars(0, length, pin, 0)
-            sdkConnection?.send(SetPin(pin), SetPin::class.java)
-            pin.fill('\u0000')
+            sdkConnection?.send(command = SetPin(value = pin), clazz = SetPin::class.java)
+            pin.fill(element = '\u0000')
         }
     }
 
     fun sendContinue() {
-        sdkConnection?.send(Continue(), Continue::class.java)
+        sdkConnection?.send(command = Continue(), clazz = Continue::class.java)
     }
 
     private fun parseAndShow(
@@ -139,11 +140,11 @@ class TesterActivity : AppCompatActivity() {
     ) {
         runOnUiThread {
             resultUrl = url
-            viewBinding.resultButton.isEnabled = resultUrl !== null
+            viewBinding.resultButton.isEnabled = resultUrl != null
 
             val color =
                 if (ok) {
-                    if (resultUrl !== null) {
+                    if (resultUrl != null) {
                         ResourcesCompat.getColor(resources, R.color.colorTrue, null)
                     } else {
                         Color.TRANSPARENT
@@ -157,16 +158,16 @@ class TesterActivity : AppCompatActivity() {
 
     private inner class LocalCallback : SdkCallback() {
         private fun handleReceive(json: String) {
-            addLineOfText(json)
+            addLineOfText(text = json)
             val message = sdkConnection?.moshi?.adapter(Message::class.java)?.fromJson(json) ?: return
             if (message.msg == "AUTH") {
                 currentState = State.UNDEFINED
                 message.result?.let { result ->
                     if (result.minor == null) { // when no minor exist expect major = ok
-                        parseAndShow(message.url, true)
+                        parseAndShow(url = message.url, ok = true)
                         return
                     }
-                    parseAndShow(null, false)
+                    parseAndShow(url = null, ok = false)
                     return
                 }
                 currentState = State.AUTH
@@ -180,25 +181,25 @@ class TesterActivity : AppCompatActivity() {
             }
 
             if (message.msg == "READER") {
-                handleReaderMessage(json)
+                handleReaderMessage(json = json)
             }
 
             if (message.msg == "PAUSE") {
-                addLineOfText("Received message PAUSE with cause ${message.cause ?: ""}")
+                addLineOfText(text = "Received message PAUSE with cause ${message.cause.orEmpty()}")
                 sendContinue()
             }
         }
 
         override fun receive(json: String) {
             try {
-                handleReceive(json)
-            } catch (e: Throwable) {
+                handleReceive(json = json)
+            } catch (e: IOException) {
                 Log.e("SDK DEMO", e.toString())
             }
         }
 
         override fun sdkDisconnected() {
-            addLineOfText("SDK Disconnect")
+            addLineOfText(text = "SDK Disconnect")
         }
     }
 
@@ -207,9 +208,9 @@ class TesterActivity : AppCompatActivity() {
         val card = reader.card
         if (card != null) {
             if (card.retryCounter == null && card.inoperative == null && card.deactivated == null) {
-                addLineOfText("Unknown card detected")
+                addLineOfText(text = "Unknown card detected")
             } else {
-                addLineOfText("eID card detected")
+                addLineOfText(text = "eID card detected")
             }
         }
     }
@@ -226,7 +227,7 @@ class TesterActivity : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     public fun openResult(view: View?) {
-        if (resultUrl !== null) {
+        if (resultUrl != null) {
             startActivity(Intent(Intent.ACTION_VIEW, resultUrl?.toUri()))
         }
     }

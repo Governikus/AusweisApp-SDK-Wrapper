@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper
@@ -101,7 +101,13 @@ object AusweisApp2WrapperConnection : CoroutineScope by MainScope() {
         developerMode: Boolean = false,
         cardSimulatorMode: SimulatorMode = SimulatorMode.DISABLED,
     ) {
-        launch(Authentication.Options(tcTokenUrl, developerMode, cardSimulatorMode))
+        launch(
+            Authentication.Options(
+                tcTokenUrl = tcTokenUrl,
+                developerMode = developerMode,
+                cardSimulatorMode = cardSimulatorMode,
+            ),
+        )
     }
 
     fun ActivityResultLauncher<ChangePin.Options>.changePin() {
@@ -109,6 +115,6 @@ object AusweisApp2WrapperConnection : CoroutineScope by MainScope() {
     }
 
     fun ActivityResultLauncher<ChangePin.Options>.changeTransportPin() {
-        launch(ChangePin.Options(true))
+        launch(ChangePin.Options(changeTransportPin = true))
     }
 }

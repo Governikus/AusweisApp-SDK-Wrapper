@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp
@@ -115,24 +115,27 @@ internal class AA2SdkConnection : WorkflowController.SdkConnection {
 
         var messagePayload: CharArray? = null
 
-        return try {
-            messagePayload =
-                if (command is SensitiveCommand) {
-                    command.toJsonCharArray()
-                } else {
-                    moshi.adapter(clazz).toJson(command).toCharArray()
-                }
+        val result =
+            runCatching {
+                messagePayload =
+                    if (command is SensitiveCommand) {
+                        command.toJsonCharArray()
+                    } else {
+                        moshi.adapter(clazz).toJson(command).toCharArray()
+                    }
 
-            sdk.transmit(sessionId, messagePayload)
-        } catch (e: Exception) {
-            Log.d(TAG, "Could not send command", e)
-            false
-        } finally {
-            messagePayload?.fill('\u0000')
-            if (command is SensitiveCommand) {
-                command.clear()
+                sdk.transmit(sessionId, messagePayload)
             }
+
+        result.onFailure { throwable ->
+            Log.d(TAG, "Could not send command", throwable)
         }
+        messagePayload?.fill(element = '\u0000')
+        if (command is SensitiveCommand) {
+            command.clear()
+        }
+
+        return result.isSuccess
     }
 
     override fun updateNfcTag(tag: Tag): Boolean {

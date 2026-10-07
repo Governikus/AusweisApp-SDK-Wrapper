@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.util
@@ -15,16 +15,15 @@ import java.lang.reflect.Constructor
 internal class WorkflowFragmentViewModelFactory(
     private val activity: FragmentActivity,
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        if (WorkflowFragmentViewModel::class.java.isAssignableFrom(modelClass)) {
-            val constructor =
-                modelClass.findMatchingConstructor(WorkflowViewModelSignature)
-                    ?: throw IllegalArgumentException("Constructor not found")
-            val activityViewModel: WorkflowViewModel by activity.viewModels()
-            constructor.newInstance(activityViewModel, activity.application)
-        } else {
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        require(value = WorkflowFragmentViewModel::class.java.isAssignableFrom(modelClass)) { "Unknown ViewModel class" }
+
+        val constructor = modelClass.findMatchingConstructor(signature = WorkflowViewModelSignature)
+        requireNotNull(value = constructor) { "Constructor not found" }
+
+        val activityViewModel: WorkflowViewModel by activity.viewModels()
+        return constructor.newInstance(activityViewModel, activity.application)
+    }
 
     companion object {
         private val WorkflowViewModelSignature: Array<Class<*>> =
@@ -33,7 +32,7 @@ internal class WorkflowFragmentViewModelFactory(
         private fun <T> Class<T>.findMatchingConstructor(signature: Array<Class<*>>): Constructor<T>? {
             val constructor =
                 constructors.firstOrNull {
-                    signature.contentEquals(it.parameterTypes)
+                    signature.contentEquals(other = it.parameterTypes)
                 }
             @Suppress("UNCHECKED_CAST")
             return constructor as? Constructor<T>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2024-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.sdk
@@ -24,32 +24,32 @@ class WebsocketActivity : AppCompatActivity() {
         object : SdkCallback() {
             @Throws(RemoteException::class)
             override fun receive(pJson: String) {
-                addLineOfText(pJson)
-                webSocketServer.send(pJson)
+                addLineOfText(text = pJson)
+                webSocketServer.send(message = pJson)
             }
 
             @Throws(RemoteException::class)
             override fun sdkDisconnected() {
-                addLineOfText("SDK Disconnect")
+                addLineOfText(text = "SDK Disconnect")
             }
         }
 
-    private var webSocketServer =
-        WebSocketServer(this).also {
+    private val webSocketServer =
+        WebSocketServer(context = this).also {
             it.onStarted = { isStarted ->
                 if (isStarted) {
-                    addShortLineOfText("Server is started")
-                    addShortLineOfText("Write ':help' for the command list")
-                    addLineOfText(it.ip)
+                    addShortLineOfText(text = "Server is started")
+                    addShortLineOfText(text = "Write ':help' for the command list")
+                    addLineOfText(text = it.ip)
                 } else {
-                    addShortLineOfText("Server is stopped")
+                    addShortLineOfText(text = "Server is stopped")
                 }
             }
             it.onConnected = {
-                addLineOfText("Client is connected")
+                addLineOfText(text = "Client is connected")
             }
             it.onNewMessage = { message ->
-                handleWebSocketMessage(it, message)
+                handleWebSocketMessage(webSocketServer = it, message = message)
             }
         }
 
@@ -60,7 +60,7 @@ class WebsocketActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityWebsocketBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
-        dispatcher = ForegroundDispatcher(this) { nfcIntent -> sdkConnection?.send(nfcIntent) }
+        dispatcher = ForegroundDispatcher(activity = this) { nfcIntent -> sdkConnection?.send(intent = nfcIntent) }
         viewBinding.websocketLogView.movementMethod = ScrollingMovementMethod()
         ViewCompat.setOnApplyWindowInsetsListener(viewBinding.root) { v, insets ->
             val systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -100,15 +100,15 @@ class WebsocketActivity : AppCompatActivity() {
     fun startAA2SDK() {
         if (sdkConnection != null) {
             Log.d("startAA2", "start AA2")
-            addLineOfText("AA2 is already connected")
+            addLineOfText(text = "AA2 is already connected")
             return
         }
         sdkConnection =
-            SdkConnection(sdkCallback).also { connection ->
+            SdkConnection(callback = sdkCallback).also { connection ->
                 val serviceIntent = Intent("com.governikus.ausweisapp2.START_SERVICE")
                 serviceIntent.setPackage(applicationContext.packageName)
                 bindService(serviceIntent, connection, BIND_AUTO_CREATE)
-                connection.send(intent)
+                connection.send(intent = intent)
             }
     }
 
@@ -121,7 +121,7 @@ class WebsocketActivity : AppCompatActivity() {
     @Suppress("UNUSED_PARAMETER")
     fun startWebsocket(view: View) {
         if (webSocketServer.isStarted) {
-            addLineOfText("Websocket already started")
+            addLineOfText(text = "Websocket already started")
             return
         }
         webSocketServer.start()
@@ -143,53 +143,53 @@ class WebsocketActivity : AppCompatActivity() {
         message: String,
     ) {
         val sdkConnection = sdkConnection
-        addLineOfText(message)
-        if (message.startsWith(":")) {
+        addLineOfText(text = message)
+        if (message.startsWith(prefix = ":")) {
             val splitMessage =
                 message
-                    .substring(1)
-                    .lowercase(Locale.getDefault())
+                    .substring(startIndex = 1)
+                    .lowercase(locale = Locale.getDefault())
                     .split(" ", limit = 2)
             when (splitMessage.firstOrNull()?.trim()) {
                 "open" -> {
                     if (sdkConnection != null) {
-                        webSocketServer.send("Already connected")
+                        webSocketServer.send(message = "Already connected")
                         return
                     }
-                    webSocketServer.send("Connect to SDK..")
+                    webSocketServer.send(message = "Connect to SDK..")
                     startAA2SDK()
                 }
 
                 "close" -> {
                     if (sdkConnection == null) {
-                        webSocketServer.send("Not connected yet")
+                        webSocketServer.send(message = "Not connected yet")
                         return
                     }
-                    webSocketServer.send("Disconnect from SDK...")
+                    webSocketServer.send(message = "Disconnect from SDK...")
                     unbindService(sdkConnection)
                     this@WebsocketActivity.sdkConnection = null
                 }
 
                 "help" -> {
-                    webSocketServer.send("---------Help---------")
-                    webSocketServer.send(":open - Open connection to SDK")
-                    webSocketServer.send(":close - Close connection to SDK")
-                    webSocketServer.send(":help - This help")
+                    webSocketServer.send(message = "---------Help---------")
+                    webSocketServer.send(message = ":open - Open connection to SDK")
+                    webSocketServer.send(message = ":close - Close connection to SDK")
+                    webSocketServer.send(message = ":help - This help")
                 }
 
                 else -> {
-                    addLineOfText("Unknown command")
-                    webSocketServer.send("Unknown command")
+                    addLineOfText(text = "Unknown command")
+                    webSocketServer.send(message = "Unknown command")
                 }
             }
         } else {
             if (sdkConnection == null) {
-                webSocketServer.send("Not connected yet! Try :help for commands.")
+                webSocketServer.send(message = "Not connected yet! Try :help for commands.")
                 return
             }
 
             Log.d("handleMessage()", "$message: $sdkConnection")
-            sdkConnection.send(message)
+            sdkConnection.send(message = message)
         }
     }
 

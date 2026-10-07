@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.password
@@ -104,16 +104,13 @@ internal class EnterPasswordViewModel(
                         // When we have a last card and have to ask for the PIN again or we have to ask for the PUK/CAN after while the retryCounter did not change, the last input was wrong
                         lastCard != null -> {
                             val retryCounterEqual = (lastCard.pinRetryCounter == currentCard.pinRetryCounter)
-                            if (
-                                (
-                                    (
-                                        passwordType == EnterPasswordFragment.PasswordType.PIN ||
-                                            passwordType == EnterPasswordFragment.PasswordType.TRANSPORT_PIN
-                                    ) && lastCard.pinRetryCounter!! > 0
-                                ) ||
-                                (passwordType == EnterPasswordFragment.PasswordType.PUK && retryCounterEqual) ||
-                                (passwordType == EnterPasswordFragment.PasswordType.CAN && retryCounterEqual)
-                            ) {
+                            val supportedPasswordType = passwordType == EnterPasswordFragment.PasswordType.PIN || passwordType == EnterPasswordFragment.PasswordType.TRANSPORT_PIN
+                            val isPukOrCanAndEqualRetryCounter =
+                                arrayOf(EnterPasswordFragment.PasswordType.PUK, EnterPasswordFragment.PasswordType.CAN).contains(
+                                    element = passwordType,
+                                ) && retryCounterEqual
+                            val lastRetryCounter = lastCard.pinRetryCounter ?: -1
+                            if ((supportedPasswordType && lastRetryCounter > 0) || isPukOrCanAndEqualRetryCounter) {
                                 application.getString(R.string.enter_password_wrong_try)
                             } else {
                                 null
@@ -143,9 +140,19 @@ internal class EnterPasswordViewModel(
         value: CharArray?,
     ) {
         when (passwordType) {
-            EnterPasswordFragment.PasswordType.CAN -> workflowViewModel.setCan(value)
-            EnterPasswordFragment.PasswordType.PUK -> workflowViewModel.setPuk(value)
-            EnterPasswordFragment.PasswordType.PIN, EnterPasswordFragment.PasswordType.TRANSPORT_PIN -> workflowViewModel.setPin(value)
+            EnterPasswordFragment.PasswordType.CAN -> {
+                workflowViewModel.setCan(can = value)
+            }
+
+            EnterPasswordFragment.PasswordType.PUK -> {
+                workflowViewModel.setPuk(puk = value)
+            }
+
+            EnterPasswordFragment.PasswordType.PIN, EnterPasswordFragment.PasswordType.TRANSPORT_PIN -> {
+                workflowViewModel.setPin(
+                    pin = value,
+                )
+            }
         }
     }
 
@@ -158,12 +165,12 @@ internal class EnterPasswordViewModel(
             return
         }
 
-        setPassword(passwordType, password)
+        setPassword(passwordType = passwordType, value = password)
     }
 
     fun onAcceptEmptyPassword() {
         val passwordType = passwordType.value ?: return
 
-        setPassword(passwordType, null)
+        setPassword(passwordType = passwordType, value = null)
     }
 }

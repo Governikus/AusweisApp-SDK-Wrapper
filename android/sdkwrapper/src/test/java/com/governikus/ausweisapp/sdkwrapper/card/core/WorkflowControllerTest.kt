@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core
@@ -27,7 +27,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -37,7 +36,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Duration.Companion.milliseconds
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(value = RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class WorkflowControllerTest {
@@ -48,9 +47,9 @@ class WorkflowControllerTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
+        Dispatchers.setMain(dispatcher = mainThreadSurrogate)
         connection = MockSdkConnection()
-        workflowController = WorkflowController(connection!!)
+        workflowController = WorkflowController(sdkConnection = connection!!)
     }
 
     @After
@@ -69,20 +68,21 @@ class WorkflowControllerTest {
             val completed =
                 suspendCoroutine<Boolean> {
                     workflowController.registerCallbacks(
-                        object : TestWorkflowCallbacks() {
-                            override fun onStarted() {
-                                it.resume(true)
-                            }
-                        },
+                        callbacks =
+                            object : TestWorkflowCallbacks() {
+                                override fun onStarted() {
+                                    it.resume(value = true)
+                                }
+                            },
                     )
 
-                    workflowController.start(RuntimeEnvironment.getApplication())
+                    workflowController.start(context = RuntimeEnvironment.getApplication())
 
                     advanceUntilIdle()
                 }
-            assert(completed)
+            assert(value = completed)
 
-            assert(workflowController.isStarted)
+            assert(value = workflowController.isStarted)
         }
 
     @Test
@@ -109,31 +109,32 @@ class WorkflowControllerTest {
                     "msg": "INFO"
                 }
                 """
-                connection.receive(infoString)
+                connection.receive(messageJson = infoString)
             }
 
             val completed =
                 suspendCoroutine<Boolean> {
                     workflowController.registerCallbacks(
-                        object : TestWorkflowCallbacks() {
-                            override fun onInfo(
-                                versionInfo: VersionInfo,
-                                connectionInfo: ConnectionInfo,
-                            ) {
-                                assertEquals(ConnectionInfo.Connected, connectionInfo)
-                                it.resume(true)
-                            }
-                        },
+                        callbacks =
+                            object : TestWorkflowCallbacks() {
+                                override fun onInfo(
+                                    versionInfo: VersionInfo,
+                                    connectionInfo: ConnectionInfo,
+                                ) {
+                                    assertEquals(ConnectionInfo.Connected, connectionInfo)
+                                    it.resume(value = true)
+                                }
+                            },
                     )
 
-                    workflowController.start(RuntimeEnvironment.getApplication())
+                    workflowController.start(context = RuntimeEnvironment.getApplication())
                     assertEquals(true, workflowController.isStarted)
                     workflowController.getInfo()
 
                     advanceUntilIdle()
                 }
 
-            assert(completed)
+            assert(value = completed)
         }
 
     @Test
@@ -147,21 +148,21 @@ class WorkflowControllerTest {
             val completed =
                 suspendCoroutine<Boolean> {
                     workflowController.registerCallbacks(
-                        object : TestWorkflowCallbacks() {
-                            override fun onWrapperError(error: WrapperError) {
-                                it.resume(true)
-                            }
-                        },
+                        callbacks =
+                            object : TestWorkflowCallbacks() {
+                                override fun onWrapperError(error: WrapperError) {
+                                    it.resume(value = true)
+                                }
+                            },
                     )
 
-                    workflowController.startAuthentication(Uri.parse("https://test.test"))
+                    workflowController.startAuthentication(tcTokenUrl = Uri.parse("https://test.test"))
 
                     advanceUntilIdle()
                 }
-            assert(completed)
+            assert(value = completed)
         }
 
-    @Ignore("Test is flaky, kotlinx.coroutines.test.UncompletedCoroutinesError: After waiting for 1s, the test body did not run to completion")
     @Test
     fun testAuthenticationStarted() =
         runTest(timeout = 1000.milliseconds) {
@@ -178,26 +179,27 @@ class WorkflowControllerTest {
                 assertNotNull(command)
                 assertEquals(testUrl.toString(), command?.tcTokenURL)
 
-                connection.receive("{\"msg\":\"AUTH\"}")
+                connection.receive(messageJson = "{\"msg\":\"AUTH\"}")
             }
 
             val completed =
                 suspendCoroutine<Boolean> {
                     workflowController.registerCallbacks(
-                        object : TestWorkflowCallbacks() {
-                            override fun onAuthenticationStarted() {
-                                it.resume(true)
-                            }
-                        },
+                        callbacks =
+                            object : TestWorkflowCallbacks() {
+                                override fun onAuthenticationStarted() {
+                                    it.resume(value = true)
+                                }
+                            },
                     )
 
-                    workflowController.start(RuntimeEnvironment.getApplication())
-                    workflowController.startAuthentication(testUrl)
+                    workflowController.start(context = RuntimeEnvironment.getApplication())
+                    workflowController.startAuthentication(tcTokenUrl = testUrl)
 
                     advanceUntilIdle()
                 }
 
-            assert(completed)
+            assert(value = completed)
         }
 
     @Test
@@ -217,25 +219,26 @@ class WorkflowControllerTest {
                         assertNotNull(command)
                         assertEquals(tcTokenUrl.toString(), command.tcTokenURL)
 
-                        connection.receive("{\"msg\":\"AUTH\"}")
+                        connection.receive(messageJson = "{\"msg\":\"AUTH\"}")
                     }
 
                     is Accept -> {
-                        connection.receive("{\"msg\":\"INSERT_CARD\"}")
+                        connection.receive(messageJson = "{\"msg\":\"INSERT_CARD\"}")
                     }
 
                     is SetPin -> {
                         assertEquals(testPin, command.value)
 
                         connection.receive(
-                            "{" +
-                                "  \"msg\": \"AUTH\"," +
-                                "  \"result\":" +
-                                "           {" +
-                                "            \"major\": \"http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok\"" +
-                                "           }," +
-                                "  \"url\": \"https://test.governikus-eid.de/Autent-DemoApplication/refresh-address?sessionId=123456789&ResultMajor=ok\"" +
-                                "}",
+                            messageJson =
+                                "{" +
+                                    "  \"msg\": \"AUTH\"," +
+                                    "  \"result\":" +
+                                    "           {" +
+                                    "            \"major\": \"http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok\"" +
+                                    "           }," +
+                                    "  \"url\": \"https://test.governikus-eid.de/Autent-DemoApplication/refresh-address?sessionId=123456789&ResultMajor=ok\"" +
+                                    "}",
                         )
                     }
 
@@ -247,114 +250,118 @@ class WorkflowControllerTest {
             val completed =
                 suspendCoroutine<Boolean> {
                     workflowController.registerCallbacks(
-                        object : TestWorkflowCallbacks() {
-                            override fun onAuthenticationStarted() {
-                                connection.receive(
-                                    "{" +
-                                        "  \"msg\": \"ACCESS_RIGHTS\"," +
-                                        "  \"aux\":" +
-                                        "       {" +
-                                        "        \"ageVerificationDate\": \"1999-07-20\"," +
-                                        "        \"requiredAge\": \"18\"," +
-                                        "        \"validityDate\": \"2017-07-20\"," +
-                                        "        \"communityId\": \"02760400110000\"" +
-                                        "       }," +
-                                        "  \"chat\":" +
-                                        "        {" +
-                                        "         \"effective\": [\"Address\", \"FamilyName\", \"GivenNames\", \"AgeVerification\"]," +
-                                        "         \"optional\": [\"GivenNames\", \"AgeVerification\"]," +
-                                        "         \"required\": [\"Address\", \"FamilyName\"]" +
-                                        "        }," +
-                                        "  \"transactionInfo\": \"this is an example\"" +
-                                        "}",
-                                )
-                            }
-
-                            override fun onAccessRights(
-                                error: String?,
-                                accessRights: AccessRights?,
-                            ) {
-                                workflowController.accept()
-                            }
-
-                            override fun onInsertCard(error: String?) {
-                                connection.receive(
-                                    "{" +
-                                        "  \"msg\": \"READER\"," +
-                                        "  \"name\": \"NFC\"," +
-                                        "  \"attached\": true," +
-                                        "  \"insertable\": true," +
-                                        "  \"keypad\": false," +
-                                        "  \"card\":" +
-                                        "         {" +
-                                        "          \"inoperative\": false," +
-                                        "          \"deactivated\": false," +
-                                        "          \"retryCounter\": 3" +
-                                        "         }" +
-                                        "}",
-                                )
-                            }
-
-                            override fun onReader(reader: Reader?) {
-                                val card = reader?.card
-                                assertNotNull(card)
-                                assertEquals(3, card?.pinRetryCounter)
-                                assertEquals(false, card?.inoperative)
-                                assertEquals(false, card?.deactivated)
-
-                                connection.receive(
-                                    "{" +
-                                        "  \"msg\": \"ENTER_PIN\"," +
-                                        "  \"reader\":" +
-                                        "           {" +
-                                        "            \"name\": \"NFC\"," +
-                                        "            \"attached\": true," +
-                                        "            \"insertable\": true," +
-                                        "            \"keypad\": false," +
-                                        "            \"card\":" +
-                                        "                   {" +
-                                        "                    \"inoperative\": false," +
-                                        "                    \"deactivated\": false," +
-                                        "                    \"retryCounter\": 3" +
-                                        "                   }" +
-                                        "           }" +
-                                        "}",
-                                )
-                            }
-
-                            override fun onEnterPin(
-                                error: String?,
-                                reader: Reader,
-                            ) {
-                                val card = reader.card
-                                if (card != null) {
-                                    assertEquals(3, card.pinRetryCounter)
-                                    assertEquals(false, card.inoperative)
-                                    assertEquals(false, card.deactivated)
-
-                                    workflowController.setPin(testPin)
-                                } else {
-                                    assert(false)
+                        callbacks =
+                            object : TestWorkflowCallbacks() {
+                                override fun onAuthenticationStarted() {
+                                    connection.receive(
+                                        messageJson =
+                                            "{" +
+                                                "  \"msg\": \"ACCESS_RIGHTS\"," +
+                                                "  \"aux\":" +
+                                                "       {" +
+                                                "        \"ageVerificationDate\": \"1999-07-20\"," +
+                                                "        \"requiredAge\": \"18\"," +
+                                                "        \"validityDate\": \"2017-07-20\"," +
+                                                "        \"communityId\": \"02760400110000\"" +
+                                                "       }," +
+                                                "  \"chat\":" +
+                                                "        {" +
+                                                "         \"effective\": [\"Address\", \"FamilyName\", \"GivenNames\", \"AgeVerification\"]," +
+                                                "         \"optional\": [\"GivenNames\", \"AgeVerification\"]," +
+                                                "         \"required\": [\"Address\", \"FamilyName\"]" +
+                                                "        }," +
+                                                "  \"transactionInfo\": \"this is an example\"" +
+                                                "}",
+                                    )
                                 }
-                            }
 
-                            override fun onAuthenticationCompleted(authResult: AuthResult) {
-                                assertNotNull(authResult.result)
-                                assertNotNull(authResult.url)
-                                assertEquals("http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok", authResult.result?.major)
+                                override fun onAccessRights(
+                                    error: String?,
+                                    accessRights: AccessRights?,
+                                ) {
+                                    workflowController.accept()
+                                }
 
-                                it.resume(true)
-                            }
-                        },
+                                override fun onInsertCard(error: String?) {
+                                    connection.receive(
+                                        messageJson =
+                                            "{" +
+                                                "  \"msg\": \"READER\"," +
+                                                "  \"name\": \"NFC\"," +
+                                                "  \"attached\": true," +
+                                                "  \"insertable\": true," +
+                                                "  \"keypad\": false," +
+                                                "  \"card\":" +
+                                                "         {" +
+                                                "          \"inoperative\": false," +
+                                                "          \"deactivated\": false," +
+                                                "          \"retryCounter\": 3" +
+                                                "         }" +
+                                                "}",
+                                    )
+                                }
+
+                                override fun onReader(reader: Reader?) {
+                                    val card = reader?.card
+                                    assertNotNull(card)
+                                    assertEquals(3, card?.pinRetryCounter)
+                                    assertEquals(false, card?.inoperative)
+                                    assertEquals(false, card?.deactivated)
+
+                                    connection.receive(
+                                        messageJson =
+                                            "{" +
+                                                "  \"msg\": \"ENTER_PIN\"," +
+                                                "  \"reader\":" +
+                                                "           {" +
+                                                "            \"name\": \"NFC\"," +
+                                                "            \"attached\": true," +
+                                                "            \"insertable\": true," +
+                                                "            \"keypad\": false," +
+                                                "            \"card\":" +
+                                                "                   {" +
+                                                "                    \"inoperative\": false," +
+                                                "                    \"deactivated\": false," +
+                                                "                    \"retryCounter\": 3" +
+                                                "                   }" +
+                                                "           }" +
+                                                "}",
+                                    )
+                                }
+
+                                override fun onEnterPin(
+                                    error: String?,
+                                    reader: Reader,
+                                ) {
+                                    val card = reader.card
+                                    if (card != null) {
+                                        assertEquals(3, card.pinRetryCounter)
+                                        assertEquals(false, card.inoperative)
+                                        assertEquals(false, card.deactivated)
+
+                                        workflowController.setPin(pin = testPin)
+                                    } else {
+                                        assert(value = false)
+                                    }
+                                }
+
+                                override fun onAuthenticationCompleted(authResult: AuthResult) {
+                                    assertNotNull(authResult.result)
+                                    assertNotNull(authResult.url)
+                                    assertEquals("http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok", authResult.result?.major)
+
+                                    it.resume(value = true)
+                                }
+                            },
                     )
 
-                    workflowController.start(RuntimeEnvironment.getApplication())
-                    workflowController.startAuthentication(tcTokenUrl)
+                    workflowController.start(context = RuntimeEnvironment.getApplication())
+                    workflowController.startAuthentication(tcTokenUrl = tcTokenUrl)
 
                     advanceUntilIdle()
                 }
 
-            assert(completed)
+            assert(value = completed)
         }
 }
 

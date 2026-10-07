@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.newpin
@@ -25,14 +25,14 @@ internal class EnterNewPinViewModel(
     val isNewPinValid =
         newPin.switchMap { newPin ->
             confirmationPin.map { confirmationPin ->
-                newPin?.size == newPinInputLength && newPin.contentEquals(confirmationPin)
+                newPin?.size == newPinInputLength && newPin.contentEquals(other = confirmationPin)
             }
         }
 
     val pinErrorMessage =
         newPin.switchMap { newPin ->
             confirmationPin.map { confirmationPin ->
-                if (confirmationPin?.size == newPinInputLength && !newPin.contentEquals(confirmationPin)) {
+                if (confirmationPin?.size == newPinInputLength && !newPin.contentEquals(other = confirmationPin)) {
                     application.getString(R.string.enter_new_pin_confirmation_error)
                 } else {
                     null
@@ -48,10 +48,10 @@ internal class EnterNewPinViewModel(
             return
         }
 
-        workflowViewModel.setNewPin(newPin)
+        workflowViewModel.setNewPin(newPin = newPin)
     }
 
     fun onAcceptEmptyPassword() {
-        workflowViewModel.setNewPin(null)
+        workflowViewModel.setNewPin(newPin = null)
     }
 }

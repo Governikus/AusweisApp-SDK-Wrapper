@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.accessrights
@@ -56,9 +56,9 @@ internal class AccessRightsFragmentViewModel(
         workflowViewModel.accessRights.map { accessRights ->
             accessRights?.requiredRights?.map { accessRight ->
                 AccessRightsStatus(
-                    accessRight,
-                    true,
-                    false,
+                    accessRight = accessRight,
+                    enabled = true,
+                    editable = false,
                 )
             }
         }
@@ -71,9 +71,9 @@ internal class AccessRightsFragmentViewModel(
         workflowViewModel.accessRights.map { accessRights ->
             accessRights?.optionalRights?.map { accessRight ->
                 AccessRightsStatus(
-                    accessRight,
-                    accessRights.effectiveRights.contains(accessRight),
-                    true,
+                    accessRight = accessRight,
+                    enabled = accessRights.effectiveRights.contains(element = accessRight),
+                    editable = true,
                 )
             }
         }
@@ -88,13 +88,17 @@ internal class AccessRightsFragmentViewModel(
 
     val certificatePurpose = workflowViewModel.certificateDescription.map { it?.purpose }
 
-    private fun checkedOptionalAccessRights() = optionalRightsStatus.value?.filter { it.enabled }?.map { it.accessRight } ?: emptyList()
+    private fun checkedOptionalAccessRights() =
+        optionalRightsStatus.value
+            ?.filter { it.enabled }
+            ?.map { it.accessRight }
+            .orEmpty()
 
     fun showCertificate() {
         workflowViewModel.showCertificate()
     }
 
     fun accept() {
-        workflowViewModel.acceptAccessRights(checkedOptionalAccessRights())
+        workflowViewModel.acceptAccessRights(acceptedOptionalRights = checkedOptionalAccessRights())
     }
 }

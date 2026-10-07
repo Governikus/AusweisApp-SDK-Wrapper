@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.error
@@ -16,7 +16,7 @@ internal class ErrorFragment : BaseFragment<FragmentErrorBinding>() {
     private val viewModel: ErrorFragmentViewModel by viewModels(
         factoryProducer = {
             WorkflowFragmentViewModelFactory(
-                requireActivity(),
+                activity = requireActivity(),
             )
         },
     )

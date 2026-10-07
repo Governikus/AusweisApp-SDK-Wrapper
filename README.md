@@ -18,10 +18,10 @@ Just open the AusweisApp2SDKWrapper/Package.swift in Xcode.
 
 ## Contact
 
-    Governikus GmbH & Co. KG.
+    Governikus Service GmbH
     Hochschulring 4
     28359 Bremen
 
 ## License
 
-Copyright (c) 2026 Governikus GmbH & Co. KG, Germany
+Copyright (c) 2026 Governikus Service GmbH, Germany

@@ -7,11 +7,12 @@ plugins {
     id("org.sonarqube")
 
     id("com.android.application") apply false
+    id("dev.detekt")
 }
 
 ext {
-    ausweisapp_version = '2.5.5'
-    sdkwrapper_version = '2.5.5'
+    ausweisapp_version = '2.6.0'
+    sdkwrapper_version = '2.6.0'
     java_version = 21
 
     configureRename = { Project module, String suffix ->
@@ -98,8 +99,8 @@ tasks.named("dependencyUpdates").configure {
     }
     rejectVersionIf { selection ->
         if (selection.candidate.group == "androidx.core" && selection.candidate.module == "core-ktx") {
-            if (selection.candidate.version == "1.19.0") {
-                return true // Requires compileSdk >36, which we not yet use
+            if (selection.currentVersion == "1.18.0") {
+                return true // 1.19.x requires compileSdk > 36, which we not yet use
             }
         }
         if (selection.candidate.module == "kotlin-build-tools-impl") {
@@ -107,6 +108,11 @@ tasks.named("dependencyUpdates").configure {
                 return true
                 // Needed because the 2.4.10 of the Kotlin Gradle Plugin seems to also include 2.4.0 for backwards compatibility.
                 // We need to check currentVersion here as there are false positives if only the candidate version gets checked.
+            }
+        }
+        if (selection.candidate.group == "com.squareup.okhttp3" && selection.candidate.module == "okhttp-jvm") {
+            if (selection.candidate.currentVersion == "5.1.0") {
+                return true // Issue with new Versions: okio.Socket okio.Okio.socket(java.net.Socket)
             }
         }
         if (isNonStable(selection.candidate.version) && !isNonStable(selection.currentVersion)) {

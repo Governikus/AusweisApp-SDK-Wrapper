@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.accessrights
@@ -52,7 +52,7 @@ internal class AccessRightsStatusAdapter : ListAdapter<AccessRightsStatus, Acces
         viewType: Int,
     ): AccessRightsStatusViewHolder {
         val viewBinding = ViewAccessRightBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AccessRightsStatusViewHolder(viewBinding)
+        return AccessRightsStatusViewHolder(viewBinding = viewBinding)
     }
 
     override fun onBindViewHolder(
@@ -60,7 +60,7 @@ internal class AccessRightsStatusAdapter : ListAdapter<AccessRightsStatus, Acces
         position: Int,
     ) {
         val status = getItem(position)
-        holder.bindTo(status) { checked ->
+        holder.bindTo(status = status) { checked ->
             status.enabled = checked
         }
     }

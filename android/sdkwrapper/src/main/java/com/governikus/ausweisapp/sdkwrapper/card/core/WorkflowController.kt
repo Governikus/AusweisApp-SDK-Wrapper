@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core
@@ -119,18 +119,22 @@ class WorkflowController internal constructor(
         isStarting = true
 
         sdkConnection.bind(
-            context,
+            context = context,
             onConnected = {
                 isStarting = false
                 callback { onStarted() }
             },
             onConnectionFailed = {
                 isStarting = false
-                val error = WrapperError("WorkflowController::start", "Connection failed")
-                callback { onWrapperError(error) }
+                val error =
+                    WrapperError(
+                        msg = "WorkflowController::start",
+                        error = "Connection failed",
+                    )
+                callback { onWrapperError(error = error) }
             },
             onMessageReceived = { messageJson ->
-                handleMessage(messageJson)
+                handleMessage(message = messageJson)
             },
         )
     }
@@ -201,7 +205,15 @@ class WorkflowController internal constructor(
         status: Boolean = true,
         header: Map<String, String>? = null,
     ) {
-        send(RunAuth(tcTokenUrl.toString(), developerMode, status, header))
+        send(
+            command =
+                RunAuth(
+                    tcTokenURL = tcTokenUrl.toString(),
+                    developerMode = developerMode,
+                    status = status,
+                    header = header,
+                ),
+        )
     }
 
     /**
@@ -224,7 +236,7 @@ class WorkflowController internal constructor(
      * callbacks to [WorkflowCallbacks.onStatus].
      */
     fun startChangePin(status: Boolean = true) {
-        send(RunChangePin(status))
+        send(command = RunChangePin(status = status))
     }
 
     /**
@@ -243,7 +255,7 @@ class WorkflowController internal constructor(
      * @param accessRights List of enabled optional access rights. If the list is empty all optional access rights are disabled.
      */
     fun setAccessRights(accessRights: List<AccessRight>) {
-        send(SetAccessRights(accessRights.map { it.rawName }))
+        send(command = SetAccessRights(chat = accessRights.map { it.rawName }))
     }
 
     /**
@@ -251,7 +263,7 @@ class WorkflowController internal constructor(
      * This command is allowed only if the SDK Wrapper called [WorkflowCallbacks.onAccessRights] beforehand.
      */
     fun getAccessRights() {
-        send(GetAccessRights())
+        send(command = GetAccessRights())
     }
 
     /**
@@ -260,7 +272,7 @@ class WorkflowController internal constructor(
      * The SDK Wrapper will call [WorkflowCallbacks.onInfo] as an answer.
      */
     fun getInfo() {
-        send(GetInfo())
+        send(command = GetInfo())
     }
 
     /**
@@ -291,20 +303,20 @@ class WorkflowController internal constructor(
      * @param pin The personal identification number (PIN) of the card. Must contain 5 (Transport PIN) or 6 digits.
      */
     fun setPin(pin: CharArray?) {
-        send(SetPin(pin))
+        send(command = SetPin(value = pin))
     }
 
     @Suppress("kotlin:S1133")
     @Deprecated(
         message = "Use the CharArray version instead.",
-        replaceWith = ReplaceWith("setPin(pin?.toCharArray())"),
+        replaceWith = ReplaceWith(expression = "setPin(pin?.toCharArray())"),
     )
     fun setPin(pin: String?) {
-        setPin(pin?.toCharArray())
+        setPin(pin = pin?.toCharArray())
     }
 
     fun setPin(pin: Nothing?) {
-        setPin(pin as CharArray?)
+        setPin(pin = pin as CharArray?)
     }
 
     /**
@@ -319,20 +331,20 @@ class WorkflowController internal constructor(
      * Must be null if the current reader has a keypad. See [Reader].
      */
     fun setNewPin(newPin: CharArray?) {
-        send(SetNewPin(newPin))
+        send(command = SetNewPin(value = newPin))
     }
 
     @Suppress("kotlin:S1133")
     @Deprecated(
         message = "Use the CharArray version instead.",
-        replaceWith = ReplaceWith("setNewPin(newPin?.toCharArray())"),
+        replaceWith = ReplaceWith(expression = "setNewPin(newPin?.toCharArray())"),
     )
     fun setNewPin(newPin: String?) {
-        setNewPin(newPin?.toCharArray())
+        setNewPin(newPin = newPin?.toCharArray())
     }
 
     fun setNewPin(newPin: Nothing?) {
-        setNewPin(newPin as CharArray?)
+        setNewPin(newPin = newPin as CharArray?)
     }
 
     /**
@@ -356,20 +368,20 @@ class WorkflowController internal constructor(
      * Must be null if the current reader has a keypad. See [Reader].
      */
     fun setPuk(puk: CharArray?) {
-        send(SetPuk(puk))
+        send(command = SetPuk(value = puk))
     }
 
     @Suppress("kotlin:S1133")
     @Deprecated(
         message = "Use the CharArray version instead.",
-        replaceWith = ReplaceWith("setPuk(puk?.toCharArray())"),
+        replaceWith = ReplaceWith(expression = "setPuk(puk?.toCharArray())"),
     )
     fun setPuk(puk: String?) {
-        setPuk(puk?.toCharArray())
+        setPuk(puk = puk?.toCharArray())
     }
 
     fun setPuk(puk: Nothing?) {
-        setPuk(puk as CharArray?)
+        setPuk(puk = puk as CharArray?)
     }
 
     /**
@@ -392,20 +404,20 @@ class WorkflowController internal constructor(
      * Must be null if the current reader has a keypad. See [Reader].
      */
     fun setCan(can: CharArray?) {
-        send(SetCan(can))
+        send(command = SetCan(value = can))
     }
 
     @Suppress("kotlin:S1133")
     @Deprecated(
         message = "Use the CharArray version instead.",
-        replaceWith = ReplaceWith("setCan(can?.toCharArray())"),
+        replaceWith = ReplaceWith(expression = "setCan(can?.toCharArray())"),
     )
     fun setCan(can: String?) {
-        setCan(can?.toCharArray())
+        setCan(can = can?.toCharArray())
     }
 
     fun setCan(can: Nothing?) {
-        setCan(can as CharArray?)
+        setCan(can = can as CharArray?)
     }
 
     /**
@@ -418,7 +430,16 @@ class WorkflowController internal constructor(
         name: String,
         simulator: Simulator?,
     ) {
-        send(SetCard(name, workflowSimulatorToCommandSimulator(simulator)))
+        send(
+            command =
+                SetCard(
+                    name = name,
+                    simulator =
+                        workflowSimulatorToCommandSimulator(
+                            simulator = simulator,
+                        ),
+                ),
+        )
     }
 
     /**
@@ -435,7 +456,7 @@ class WorkflowController internal constructor(
      *  one without the other.
      */
     fun accept() {
-        send(Accept())
+        send(command = Accept())
     }
 
     /**
@@ -445,14 +466,14 @@ class WorkflowController internal constructor(
      * You can send this command in any state of a running workflow to abort it.
      */
     fun cancel() {
-        send(Cancel())
+        send(command = Cancel())
     }
 
     /**
      * Resumes the workflow after a callback to [WorkflowCallbacks.onPause].
      */
     fun continueWorkflow() {
-        send(ContinueWorkflow())
+        send(command = ContinueWorkflow())
     }
 
     /**
@@ -461,7 +482,7 @@ class WorkflowController internal constructor(
      * The SDK will call [WorkflowCallbacks.onCertificate] as an answer.
      */
     fun getCertificate() {
-        send(GetCertificate())
+        send(command = GetCertificate())
     }
 
     /**
@@ -469,7 +490,7 @@ class WorkflowController internal constructor(
      * The SDK will call [WorkflowCallbacks.onStatus] as an answer.
      */
     fun getStatus() {
-        send(GetStatus())
+        send(command = GetStatus())
     }
 
     /**
@@ -481,7 +502,7 @@ class WorkflowController internal constructor(
      * @param name Name of the reader.
      */
     fun getReader(name: String) {
-        send(GetReader(name))
+        send(command = GetReader(name = name))
     }
 
     /**
@@ -491,7 +512,7 @@ class WorkflowController internal constructor(
      * The SDK Wrapper will call [WorkflowCallbacks.onReaderList] as an answer.
      */
     fun getReaderList() {
-        send(GetReaderList())
+        send(command = GetReaderList())
     }
 
     /**
@@ -505,28 +526,44 @@ class WorkflowController internal constructor(
      * @param tag Detected id card. ISO-DEP (ISO 14443-4) NFC tag
      */
     fun onNfcTagDetected(tag: Tag) {
-        require(tag.techList.contains(IsoDep::class.java.name)) { "NFC tag isn't a ISO-DEP (ISO 14443-4) NFC tag" }
+        require(value = tag.techList.contains(element = IsoDep::class.java.name)) { "NFC tag isn't a ISO-DEP (ISO 14443-4) NFC tag" }
 
-        SDKWrapper.launch(ioDispatcher) {
+        SDKWrapper.launch(context = ioDispatcher) {
             if (isStarted) {
-                sdkConnection.updateNfcTag(tag)
+                sdkConnection.updateNfcTag(tag = tag)
             } else {
-                callback { onWrapperError(WrapperError("WorkflowController::onNfcTagDetected: isStarted", "Not started")) }
+                callback {
+                    onWrapperError(
+                        error =
+                            WrapperError(
+                                msg = "WorkflowController::onNfcTagDetected: isStarted",
+                                error = "Not started",
+                            ),
+                    )
+                }
             }
         }
     }
 
     private inline fun <reified T : Command> send(command: T) =
-        SDKWrapper.launch(ioDispatcher) {
+        SDKWrapper.launch(context = ioDispatcher) {
             if (isStarted) {
-                sdkConnection.send(command, T::class.java)
+                sdkConnection.send(command = command, clazz = T::class.java)
             } else {
-                callback { onWrapperError(WrapperError("WorkflowController::send: isStarted", "Not started")) }
+                callback {
+                    onWrapperError(
+                        error =
+                            WrapperError(
+                                msg = "WorkflowController::send: isStarted",
+                                error = "Not started",
+                            ),
+                    )
+                }
             }
         }
 
     private fun callback(callback: WorkflowCallbacks.() -> Unit) =
-        SDKWrapper.launch(mainDispatcher) {
+        SDKWrapper.launch(context = mainDispatcher) {
             workflowCallbacks.forEach {
                 callback(it)
             }
@@ -535,25 +572,33 @@ class WorkflowController internal constructor(
     private fun handleEnterPassword(message: Message) {
         val reader = message.getReaderFromReaderMember()
         if (reader == null) {
-            callback { onWrapperError(WrapperError(message.msg.toString(), "Missing reader")) }
+            callback {
+                onWrapperError(
+                    error =
+                        WrapperError(
+                            msg = message.msg.toString(),
+                            error = "Missing reader",
+                        ),
+                )
+            }
             return
         }
 
         when (message.msg) {
             MSG_ENTER_PIN -> {
-                callback { onEnterPin(message.error, reader) }
+                callback { onEnterPin(error = message.error, reader = reader) }
             }
 
             MSG_ENTER_NEW_PIN -> {
-                callback { onEnterNewPin(message.error, reader) }
+                callback { onEnterNewPin(error = message.error, reader = reader) }
             }
 
             MSG_ENTER_PUK -> {
-                callback { onEnterPuk(message.error, reader) }
+                callback { onEnterPuk(error = message.error, reader = reader) }
             }
 
             MSG_ENTER_CAN -> {
-                callback { onEnterCan(message.error, reader) }
+                callback { onEnterCan(error = message.error, reader = reader) }
             }
 
             else -> {
@@ -566,17 +611,17 @@ class WorkflowController internal constructor(
         when (message.msg) {
             MSG_INFO -> {
                 val info = message.getVersionInfo()
-                val connection = ConnectionInfo.fromRawName(message.connectionInfo)
+                val connection = ConnectionInfo.fromRawName(name = message.connectionInfo)
                 if (info == null || connection == null) {
-                    callback { onWrapperError(WrapperError(message.msg, "Parsing error")) }
+                    callback { onWrapperError(error = WrapperError(msg = message.msg, error = "Parsing error")) }
                 } else {
-                    callback { onInfo(info, connection) }
+                    callback { onInfo(versionInfo = info, connectionInfo = connection) }
                 }
             }
 
             MSG_AUTH -> {
                 if (message.error != null) {
-                    callback { onAuthenticationStartFailed(message.error) }
+                    callback { onAuthenticationStartFailed(error = message.error) }
                 }
 
                 when (val authResult = message.getAuthResult()) {
@@ -586,7 +631,7 @@ class WorkflowController internal constructor(
                     }
 
                     else -> {
-                        callback { onAuthenticationCompleted(authResult) }
+                        callback { onAuthenticationCompleted(authResult = authResult) }
                     }
                 }
             }
@@ -594,17 +639,38 @@ class WorkflowController internal constructor(
             MSG_ACCESS_RIGHTS -> {
                 when (val accessRights = message.getAccessRights()) {
                     null -> {
-                        callback { onWrapperError(WrapperError(message.msg, "Missing access rights")) }
+                        callback {
+                            onWrapperError(
+                                error =
+                                    WrapperError(
+                                        msg = message.msg,
+                                        error = "Missing access rights",
+                                    ),
+                            )
+                        }
                     }
 
                     else -> {
-                        callback { onAccessRights(message.error, accessRights) }
+                        callback {
+                            onAccessRights(
+                                error = message.error,
+                                accessRights = accessRights,
+                            )
+                        }
                     }
                 }
             }
 
             MSG_BAD_STATE -> {
-                callback { onWrapperError(WrapperError(message.msg, message.error ?: "Unknown bad state")) }
+                callback {
+                    onWrapperError(
+                        error =
+                            WrapperError(
+                                msg = message.msg,
+                                error = message.error ?: "Unknown bad state",
+                            ),
+                    )
+                }
             }
 
             MSG_CHANGE_PIN -> {
@@ -614,63 +680,87 @@ class WorkflowController internal constructor(
                     }
 
                     else -> {
-                        callback { onChangePinCompleted(ChangePinResult(message.success, message.reason)) }
+                        callback {
+                            onChangePinCompleted(
+                                changePinResult =
+                                    ChangePinResult(
+                                        success = message.success,
+                                        reason = message.reason,
+                                    ),
+                            )
+                        }
                     }
                 }
             }
 
             MSG_ENTER_PIN, MSG_ENTER_CAN, MSG_ENTER_PUK, MSG_ENTER_NEW_PIN -> {
-                handleEnterPassword(message)
+                handleEnterPassword(message = message)
             }
 
             MSG_INSERT_CARD -> {
-                callback { onInsertCard(null) }
+                callback { onInsertCard(error = null) }
             }
 
             MSG_CERTIFICATE -> {
                 when (val certificateDescription = message.getCertificateDescription()) {
                     null -> {
-                        callback { onWrapperError(WrapperError(message.msg, "Missing certificateDescription")) }
+                        callback {
+                            onWrapperError(
+                                error =
+                                    WrapperError(
+                                        msg = message.msg,
+                                        error = "Missing certificateDescription",
+                                    ),
+                            )
+                        }
                     }
 
                     else -> {
-                        callback { onCertificate(certificateDescription) }
+                        callback { onCertificate(certificateDescription = certificateDescription) }
                     }
                 }
             }
 
             MSG_PAUSE -> {
-                when (val cause = Cause.fromRawName(message.cause)) {
+                when (val cause = Cause.fromRawName(name = message.cause)) {
                     null -> {
-                        callback { onWrapperError(WrapperError(message.msg, "Failed to map cause \"${message.cause}\" to PauseReason")) }
+                        callback {
+                            onWrapperError(
+                                error =
+                                    WrapperError(
+                                        msg = message.msg,
+                                        error = "Failed to map cause \"${message.cause}\" to PauseReason",
+                                    ),
+                            )
+                        }
                     }
 
                     else -> {
-                        callback { onPause(cause) }
+                        callback { onPause(cause = cause) }
                     }
                 }
             }
 
             MSG_READER -> {
-                callback { onReader(message.getReaderFromRoot()) }
+                callback { onReader(reader = message.getReaderFromRoot()) }
             }
 
             MSG_READER_LIST -> {
-                callback { onReaderList(message.getReaderList()) }
+                callback { onReaderList(readers = message.getReaderList()) }
             }
 
             MSG_INVALID, MSG_UNKNOWN_COMMAND -> {
                 val error = message.error ?: "Unknown SDK Wrapper error"
-                callback { onWrapperError(WrapperError(message.msg, error)) }
+                callback { onWrapperError(error = WrapperError(msg = message.msg, error = error)) }
             }
 
             MSG_INTERNAL_ERROR -> {
                 val errorMessage = message.error ?: "Unknown internal error"
-                callback { onInternalError(errorMessage) }
+                callback { onInternalError(error = errorMessage) }
             }
 
             MSG_STATUS -> {
-                callback { onStatus(message.getWorkflowProgress()) }
+                callback { onStatus(workflowProgress = message.getWorkflowProgress()) }
             }
 
             else -> {

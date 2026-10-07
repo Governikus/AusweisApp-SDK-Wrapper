@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.newpin
@@ -19,7 +19,7 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
     private val viewModel: EnterNewPinViewModel by viewModels(
         factoryProducer = {
             WorkflowFragmentViewModelFactory(
-                requireActivity(),
+                activity = requireActivity(),
             )
         },
     )
@@ -37,9 +37,9 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
         viewBinding.etNewPin.doOnTextChanged { s, _, _, _ ->
             val newPin =
                 if (s != null) {
-                    CharArray(s.length) { index -> s[index] }
+                    CharArray(size = s.length) { index -> s[index] }
                 } else {
-                    CharArray(0)
+                    CharArray(size = 0)
                 }
             viewModel.newPin.postValue(newPin)
         }
@@ -51,9 +51,9 @@ internal class EnterNewPinFragment : BaseFragment<FragmentEnterNewPinBinding>() 
         viewBinding.etConfirmNewPin.doOnTextChanged { s, _, _, _ ->
             val confirmationPin =
                 if (s != null) {
-                    CharArray(s.length) { index -> s[index] }
+                    CharArray(size = s.length) { index -> s[index] }
                 } else {
-                    CharArray(0)
+                    CharArray(size = 0)
                 }
             viewModel.confirmationPin.postValue(confirmationPin)
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.common
@@ -21,7 +21,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        viewBinding = onCreateViewBinding(inflater)
+        viewBinding = onCreateViewBinding(inflater = inflater)
 
         viewBinding?.root?.let { root ->
             ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->

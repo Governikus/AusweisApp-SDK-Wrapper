@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.password
@@ -33,7 +33,7 @@ internal class EnterPasswordFragment : BaseFragment<FragmentEnterPasswordBinding
     private val viewModel: EnterPasswordViewModel by viewModels(
         factoryProducer = {
             WorkflowFragmentViewModelFactory(
-                requireActivity(),
+                activity = requireActivity(),
             )
         },
     )
@@ -42,7 +42,7 @@ internal class EnterPasswordFragment : BaseFragment<FragmentEnterPasswordBinding
         super.onCreate(savedInstanceState)
 
         viewModel.passwordType.value =
-            PasswordType.fromString(arguments?.getString("passwordType"))
+            PasswordType.fromString(type = arguments?.getString("passwordType"))
     }
 
     override fun onCreateViewBinding(inflater: LayoutInflater): FragmentEnterPasswordBinding = FragmentEnterPasswordBinding.inflate(inflater)
@@ -68,9 +68,9 @@ internal class EnterPasswordFragment : BaseFragment<FragmentEnterPasswordBinding
         viewBinding.etPassword.doOnTextChanged { s, _, _, _ ->
             val password =
                 if (s != null) {
-                    CharArray(s.length) { index -> s[index] }
+                    CharArray(size = s.length) { index -> s[index] }
                 } else {
-                    CharArray(0)
+                    CharArray(size = 0)
                 }
             viewModel.password.postValue(password)
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui
@@ -61,13 +61,13 @@ internal class WorkflowActivity : AppCompatActivity() {
 
         val callback =
             object : OnBackPressedCallback(
-                true,
+                enabled = true,
             ) {
                 override fun handleOnBackPressed() {
                     backPressed()
                 }
             }
-        onBackPressedDispatcher.addCallback(this, callback)
+        onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback = callback)
 
         val navController = navHostFragment.navController
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -91,7 +91,7 @@ internal class WorkflowActivity : AppCompatActivity() {
 
         viewModel.navigation.observe(this) { event ->
             val navEvent = event.getContentIfNotHandled() ?: return@observe
-            navController.navigate(navEvent.action, navEvent.data)
+            navController.navigate(resId = navEvent.action, args = navEvent.data)
         }
 
         viewModel.workflowEvent.observe(this) { event ->
@@ -111,16 +111,19 @@ internal class WorkflowActivity : AppCompatActivity() {
             Toast.makeText(this, toast, Toast.LENGTH_SHORT).show()
         }
 
-        nfcDispatcher = NfcForegroundDispatcher(this, workflowController)
+        nfcDispatcher =
+            NfcForegroundDispatcher(
+                activity = this,
+                workflowController = workflowController,
+            )
 
         // Do not reset values when restoring activity
         if (savedInstanceState != null) {
             return
         }
 
-        viewModel.workflow =
-            getSerializableExtra(intent, PARAM_REQUESTED_WORKFLOW, Workflow::class.java)
-                ?: throw IllegalStateException("No workflow requested")
+        viewModel.workflow = getSerializableExtra(intent, PARAM_REQUESTED_WORKFLOW, Workflow::class.java)
+            ?: error(message = "No workflow requested")
 
         when (viewModel.workflow) {
             Workflow.AUTHENTICATE -> {
@@ -128,25 +131,26 @@ internal class WorkflowActivity : AppCompatActivity() {
                     getParcelableExtra(intent, PARAM_TC_TOKEN_URL, Uri::class.java)
                 viewModel.developerMode = intent.getBooleanExtra(PARAM_DEVELOPER_MODE, false)
                 viewModel.cardSimulatorMode =
-                    SimulatorMode.fromString(intent.getStringExtra(PARAM_CARD_SIMULATOR))
+                    SimulatorMode.fromString(mode = intent.getStringExtra(PARAM_CARD_SIMULATOR))
                         ?: SimulatorMode.DISABLED
 
-                navController.navigate(R.id.action_start_authentication)
+                navController.navigate(resId = R.id.action_start_authentication)
             }
 
             Workflow.CHANGE_PIN -> {
-                navController.navigate(R.id.action_start_pin_change)
+                navController.navigate(resId = R.id.action_start_pin_change)
             }
 
             Workflow.CHANGE_TRANSPORT_PIN -> {
                 navController.navigate(
-                    R.id.action_start_pin_change,
-                    Bundle().apply {
-                        putString(
-                            "passwordType",
-                            EnterPasswordFragment.PasswordType.TRANSPORT_PIN.type,
-                        )
-                    },
+                    resId = R.id.action_start_pin_change,
+                    args =
+                        Bundle().apply {
+                            putString(
+                                "passwordType",
+                                EnterPasswordFragment.PasswordType.TRANSPORT_PIN.type,
+                            )
+                        },
                 )
             }
         }

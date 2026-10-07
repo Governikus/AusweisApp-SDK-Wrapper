@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.tester.wrapper.card.ui.accessrights
@@ -18,7 +18,7 @@ internal class AccessRightsFragment : BaseFragment<FragmentAccessRightsBinding>(
     private val viewModel: AccessRightsFragmentViewModel by viewModels(
         factoryProducer = {
             WorkflowFragmentViewModelFactory(
-                requireActivity(),
+                activity = requireActivity(),
             )
         },
     )

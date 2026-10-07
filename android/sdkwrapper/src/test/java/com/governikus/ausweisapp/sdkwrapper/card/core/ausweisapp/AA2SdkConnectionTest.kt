@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Governikus GmbH & Co. KG, Germany
+ * Copyright (c) 2026 Governikus Service GmbH, Germany
  */
 
 package com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp
@@ -47,7 +47,7 @@ class FakeSdk : IAusweisApp2Sdk.Stub() {
 
     @Deprecated(
         message = "Use transmit instead.",
-        replaceWith = ReplaceWith("transmit(pMessageFromClient?.toCharArray())"),
+        replaceWith = ReplaceWith(expression = "transmit(pMessageFromClient?.toCharArray())"),
     )
     override fun send(
         pSessionId: String,
@@ -62,7 +62,7 @@ class FakeSdk : IAusweisApp2Sdk.Stub() {
 
         capturedSessionId = pSessionId
         capturedMessageFromClient = pMessageFromClient
-        capturedMessageFromClientAsString = String(pMessageFromClient)
+        capturedMessageFromClientAsString = String(chars = pMessageFromClient)
         return true
     }
 
@@ -74,7 +74,7 @@ class FakeSdk : IAusweisApp2Sdk.Stub() {
     ): Boolean = false
 }
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(value = RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
 class AA2SdkConnectionBasicTest {
     private lateinit var connection: AA2SdkConnection
@@ -92,7 +92,17 @@ class AA2SdkConnectionBasicTest {
     @Test
     fun `send fails if sdk is null`() {
         connection.sdk = null
-        val result = connection.send(RunAuth("https://example.org", false, true, null), RunAuth::class.java)
+        val result =
+            connection.send(
+                command =
+                    RunAuth(
+                        tcTokenURL = "https://example.org",
+                        developerMode = false,
+                        status = true,
+                        header = null,
+                    ),
+                clazz = RunAuth::class.java,
+            )
 
         assertFalse("Expected send to fail when SDK is null", result)
         assertNull(fakeSdk.capturedMessageFromClientAsString)
@@ -101,7 +111,17 @@ class AA2SdkConnectionBasicTest {
     @Test
     fun `send fails if sessionId is null`() {
         connection.sdkSessionId = null
-        val result = connection.send(RunAuth("https://example.org", false, true, null), RunAuth::class.java)
+        val result =
+            connection.send(
+                command =
+                    RunAuth(
+                        tcTokenURL = "https://example.org",
+                        developerMode = false,
+                        status = true,
+                        header = null,
+                    ),
+                clazz = RunAuth::class.java,
+            )
 
         assertFalse("Expected send to fail when sessionId is null", result)
         assertNull(fakeSdk.capturedMessageFromClientAsString)
@@ -112,13 +132,13 @@ class AA2SdkConnectionBasicTest {
         fakeSdk.shouldThrowException = true
         val command = Accept()
 
-        val result = connection.send(command, Accept::class.java)
+        val result = connection.send(command = command, clazz = Accept::class.java)
 
         assertFalse("Expected send to return false on exception", result)
     }
 }
 
-@RunWith(ParameterizedRobolectricTestRunner::class)
+@RunWith(value = ParameterizedRobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
 class AA2SdkConnectionNonSensitiveSerializationTest(
     private val commandAsAny: Any,
@@ -144,7 +164,7 @@ class AA2SdkConnectionNonSensitiveSerializationTest(
         @Suppress("UNCHECKED_CAST")
         val clazz = clazzAsAny as Class<Command>
 
-        val result = connection.send(command, clazz)
+        val result = connection.send(command = command, clazz = clazz)
 
         assertTrue("Expected send() to succeed", result)
         assertEquals(expectedJson, fakeSdk.capturedMessageFromClientAsString)
@@ -186,7 +206,7 @@ class AA2SdkConnectionNonSensitiveSerializationTest(
                     """{"cmd":"GET_INFO"}""",
                 ),
                 arrayOf(
-                    GetReader("reader123"),
+                    GetReader(name = "reader123"),
                     GetReader::class.java,
                     """{"name":"reader123","cmd":"GET_READER"}""",
                 ),
@@ -201,22 +221,27 @@ class AA2SdkConnectionNonSensitiveSerializationTest(
                     """{"cmd":"GET_STATUS"}""",
                 ),
                 arrayOf(
-                    RunChangePin(true),
+                    RunChangePin(status = true),
                     RunChangePin::class.java,
                     """{"status":true,"cmd":"RUN_CHANGE_PIN"}""",
                 ),
                 arrayOf(
-                    SetAccessRights(listOf()),
+                    SetAccessRights(chat = listOf()),
                     SetAccessRights::class.java,
                     """{"chat":[],"cmd":"SET_ACCESS_RIGHTS"}""",
                 ),
                 arrayOf(
-                    SetCard("card123", null),
+                    SetCard(name = "card123", simulator = null),
                     SetCard::class.java,
                     """{"name":"card123","cmd":"SET_CARD"}""",
                 ),
                 arrayOf(
-                    RunAuth("https://example.org", false, true, hashMapOf("Bearer" to "0123456789abcdef")),
+                    RunAuth(
+                        tcTokenURL = "https://example.org",
+                        developerMode = false,
+                        status = true,
+                        header = hashMapOf("Bearer" to "0123456789abcdef"),
+                    ),
                     RunAuth::class.java,
                     """{"tcTokenURL":"https://example.org","developerMode":false,"status":true,"header":{"Bearer":"0123456789abcdef"},"cmd":"RUN_AUTH"}""",
                 ),
@@ -224,7 +249,7 @@ class AA2SdkConnectionNonSensitiveSerializationTest(
     }
 }
 
-@RunWith(ParameterizedRobolectricTestRunner::class)
+@RunWith(value = ParameterizedRobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
 class AA2SdkConnectionSensitiveSerializationTest(
     private val commandAsAny: Any,
@@ -250,11 +275,11 @@ class AA2SdkConnectionSensitiveSerializationTest(
         @Suppress("UNCHECKED_CAST")
         val clazz = clazzAsAny as Class<Command>
 
-        val result = connection.send(command, clazz)
+        val result = connection.send(command = command, clazz = clazz)
 
         assertTrue("Expected send() to succeed", result)
         assertEquals(expectedJson, fakeSdk.capturedMessageFromClientAsString)
-        assertArrayEquals(CharArray(fakeSdk.capturedMessageFromClient!!.size), fakeSdk.capturedMessageFromClient)
+        assertArrayEquals(CharArray(size = fakeSdk.capturedMessageFromClient!!.size), fakeSdk.capturedMessageFromClient)
     }
 
     companion object {
@@ -263,42 +288,42 @@ class AA2SdkConnectionSensitiveSerializationTest(
         fun data(): Collection<Array<Any>> =
             listOf(
                 arrayOf(
-                    SetCan("123456".toCharArray()),
+                    SetCan(value = "123456".toCharArray()),
                     SetCan::class.java,
                     """{"cmd":"SET_CAN","value":"123456"}""",
                 ),
                 arrayOf(
-                    SetCan(null),
+                    SetCan(value = null),
                     SetCan::class.java,
                     """{"cmd":"SET_CAN"}""",
                 ),
                 arrayOf(
-                    SetNewPin("123456".toCharArray()),
+                    SetNewPin(value = "123456".toCharArray()),
                     SetNewPin::class.java,
                     """{"cmd":"SET_NEW_PIN","value":"123456"}""",
                 ),
                 arrayOf(
-                    SetNewPin(null),
+                    SetNewPin(value = null),
                     SetNewPin::class.java,
                     """{"cmd":"SET_NEW_PIN"}""",
                 ),
                 arrayOf(
-                    SetPin("123456".toCharArray()),
+                    SetPin(value = "123456".toCharArray()),
                     SetPin::class.java,
                     """{"cmd":"SET_PIN","value":"123456"}""",
                 ),
                 arrayOf(
-                    SetPin(null),
+                    SetPin(value = null),
                     SetPin::class.java,
                     """{"cmd":"SET_PIN"}""",
                 ),
                 arrayOf(
-                    SetPuk("1234567890".toCharArray()),
+                    SetPuk(value = "1234567890".toCharArray()),
                     SetPuk::class.java,
                     """{"cmd":"SET_PUK","value":"1234567890"}""",
                 ),
                 arrayOf(
-                    SetPuk(null),
+                    SetPuk(value = null),
                     SetPuk::class.java,
                     """{"cmd":"SET_PUK"}""",
                 ),
