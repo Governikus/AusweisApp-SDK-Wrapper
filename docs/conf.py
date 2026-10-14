@@ -7,7 +7,7 @@ import sys
 
 # -- General configuration ------------------------------------------------
 
-AA2_SDKWRAPPER_VERSION = '2.6.0'
+AA2_SDKWRAPPER_VERSION = '2.6.1'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 needs_sphinx = '1.3'
@@ -166,6 +166,4 @@ latex_show_urls = 'footnote'
 # If false, no module index is generated.
 # latex_domain_indices = True
 
-intersphinx_mapping = {
-    'sphinx': ('https://www.ausweisapp.bund.de/sdk/', 'objects.inv')
-}
+intersphinx_mapping = {'sphinx': ('https://www.ausweisapp.bund.de/sdk/', 'objects.inv')}
