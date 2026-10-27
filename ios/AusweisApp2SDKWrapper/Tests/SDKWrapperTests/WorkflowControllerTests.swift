@@ -1,392 +1,110 @@
 /*
- * Copyright (c) 2020-2026 Governikus Service GmbH, Germany
+ * Copyright (c) 2026 Governikus Service GmbH, Germany
  */
 
 @testable import AusweisApp2SDKWrapper
 import XCTest
 
+@available(iOS 17.0, *)
 class WorkflowControllerTests: XCTestCase {
-	private var connection: MockSdkConnection!
 	private var workflowController: WorkflowController!
 	private var testCallbacks: TestWorkflowCallbacks!
-	private var testUrl = URL(string: "https://test.test")!
 
 	override func setUp() {
-		connection = MockSdkConnection()
-		workflowController = WorkflowController(withConnection: connection)
+		workflowController = AA2SDKWrapper.workflowController
 		testCallbacks = TestWorkflowCallbacks()
 		workflowController.registerCallbacks(testCallbacks)
 	}
 
 	override func tearDown() {
 		workflowController.unregisterCallbacks(testCallbacks)
-		connection = nil
 		workflowController = nil
 		testCallbacks = nil
 	}
 
-	func testOnStarted() {
+	func testChangePinWithSimulator() {
 		let onStartedExpectation = expectation(description: "onStarted called")
-
 		testCallbacks.doOnStarted = {
 			onStartedExpectation.fulfill()
+			self.workflowController.startChangePin()
 		}
 
-		workflowController.start()
-
-		waitForExpectations(timeout: 1, handler: nil)
-		XCTAssertTrue(workflowController.isStarted)
-	}
-
-	func testErrorNotStarted() {
-		let onErrorExpectation = expectation(description: "onWrapperError called")
-
-		testCallbacks.doOnError = {
-			onErrorExpectation.fulfill()
+		let onChangePinStartedExpectation = expectation(description: "onChangePinStarted called")
+		testCallbacks.doOnChangePinStarted = {
+			onChangePinStartedExpectation.fulfill()
 		}
 
-		XCTAssertFalse(workflowController.isStarted)
-		workflowController.startAuthentication(withTcTokenUrl: testUrl)
-
-		waitForExpectations(timeout: 1, handler: nil)
-	}
-
-	func testAuthenticationStarted() {
-		let onAuthenticationStartedExpectation = expectation(description: "onAuthenticationStarted called")
-		let authCommandReceivedExpectation = expectation(description: "authCommandReceived")
-
-		connection.onCommandSend = { command in
-			let command = command as? RunAuth
-
-			XCTAssertNotNil(command)
-			XCTAssertEqual(self.testUrl.absoluteString, command!.tcTokenURL)
-
-			authCommandReceivedExpectation.fulfill()
-			self.connection.receive(messageJson: "{\"msg\":\"AUTH\"}")
-		}
-
-		testCallbacks.doOnAuthenticationStarted = {
-			onAuthenticationStartedExpectation.fulfill()
-		}
-
-		workflowController.start()
-		workflowController.startAuthentication(withTcTokenUrl: testUrl)
-
-		waitForExpectations(timeout: 1, handler: nil)
-	}
-
-	// swiftlint:disable function_body_length
-	func testFullAuthentication() {
-		let pin = "123456"
-
-		let exampleDateString = "1999-07-20"
-		let exampleDate = exampleDateString.parseDate(format: "yyyy-MM-dd")
-
-		let readerMessage = "{" +
-			"  \"msg\": \"READER\"," +
-			"  \"name\": \"NFC\"," +
-			"  \"attached\": true," +
-			"  \"insertable\": true," +
-			"  \"keypad\": false," +
-			"  \"card\":" +
-			"         {" +
-			"          \"inoperative\": false," +
-			"          \"deactivated\": false," +
-			"          \"retryCounter\": 3" +
-			"         }" +
-			"}"
-
-		let authCommandReceivedExpectation = expectation(description: "authCommandReceived")
-		let acceptReceivedExpectation = expectation(description: "acceptReceived")
-		let setPinReceivedExpectation = expectation(description: "setPinReceived")
-		connection.onCommandSend = { command in
-			if let authCommand = command as? RunAuth {
-				authCommandReceivedExpectation.fulfill()
-
-				XCTAssertEqual(authCommand.tcTokenURL, self.testUrl.absoluteString)
-
-				self.connection.receive(messageJson: "{\"msg\":\"AUTH\"}")
-			} else if command is Accept {
-				acceptReceivedExpectation.fulfill()
-				self.connection.receive(messageJson: "{\"msg\":\"INSERT_CARD\"}")
-			} else if let setPinCommand = command as? SetPin {
-				setPinReceivedExpectation.fulfill()
-
-				XCTAssertEqual(setPinCommand.value, pin)
-
-				// swiftlint:disable line_length
-				self.connection.receive(messageJson:
-					"{" +
-						"  \"msg\": \"AUTH\"," +
-						"  \"result\":" +
-						"           {" +
-						"            \"major\": \"http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok\"" +
-						"           }," +
-						"  \"url\": \"https://test.governikus-eid.de/Autent-DemoApplication/refresh-address?sessionId=123456789&ResultMajor=ok\"" +
-						"}")
-				// swiftlint:enable line_length
-			}
-		}
-
-		let onAuthenticationCompletedExpectation = expectation(description: "onAuthenticationCompleted called")
-		testCallbacks.doOnAuthenticationCompleted = { _ in
-			onAuthenticationCompletedExpectation.fulfill()
-		}
-
-		let onEnterPinExpectation = expectation(description: "onEnterPin called")
-		testCallbacks.doOnRequestPin = { card in
-			onEnterPinExpectation.fulfill()
-
-			XCTAssertEqual(card.pinRetryCounter, 3)
-			XCTAssertEqual(card.deactivated, false)
-			XCTAssertEqual(card.inoperative, false)
-
-			self.workflowController.setPin(pin)
-		}
-
-		let onRecognizedCardExpectation = expectation(description: "onRecognizedCard called")
-		testCallbacks.doOnRecognizedCard = { card in
-			onRecognizedCardExpectation.fulfill()
-
-			XCTAssertNotNil(card)
-			XCTAssertEqual(card?.pinRetryCounter, 3)
-			XCTAssertEqual(card?.deactivated, false)
-			XCTAssertEqual(card?.inoperative, false)
-
-			self.connection.receive(messageJson:
-				"{" +
-					"  \"msg\": \"ENTER_PIN\"," +
-					"  \"reader\":" +
-					readerMessage +
-					"}")
-		}
-
-		let onInsertCardExpectation = expectation(description: "onInsertCard called")
+		let onRequestCardExpectation = expectation(description: "onInsertCard called")
 		testCallbacks.doOnRequestCard = {
-			onInsertCardExpectation.fulfill()
-
-			self.connection.receive(messageJson: readerMessage)
+			onRequestCardExpectation.fulfill()
+			self.workflowController.setCard(name: "Simulator")
 		}
 
-		let onAccessRightsExpectation = expectation(description: "onAccessRights called")
-		testCallbacks.doOnRequestAccessRights = { accessRights in
+		let onSetPinExpectation = expectation(description: "onSetPin called")
+		testCallbacks.doOnRequestPin = { _ in
+			onSetPinExpectation.fulfill()
+			self.workflowController.setPin(nil)
+		}
+
+		let onSetNewPinExpectation = expectation(description: "onSetNewPin called")
+		testCallbacks.doOnRequestNewPin = { _ in
+			onSetNewPinExpectation.fulfill()
+			self.workflowController.setNewPin(nil)
+		}
+
+		let onChangePinCompletedExpectation = expectation(description: "onChangePinCompleted called")
+		testCallbacks.doOnChangePinCompleted = { changePinResult in
+			onChangePinCompletedExpectation.fulfill()
+			XCTAssertTrue(changePinResult.success)
+		}
+
+		workflowController.start()
+		waitForExpectations(timeout: 5, handler: nil)
+		workflowController.stop()
+	}
+
+	func testAuthWithSimulator() {
+		let onStartedExpectation = expectation(description: "onStarted called")
+		testCallbacks.doOnStarted = {
+			onStartedExpectation.fulfill()
+			// swiftlint:disable line_length
+			self.workflowController.startAuthentication(withTcTokenUrl: URL(string: "https://test.governikus-eid.de/AusweisAuskunft/WebServiceRequesterServlet?mode=json")!)
+			// swiftlint:enable line_length
+		}
+
+		let onAuthStartedExpectation = expectation(description: "onAuthenticationStarted called")
+		testCallbacks.doOnAuthenticationStarted = {
+			onAuthStartedExpectation.fulfill()
+		}
+
+		let onAccessRightsExpectation = expectation(description: "onRequestAccessRights called")
+		testCallbacks.doOnRequestAccessRights = { _ in
 			onAccessRightsExpectation.fulfill()
-
-			XCTAssertEqual(accessRights.auxiliaryData?.ageVerificationDate, exampleDate)
-			XCTAssertEqual(accessRights.auxiliaryData?.requiredAge, 18)
-			XCTAssertEqual(accessRights.auxiliaryData?.validityDate, exampleDate)
-			XCTAssertEqual(accessRights.auxiliaryData?.communityId, "02760400110000")
-
-			XCTAssertTrue(accessRights.requiredRights.contains { $0 == .Address })
-			XCTAssertTrue(accessRights.requiredRights.contains { $0 == .FamilyName })
-			XCTAssertTrue(accessRights.optionalRights.contains { $0 == .GivenNames })
-			XCTAssertTrue(accessRights.optionalRights.contains { $0 == .AgeVerification })
-
-			XCTAssertEqual(accessRights.transactionInfo, "this is an example")
-
 			self.workflowController.accept()
 		}
 
-		let onAuthenticationStartedExpectation = expectation(description: "onAuthenticationStarted called")
-		testCallbacks.doOnAuthenticationStarted = {
-			onAuthenticationStartedExpectation.fulfill()
+		let onRequestCardExpectation = expectation(description: "onInsertCard called")
+		testCallbacks.doOnRequestCard = {
+			onRequestCardExpectation.fulfill()
+			self.workflowController.setCard(name: "Simulator")
+		}
 
-			self.connection.receive(messageJson:
-				"{" +
-					"  \"msg\": \"ACCESS_RIGHTS\"," +
-					"  \"aux\":" +
-					"       {" +
-					"        \"ageVerificationDate\": \"" + exampleDateString + "\"," +
-					"        \"requiredAge\": \"18\"," +
-					"        \"validityDate\": \"" + exampleDateString + "\"," +
-					"        \"communityId\": \"02760400110000\"" +
-					"       }," +
-					"  \"chat\":" +
-					"        {" +
-					"         \"effective\": [\"Address\", \"FamilyName\", \"GivenNames\", \"AgeVerification\"]," +
-					"         \"optional\": [\"GivenNames\", \"AgeVerification\"]," +
-					"         \"required\": [\"Address\", \"FamilyName\"]" +
-					"        }," +
-					"  \"transactionInfo\": \"this is an example\"" +
-					"}")
+		let onSetPinExpectation = expectation(description: "onSetPin called")
+		testCallbacks.doOnRequestPin = { _ in
+			onSetPinExpectation.fulfill()
+			self.workflowController.setPin(nil)
+		}
+
+		let onAuthCompletedExpectation = expectation(description: "onAuthenticationCompleted called")
+		testCallbacks.doOnAuthenticationCompleted = { authResult in
+			onAuthCompletedExpectation.fulfill()
+			XCTAssertNotNil(authResult.url)
+			XCTAssertNotNil(authResult.result)
+			XCTAssertEqual(authResult.result!.major, "http://www.bsi.bund.de/ecard/api/1.1/resultmajor#ok")
 		}
 
 		workflowController.start()
-		workflowController.startAuthentication(withTcTokenUrl: testUrl, withCustomHeader: ["Bearer": "0123456789abcdef"])
-		waitForExpectations(timeout: 2, handler: nil)
-	}
-
-	// swiftlint:enable function_body_length
-}
-
-class MockSdkConnection: SdkConnection {
-	var isStarted = false
-
-	var onConnected: (() -> Void)?
-	var onMessageReceived: ((AA2Message) -> Void)?
-
-	var onCommandSend: ((Command) -> Void)?
-
-	func start() {
-		isStarted = true
-		if let onConnected {
-			onConnected()
-		}
-	}
-
-	func stop() {
-		isStarted = false
-	}
-
-	func send(command: some Command) {
-		if let onCommandSend {
-			DispatchQueue.global().async {
-				onCommandSend(command)
-			}
-		}
-	}
-
-	func receive(messageJson: String) {
-		let messageData = Data(messageJson.utf8)
-		let message = try? JSONDecoder().decode(AA2Message.self, from: messageData)
-
-		if let onMessageReceived {
-			onMessageReceived(message!)
-		}
-	}
-}
-
-class TestWorkflowCallbacks: WorkflowCallbacks {
-	var doOnStarted: (() -> Void)?
-	var doOnAuthenticationStarted: (() -> Void)?
-	var doOnRequestAccessRights: ((AccessRights) -> Void)?
-	var doOnRequestCard: (() -> Void)?
-	var doOnRecognizedCard: ((Card?) -> Void)?
-	var doOnRequestPin: ((Card) -> Void)?
-	var doOnAuthenticationCompleted: ((AuthResult) -> Void)?
-	var doOnError: (() -> Void)?
-
-	func onInfo(versionInfo _: VersionInfo) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onReader(reader: Reader?) {
-		if let doOnRecognizedCard, let card = reader?.card {
-			DispatchQueue.global().async {
-				doOnRecognizedCard(card)
-			}
-		}
-	}
-
-	func onReaderList(readers _: [Reader]?) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onStarted() {
-		if let doOnStarted {
-			DispatchQueue.global().async {
-				doOnStarted()
-			}
-		}
-	}
-
-	func onAuthenticationStarted() {
-		if let doOnAuthenticationStarted {
-			DispatchQueue.global().async {
-				doOnAuthenticationStarted()
-			}
-		}
-	}
-
-	func onChangePinStarted() {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onAccessRights(error _: String?, accessRights: AccessRights?) {
-		if accessRights == nil {
-			return
-		}
-
-		if let doOnRequestAccessRights {
-			DispatchQueue.global().async {
-				doOnRequestAccessRights(accessRights!)
-			}
-		}
-	}
-
-	func onCertificate(certificateDescription _: CertificateDescription) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onInsertCard(error _: String?) {
-		if let doOnRequestCard {
-			DispatchQueue.global().async {
-				doOnRequestCard()
-			}
-		}
-	}
-
-	func onRecognizedCard(card _: Card?) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onPause(cause _: Cause) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onEnterPin(error _: String?, reader: Reader) {
-		if let doOnRequestPin, let card = reader.card {
-			DispatchQueue.global().async {
-				doOnRequestPin(card)
-			}
-		}
-	}
-
-	func onEnterNewPin(error _: String?, reader _: Reader) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onEnterPuk(error _: String?, reader _: Reader) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onEnterCan(error _: String?, reader _: Reader) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onAuthenticationCompleted(authResult: AuthResult) {
-		if let doOnAuthenticationCompleted {
-			DispatchQueue.global().async {
-				doOnAuthenticationCompleted(authResult)
-			}
-		}
-	}
-
-	func onAuthenticationStartFailed(error _: String) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onChangePinCompleted(changePinResult _: ChangePinResult) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onStatus(workflowProgress _: WorkflowProgress) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onWrapperError(error _: AusweisApp2SDKWrapper.WrapperError) {
-		if let doOnError {
-			DispatchQueue.global().async {
-				doOnError()
-			}
-		}
-	}
-
-	func onBadState(error _: String) {
-		// The function is required by the protocol and will be implemented by the unittests.
-	}
-
-	func onInternalError(error _: String) {
-		// The function is required by the protocol and will be implemented by the unittests.
+		waitForExpectations(timeout: 10, handler: nil)
+		workflowController.stop()
 	}
 }

@@ -11,8 +11,8 @@ plugins {
 }
 
 ext {
-    ausweisapp_version = '2.6.1'
-    sdkwrapper_version = '2.6.1'
+    ausweisapp_version = '2.6.2'
+    sdkwrapper_version = '2.6.2'
     java_version = 21
 
     configureRename = { Project module, String suffix ->
@@ -51,8 +51,13 @@ subprojects { subproject ->
 
 sonarqube {
     properties {
+        def koverReport = project.layout.buildDirectory.file("reports/kover/report.xml").get().asFile
+        if (!koverReport.exists()) {
+            throw new GradleException("Kover report not found: $koverReport")
+        }
+
         property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.coverage.jacoco.xmlReportPaths", project.layout.buildDirectory.file("reports/kover/report.xml").get().asFile
+        property "sonar.coverage.jacoco.xmlReportPaths", koverReport
     }
 }
 

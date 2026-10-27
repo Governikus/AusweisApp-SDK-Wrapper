@@ -12,6 +12,8 @@ import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Accept
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Command
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.Message
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.RunAuth
+import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.RunChangePin
+import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.SetNewPin
 import com.governikus.ausweisapp.sdkwrapper.card.core.ausweisapp.protocol.SetPin
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -26,6 +28,8 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +43,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @RunWith(value = RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [28])
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class WorkflowControllerTest {
+class WorkflowControllerTestMocked {
     private var workflowController: WorkflowController? = null
     private var connection: MockSdkConnection? = null
 
@@ -363,6 +367,143 @@ class WorkflowControllerTest {
 
             assert(value = completed)
         }
+
+    @Test
+    fun testChangePin() =
+        runTest(timeout = 30000.milliseconds) {
+            assertNotNull(workflowController)
+            assertNotNull(connection)
+            val workflowController = workflowController!!
+            val connection = connection!!
+
+            val testPin = "123456".toCharArray()
+            val testNewPin = "654321".toCharArray()
+
+            connection.onCommandSend = { command ->
+                when (command) {
+                    is RunChangePin -> {
+                        assertNotNull(command)
+                        connection.receive(messageJson = "{\"msg\":\"CHANGE_PIN\"}")
+                    }
+
+                    is SetPin -> {
+                        assertEquals(testPin, command.value)
+                        connection.receive(
+                            messageJson =
+                                "{" +
+                                    "  \"msg\": \"ENTER_NEW_PIN\"," +
+                                    "  \"reader\":" +
+                                    "           {" +
+                                    "            \"name\": \"NFC\"," +
+                                    "            \"attached\": true," +
+                                    "            \"insertable\": true," +
+                                    "            \"keypad\": false," +
+                                    "            \"card\":" +
+                                    "                   {" +
+                                    "                    \"inoperative\": false," +
+                                    "                    \"deactivated\": false," +
+                                    "                    \"retryCounter\": 3" +
+                                    "                   }" +
+                                    "           }" +
+                                    "}",
+                        )
+                    }
+
+                    is SetNewPin -> {
+                        assertEquals(testNewPin, command.value)
+
+                        connection.receive(
+                            messageJson =
+                                "{" +
+                                    "  \"msg\": \"CHANGE_PIN\"," +
+                                    "  \"success\": true" +
+                                    "}",
+                        )
+                    }
+
+                    else -> {}
+                }
+            }
+
+            val completed =
+                suspendCoroutine<Boolean> {
+                    workflowController.registerCallbacks(
+                        callbacks =
+                            object : TestWorkflowCallbacks() {
+                                override fun onChangePinStarted() {
+                                    connection.receive(messageJson = "{\"msg\":\"INSERT_CARD\"}")
+                                }
+
+                                override fun onInsertCard(error: String?) {
+                                    assertNull(error)
+
+                                    connection.receive(
+                                        messageJson =
+                                            "{" +
+                                                "  \"msg\": \"ENTER_PIN\"," +
+                                                "  \"reader\":" +
+                                                "           {" +
+                                                "            \"name\": \"NFC\"," +
+                                                "            \"attached\": true," +
+                                                "            \"insertable\": true," +
+                                                "            \"keypad\": false," +
+                                                "            \"card\":" +
+                                                "                   {" +
+                                                "                    \"inoperative\": false," +
+                                                "                    \"deactivated\": false," +
+                                                "                    \"retryCounter\": 3" +
+                                                "                   }" +
+                                                "           }" +
+                                                "}",
+                                    )
+                                }
+
+                                override fun onEnterPin(
+                                    error: String?,
+                                    reader: Reader,
+                                ) {
+                                    val card = reader.card
+                                    if (card != null) {
+                                        assertEquals(3, card.pinRetryCounter)
+                                        assertEquals(false, card.inoperative)
+                                        assertEquals(false, card.deactivated)
+
+                                        workflowController.setPin(pin = testPin)
+                                    } else {
+                                        assert(value = false)
+                                    }
+                                }
+
+                                override fun onEnterNewPin(
+                                    error: String?,
+                                    reader: Reader,
+                                ) {
+                                    val card = reader.card
+                                    if (card != null) {
+                                        assertEquals(3, card.pinRetryCounter)
+                                        assertEquals(false, card.inoperative)
+                                        assertEquals(false, card.deactivated)
+
+                                        workflowController.setNewPin(newPin = testNewPin)
+                                    } else {
+                                        assert(value = false)
+                                    }
+                                }
+
+                                override fun onChangePinCompleted(changePinResult: ChangePinResult) {
+                                    assertTrue(changePinResult.success)
+                                    it.resume(value = true)
+                                }
+                            },
+                    )
+                    workflowController.start(context = RuntimeEnvironment.getApplication())
+                    workflowController.startChangePin()
+
+                    advanceUntilIdle()
+                }
+
+            assert(value = completed)
+        }
 }
 
 internal class MockSdkConnection : WorkflowController.SdkConnection {
@@ -409,66 +550,4 @@ internal class MockSdkConnection : WorkflowController.SdkConnection {
             }
         }
     }
-}
-
-internal open class TestWorkflowCallbacks : WorkflowCallbacks {
-    override fun onStarted() {}
-
-    override fun onAuthenticationStarted() {}
-
-    override fun onAuthenticationStartFailed(error: String) {}
-
-    override fun onChangePinStarted() {}
-
-    override fun onAccessRights(
-        error: String?,
-        accessRights: AccessRights?,
-    ) {}
-
-    override fun onCertificate(certificateDescription: CertificateDescription) {}
-
-    override fun onInsertCard(error: String?) {}
-
-    override fun onReader(reader: Reader?) {}
-
-    override fun onReaderList(readers: List<Reader>?) {}
-
-    override fun onEnterPin(
-        error: String?,
-        reader: Reader,
-    ) {}
-
-    override fun onEnterNewPin(
-        error: String?,
-        reader: Reader,
-    ) {}
-
-    override fun onEnterPuk(
-        error: String?,
-        reader: Reader,
-    ) {}
-
-    override fun onEnterCan(
-        error: String?,
-        reader: Reader,
-    ) {}
-
-    override fun onAuthenticationCompleted(authResult: AuthResult) {}
-
-    override fun onChangePinCompleted(changePinResult: ChangePinResult) {}
-
-    override fun onWrapperError(error: WrapperError) {}
-
-    override fun onStatus(workflowProgress: WorkflowProgress) {}
-
-    override fun onInfo(
-        versionInfo: VersionInfo,
-        connectionInfo: ConnectionInfo,
-    ) {}
-
-    override fun onBadState(error: String) {}
-
-    override fun onInternalError(error: String) {}
-
-    override fun onPause(cause: Cause) {}
 }
