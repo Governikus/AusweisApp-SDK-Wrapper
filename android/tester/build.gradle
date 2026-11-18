@@ -118,9 +118,9 @@ dependencies {
     implementation 'com.squareup.moshi:moshi:1.15.2'
     implementation 'com.squareup.moshi:moshi-kotlin:1.15.2'
 
-    implementation 'io.ktor:ktor-server-core:3.6.0'
-    implementation 'io.ktor:ktor-server-netty:3.6.0'
-    implementation 'io.ktor:ktor-server-websockets:3.6.0'
+    implementation 'io.ktor:ktor-server-core:3.6.1'
+    implementation 'io.ktor:ktor-server-netty:3.6.1'
+    implementation 'io.ktor:ktor-server-websockets:3.6.1'
 
     testImplementation 'junit:junit:4.13.2'
 

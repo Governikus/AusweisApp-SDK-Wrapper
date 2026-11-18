@@ -11,8 +11,8 @@ plugins {
 }
 
 ext {
-    ausweisapp_version = '2.6.2'
-    sdkwrapper_version = '2.6.2'
+    ausweisapp_version = '2.6.3'
+    sdkwrapper_version = '2.6.3'
     java_version = 21
 
     configureRename = { Project module, String suffix ->
